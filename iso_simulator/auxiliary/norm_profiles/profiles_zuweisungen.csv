@@ -1,0 +1,98 @@
+hk_geb;uk_geb;typ_18599;nr_18599;typ_sia2024;nr_sia2024;gain_per_person_18599;gain_per_person_sia2024;appliance_gains_tief_18599;appliance_gains_mittel_18599;appliance_gains_hoch_18599;appliance_gains_ziel_sia2024;appliance_gains_standard_sia2024;appliance_gains_bestand_sia2024;usage_start_18599;usage_end_18599;usage_start_sia2024;usage_end_sia2024
+Büro-, Verwaltungs- oder Amtsgebäude;Parlaments- oder Gerichtsgebäude;Gruppenbüro (2 bis 6 Arbeitsplätze);2;Einzel-, Gruppenbüro;3.1;70;70;2.8;7.1;15;3;7;15;7;18;7;18
+Büro-, Verwaltungs- oder Amtsgebäude;Öffentliches Verwaltungs- oder Ämtergebäude, Rathaus;Gruppenbüro (2 bis 6 Arbeitsplätze);2;Einzel-, Gruppenbüro;3.1;70;70;2.8;7.1;15;3;7;15;7;18;7;18
+Büro-, Verwaltungs- oder Amtsgebäude;Bürogebäude;Gruppenbüro (2 bis 6 Arbeitsplätze);2;Einzel-, Gruppenbüro;3.1;70;70;2.8;7.1;15;3;7;15;7;18;7;18
+Büro-, Verwaltungs- oder Amtsgebäude;Rundfunk- oder Fernsehanstalt;Gruppenbüro (2 bis 6 Arbeitsplätze);2;Einzel-, Gruppenbüro;3.1;70;70;2.8;7.1;15;3;7;15;7;18;7;18
+Büro-, Verwaltungs- oder Amtsgebäude;Polizeipräsidium oder -station, Bürogebäude sonstiger Bereitschaftsdienste;Großraumbüro (ab 7 Arbeitsplätze);3;Großraumbüro;3.2;70;70;4.2;10;18.8;4;10;19;7;18;7;18
+Gebäude für Forschung und Hochschullehre;Hörsaalgebäude;Großraumbüro (ab 7 Arbeitsplätze);3;Hörsaal;4.4;70;70;4.2;10;18.8;2;4;6;7;18;7;18
+Gebäude für Forschung und Hochschullehre;Verwaltungs- oder Seminargebäude;Gruppenbüro (2 bis 6 Arbeitsplätze);2;Großraumbüro;3.2;70;70;2.8;7.1;15;4;10;19;7;18;7;18
+Gebäude für Forschung und Hochschullehre;Institutsgebäude für Forschung und Lehre (Labor mit geringen Anforderungen an die Raumlufttechnik, z.B. Medizin, Informatik);Labor;36;Laborraum;9.3;90;70;6;18;63;15;20;25;7;18;7;18
+Gebäude für Forschung und Hochschullehre;Institutsgebäude für Forschung und Lehre (Labor mit hohen Anforderungen an die Raumlufttechnik, z.B. Chemie, Tierforschung);Labor;36;Laborraum;9.3;90;70;6;18;63;15;20;25;7;18;7;18
+Gebäude für Forschung und Hochschullehre;Bürogebäude von Forschungsanstalten ohne Lehre;Gruppenbüro (2 bis 6 Arbeitsplätze);2;Einzel-, Gruppenbüro;3.1;70;70;2.8;7.1;15;3;7;15;7;18;7;18
+Gebäude für Forschung und Hochschullehre;Laborgebäude von Forschungsanstalten und Unternehmen (Labor mit geringen Anforderungen an die Raumlufttechnik);Labor;36;Laborraum;9.3;90;70;6;18;63;15;20;25;7;18;7;18
+Gebäude für Forschung und Hochschullehre;Laborgebäude von Forschungsanstalten und Unternehmen (Labor mit hohen Anforderungen an die Raumlufttechnik);Labor;36;Laborraum;9.3;90;70;6;18;63;15;20;25;7;18;7;18
+Gebäude für Gesundheit und Pflege;Hochschulklinik;Bettenzimmer (Zweibettzimmer im Krankenhaus, Pflegeheim);10;Bettenzimmer;8.1;70;70;2;4;6;2;4;6;0;24;0;24
+Gebäude für Gesundheit und Pflege;Krankenhaus;Bettenzimmer (Zweibettzimmer im Krankenhaus, Pflegeheim);10;Bettenzimmer;8.1;70;70;2;4;6;2;4;6;0;24;0;24
+Gebäude für Gesundheit und Pflege;Gebäude für teilstationäre Versorgung (z.B. Tagesklinik, Geburtshaus);Bettenzimmer (Zweibettzimmer im Krankenhaus, Pflegeheim);10;Bettenzimmer;8.1;70;70;2;4;6;2;4;6;0;24;0;24
+Gebäude für Gesundheit und Pflege;Rehabilitation;Fitnessraum (Untersuchungs- und Behandlungsräume);37;Fitnessraum;11.2;70;120;4;7;10;1;2;3;7;18;7;23
+Gebäude für Gesundheit und Pflege;Kur und Genesung;Bettenzimmer (Zweibettzimmer im Krankenhaus, Pflegeheim);10;Bettenzimmer;8.1;70;70;2;4;6;2;4;6;0;24;0;24
+Gebäude für Gesundheit und Pflege;Medizinisches Versorgungszentrum, Ärztehaus;Arztpraxen und theratpeutische Praxen;40;Behandlungsraum;8.3;70;70;3;5;7;10;20;30;8;18;7;18
+Gebäude für Gesundheit und Pflege;Arztpraxis;Arztpraxen und theratpeutische Praxen;40;Behandlungsraum;8.3;70;70;3;5;7;10;20;30;8;18;7;18
+Gebäude für Gesundheit und Pflege;Notfallpraxis;Arztpraxen und theratpeutische Praxen;40;Behandlungsraum;8.3;70;70;3;5;7;10;20;30;8;18;7;18
+Gebäude für Gesundheit und Pflege;Altenheim/Altenpflegeheim (ohne eigene Haushaltsführung der Bewohner/innen);Bettenzimmer (Zweibettzimmer im Krankenhaus, Pflegeheim);10;Bettenzimmer;8.1;70;70;2;4;6;2;4;6;0;24;0;24
+Gebäude für Gesundheit und Pflege;Pflegeheim für Behinderte (ohne eigene Haushaltsführung der Bewohner/innen);Bettenzimmer (Zweibettzimmer im Krankenhaus, Pflegeheim);10;Bettenzimmer;8.1;70;70;2;4;6;2;4;6;0;24;0;24
+Gebäude für Gesundheit und Pflege;Psychiatrische Pflegeheim (ohne eigene Haushaltsführung der Bewohner/innen);Bettenzimmer (Zweibettzimmer im Krankenhaus, Pflegeheim);10;Bettenzimmer;8.1;70;70;2;4;6;2;4;6;0;24;0;24
+Gebäude für Gesundheit und Pflege;Tagespflegeeinrichtung;Bettenzimmer (Zweibettzimmer im Krankenhaus, Pflegeheim);10;Bettenzimmer;8.1;70;70;2;4;6;2;4;6;0;24;0;24
+Gebäude für Gesundheit und Pflege;Hospiz;Bettenzimmer (Zweibettzimmer im Krankenhaus, Pflegeheim);10;Bettenzimmer;8.1;70;70;2;4;6;2;4;6;0;24;0;24
+Schule, Kindertagesstätte und sonstiges Betreuungsgebäude;Schule, allgemein;Klassenzimmer (Schule), Gruppenraum (Kindergarten);8;Schulzimmer;4.1;60;70;2;4;6;2;4;6;8;15;7;18
+Schule, Kindertagesstätte und sonstiges Betreuungsgebäude;Ganztagesschule;Klassenzimmer (Schule), Gruppenraum (Kindergarten);8;Schulzimmer;4.1;60;70;2;4;6;2;4;6;8;15;7;18
+Schule, Kindertagesstätte und sonstiges Betreuungsgebäude;Internatsschule;Klassenzimmer (Schule), Gruppenraum (Kindergarten);8;Schulzimmer;4.1;60;70;2;4;6;2;4;6;8;15;7;18
+Schule, Kindertagesstätte und sonstiges Betreuungsgebäude;Förder-, Sonderschule;Klassenzimmer (Schule), Gruppenraum (Kindergarten);8;Schulzimmer;4.1;60;70;2;4;6;2;4;6;8;15;7;18
+Schule, Kindertagesstätte und sonstiges Betreuungsgebäude;Berufsbildende Schule (gewerblich, wirtschaftlich);Klassenzimmer (Schule), Gruppenraum (Kindergarten);8;Schulzimmer;4.1;60;70;2;4;6;2;4;6;8;15;7;18
+Schule, Kindertagesstätte und sonstiges Betreuungsgebäude;Berufsbildende Schule (mit höherer technischer Ausstattung, z.B. Werkstätten);Klassenzimmer (Schule), Gruppenraum (Kindergarten);8;Schulzimmer;4.1;60;70;2;4;6;2;4;6;8;15;7;18
+Schule, Kindertagesstätte und sonstiges Betreuungsgebäude;Berufsakademie, Berufskolleg;Klassenzimmer (Schule), Gruppenraum (Kindergarten);8;Schulzimmer;4.1;60;70;2;4;6;2;4;6;8;15;7;18
+Schule, Kindertagesstätte und sonstiges Betreuungsgebäude;Bildungszentrum;Klassenzimmer (Schule), Gruppenraum (Kindergarten);8;Schulzimmer;4.1;60;70;2;4;6;2;4;6;8;15;7;18
+Schule, Kindertagesstätte und sonstiges Betreuungsgebäude;Ausbildungsstätte;Klassenzimmer (Schule), Gruppenraum (Kindergarten);8;Schulzimmer;4.1;60;70;2;4;6;2;4;6;8;15;7;18
+Schule, Kindertagesstätte und sonstiges Betreuungsgebäude;Volkshochschule;Klassenzimmer (Schule), Gruppenraum (Kindergarten);8;Schulzimmer;4.1;60;70;2;4;6;2;4;6;8;15;7;18
+Schule, Kindertagesstätte und sonstiges Betreuungsgebäude;KiTa;Klassenzimmer (Schule), Gruppenraum (Kindergarten);8;Schulzimmer;4.1;60;70;2;4;6;2;4;6;8;15;7;18
+Schule, Kindertagesstätte und sonstiges Betreuungsgebäude;KiTa mit Küche;Klassenzimmer (Schule), Gruppenraum (Kindergarten);8;Schulzimmer;4.1;60;70;2;4;6;2;4;6;8;15;7;18
+Schule, Kindertagesstätte und sonstiges Betreuungsgebäude;Studentenhaus;Wohnen (MFH);43;Wohnen MFH;1.1;80;70;4.8;7.2;10.8;4;8;10;0;24;0;24
+Schule, Kindertagesstätte und sonstiges Betreuungsgebäude;Altentagesstätte;Bettenzimmer (Zweibettzimmer im Krankenhaus, Pflegeheim);10;Bettenzimmer;8.1;70;70;2;4;6;2;4;6;0;24;0;24
+Schule, Kindertagesstätte und sonstiges Betreuungsgebäude;Jugendzentrum;Besprechung/Sitzungszimmer/Seminar;4;Sitzungszimmer;3.3;70;70;1;2;3;1;2;3;7;18;9;17
+Gebäude für Kultur und Freizeit;Bibliothek/Archiv (einfach, z.B. Stadtbücherei);Bibliothek - Freihandbereich;29;Bibliothek;4.3;70;70;0;0;0;1;2;3;8;20;7;18
+Gebäude für Kultur und Freizeit;Bibliothek/Archiv (höher technisiert, z.B. Unibibliothek);Bibliothek - Lesesaal;28;Bibliothek;4.3;70;70;0;0;0;1;2;3;8;20;7;18
+Gebäude für Kultur und Freizeit;Ausstellungsgebäude (Museen, Galerien);Ausstellungsräume, Museum;27;Ausstellungshalle;7.3;70;70;0;0;0;3;7;15;10;18;7;23
+Gebäude für Kultur und Freizeit;Oper, Theater und Veranstaltungshalle, Kino, Konferenzzentrum;Bühne (Theater, Veranstaltungsbauten);25;Vorstellungsraum;7.1;70;70;0;0;0;1;2;3;13;23;12;24
+Gebäude für Kultur und Freizeit;Freizeit-, Gemeinschafts-, Bürgerhaus;Besprechung/Sitzungszimmer/Seminar;4;Sitzungszimmer;3.3;70;70;1;2;3;1;2;3;7;18;9;17
+Gebäude für Kultur und Freizeit;Spielkasino, -bank, -halle;Besprechung/Sitzungszimmer/Seminar;4;Ausstellungshalle;7.3;70;70;1;2;3;3;7;15;7;18;7;23
+Sportgebäude;Einfeldhalle;Turnhalle (ohne Zuschauerbereich);31;Turnhalle;11.1;125;120;0;0;0;0;0;0;8;23;7;23
+Sportgebäude;Mehrfeldhalle;Turnhalle (ohne Zuschauerbereich);31;Turnhalle;11.1;125;120;0;0;0;0;0;0;8;23;7;23
+Sportgebäude;Gymnastikhalle;Turnhalle (ohne Zuschauerbereich);31;Turnhalle;11.1;125;120;0;0;0;0;0;0;8;23;7;23
+Sportgebäude;Sporthalle mit Mehrzwecknutzung;Turnhalle (ohne Zuschauerbereich);31;Mehrzweckhalle;7.2;125;70;0;0;0;2;4;6;8;23;7;23
+Sportgebäude;Hallenbad;Turnhalle (ohne Zuschauerbereich);31;Schwimmhalle;11.3;125;70;0;0;0;1;2;3;8;23;7;23
+Sportgebäude;Spaß- und Freizeitbad;Turnhalle (ohne Zuschauerbereich);31;Schwimmhalle;11.3;125;70;0;0;0;1;2;3;8;23;7;23
+Sportgebäude;Thermalbad;Turnhalle (ohne Zuschauerbereich);31;Schwimmhalle;11.3;125;70;0;0;0;1;2;3;8;23;7;23
+Sportgebäude;Hallenbad mit Freibadanlage;Turnhalle (ohne Zuschauerbereich);31;Schwimmhalle;11.3;125;70;0;0;0;1;2;3;8;23;7;23
+Sportgebäude;Kegelbahn/Bowling;Turnhalle (ohne Zuschauerbereich);31;Turnhalle;11.1;125;120;0;0;0;0;0;0;8;23;7;23
+Sportgebäude;Schießstand;Turnhalle (ohne Zuschauerbereich);31;Lagerhalle;10.1;125;90;0;0;0;0;0;0;8;23;0;24
+Sportgebäude;Raumschießanlage;Turnhalle (ohne Zuschauerbereich);31;Lagerhalle;10.1;125;90;0;0;0;0;0;0;8;23;0;24
+Sportgebäude;Reithalle;Lagerhallen, Logistikhallen;41;Lagerhalle;10.1;70;90;0;0;0;0;0;0;0;24;0;24
+Sportgebäude;Eissporthalle;Lagerhallen, Logistikhallen;41;Lagerhalle;10.1;70;90;0;0;0;0;0;0;0;24;0;24
+Sportgebäude;Tennishalle;Turnhalle (ohne Zuschauerbereich);31;Turnhalle;11.1;125;120;0;0;0;0;0;0;8;23;7;23
+Sportgebäude;Fitnessstudio;Fitnessraum;35;Fitnessraum;11.2;110;120;1;2;3;1;2;3;8;23;7;23
+Sportgebäude;Gebäude für Sportaußenanlage (Tribünen-, Umkleidegebäude);Sonstige Aufenthaltsräume (Garderobe, Teeküche, Lager, Archiv, Flur);18;Garderobe, Dusche;12.8;70;70;0;0;0;0;0;0;7;18;7;18
+Beherbergungs- oder Unterbringungsgebäude, Gastronomie- oder Verpflegungsgebäude;Herberge, Ferienheim, Ferienhaus, Hotel/Pension einfach;Hotelzimmer (Doppelzimmer);11;Hotelzimmer;2.1;70;70;2;4;6;4;8;10;21;8;17;12
+Beherbergungs- oder Unterbringungsgebäude, Gastronomie- oder Verpflegungsgebäude;Sterne-Hotel;Hotelzimmer (Doppelzimmer);11;Hotelzimmer;2.1;70;70;2;4;6;4;8;10;21;8;17;12
+Beherbergungs- oder Unterbringungsgebäude, Gastronomie- oder Verpflegungsgebäude;Ausschankwirtschaft;Kantine (Restaurant);13;Restaurant;6.1;70;70;1;2;3;1;2;3;10;24;8;24
+Beherbergungs- oder Unterbringungsgebäude, Gastronomie- oder Verpflegungsgebäude;Speisegaststätte (einfach);Kantine (Restaurant);13;Restaurant;6.1;70;70;1;2;3;1;2;3;10;24;8;24
+Beherbergungs- oder Unterbringungsgebäude, Gastronomie- oder Verpflegungsgebäude;Restaurant (gehoben);Kantine (Restaurant);13;Restaurant;6.1;70;70;1;2;3;1;2;3;10;24;8;24
+Beherbergungs- oder Unterbringungsgebäude, Gastronomie- oder Verpflegungsgebäude;Mensa/Kantine;Kantine (Kantine);12;Selbstbedienungsrestaurant;6.2;70;70;1;2;3;1;2;3;8;15;8;15
+Beherbergungs- oder Unterbringungsgebäude, Gastronomie- oder Verpflegungsgebäude;Gemeinschaftsunterkunft (z.B. Flüchtlingsheim, Kaserne, Kloster);Wohnen (MFH);43;Wohnen MFH;1.1;80;70;4.8;7.2;10.8;4;8;10;0;24;0;24
+Beherbergungs- oder Unterbringungsgebäude, Gastronomie- oder Verpflegungsgebäude;Sonstige Gebäudefunktion;Sonstige Aufenthaltsräume (Pausenraum, Wartezimmer);17;Nebenraum;12.4;70;70;1;2;3;0;0;0;7;18;6;19
+Produktions-, Werkstatt-, Lager- oder Betriebsgebäude;Gebäude für gewerbliche Produktion und Verarbeitung (z.B. Brauerei, Molkerei, Schlachthof);Gewerbliche und industrielle Hallen (mittelschwere Arbeit, überw. stehende Tätigkeit);22.2;Produktion (grobe Arbeit);9.1;100;90;25;35;45;5;10;15;7;16;0;24
+Produktions-, Werkstatt-, Lager- oder Betriebsgebäude;Gebäude für industrielle Produktion und Verarbeitung (z.B. Chemie, Metall, Textilien, Lebensmittel, Holz);Gewerbliche und industrielle Hallen (mittelschwere Arbeit, überw. stehende Tätigkeit);22.2;Produktion (grobe Arbeit);9.1;100;90;25;35;45;5;10;15;7;16;0;24
+Produktions-, Werkstatt-, Lager- oder Betriebsgebäude;Werkstattgebäude allgemein (z.B. von Handwerksbetrieben wie Klempner, Schlosser, Schreiner);Gewerbliche und industrielle Hallen (mittelschwere Arbeit, überw. stehende Tätigkeit);22.2;Produktion (grobe Arbeit);9.1;100;90;25;35;45;5;10;15;7;16;0;24
+Produktions-, Werkstatt-, Lager- oder Betriebsgebäude;Werkstattgebäude zur Wartung, Instandsetzung, Reparatur (von z.B. Kfz);Gewerbliche und industrielle Hallen (mittelschwere Arbeit, überw. stehende Tätigkeit);22.2;Produktion (grobe Arbeit);9.1;100;90;25;35;45;5;10;15;7;16;0;24
+Produktions-, Werkstatt-, Lager- oder Betriebsgebäude;Logistikimmobilie mit Toren bzw. Rampen;Lagerhallen, Logistikhallen;41;Lagerhalle;10.1;70;90;0;0;0;0;0;0;0;24;0;24
+Produktions-, Werkstatt-, Lager- oder Betriebsgebäude;Sonstiges Gebäude für Lagerung;Lagerhallen, Logistikhallen;41;Lagerhalle;10.1;70;90;0;0;0;0;0;0;0;24;0;24
+Produktions-, Werkstatt-, Lager- oder Betriebsgebäude;Feuerwehr, Rettungswache;Großraumbüro (ab 7 Arbeitsplätze);3;Großraumbüro;3.2;70;70;4.2;10;18.8;4;10;19;7;18;7;18
+Produktions-, Werkstatt-, Lager- oder Betriebsgebäude;Straßenmeisterei, Bauhof u.ä.;Lagerhallen, Logistikhallen;41;Lagerhalle;10.1;70;90;0;0;0;0;0;0;0;24;0;24
+Produktions-, Werkstatt-, Lager- oder Betriebsgebäude;Fuhrpark;Parkhaus (Büro- und Privatnutzung);32;Parkhaus;12.9;70;70;0;0;0;0.5;1;2;7;18;7;18
+Produktions-, Werkstatt-, Lager- oder Betriebsgebäude;zentrales Wirtschaftsgebäude (z.B. Zentralküche oder -wäscherei in Krankenhaus);Küche (Vorbereitung, Lager);15;Küche, Teeküche;12.5;80;70;20;30;40;30;40;50;10;23;7;18
+Produktions-, Werkstatt-, Lager- oder Betriebsgebäude;Rechenzentrum;Rechenzentrum;21;Serverraum;12.12;70;70;50;150;500;50;100;150;0;24;7;18
+Handelsgebäude;Handelsgebäude des Lebensmitteleinzel- und -großhandels;Einzelhandel/Kaufhaus (Lebensmittelabteilung mit Kühlprodukten);7;Lebensmittelverkauf;5.1;70;70;-12;-10;-8;-8;-10;-12;8;20;7;20
+Handelsgebäude;Handelsgebäude des Non-Food-Einzel- und -Großhandels;Einzelhandel/Kaufhaus;6;Fachgeschäft;5.2;70;70;1;2;3;1;2;3;8;20;7;20
+Handelsgebäude;Einkaufszentrum, Shopping-Mall;Schalterhalle;5;Schalterhalle, Empfang;3.4;70;70;1.5;4;9.5;1.5;4;9.5;7;18;7;18
+Handelsgebäude;Markthalle;Einzelhandel/Kaufhaus (Lebensmittelabteilung mit Kühlprodukten);7;Lebensmittelverkauf;5.1;70;70;-12;-10;-8;-8;-10;-12;8;20;7;20
+Handelsgebäude;Messehalle;Messe/Kongress;26;Ausstellungshalle;7.3;70;70;1;2;3;3;7;15;13;18;7;23
+Handelsgebäude;von Dienstleistern (z.B. Frisör, Kosmetik) genutztes Ladengebäude;Einzelhandel/Kaufhaus;6;Fachgeschäft;5.2;70;70;1;2;3;1;2;3;8;20;7;20
+Technikgebäude (Ver- und Entsorgung);Kraftwerk (Gesamtanlage für Energieversorgung);Großraumbüro (ab 7 Arbeitsplätze);3;Großraumbüro;3.2;70;70;4.2;10;18.8;4;10;19;7;18;7;18
+Technikgebäude (Ver- und Entsorgung);Gebäude für Lenkung, Steuerung, Überwachung und Nachrichtenübermittlung (z.B. Stellwerk, Leuchtturm);Großraumbüro (ab 7 Arbeitsplätze);3;Großraumbüro;3.2;70;70;4.2;10;18.8;4;10;19;7;18;7;18
+Technikgebäude (Ver- und Entsorgung);Gebäude für Energieversorgung (z.B. Fernheizwerk, Tankstelle);Großraumbüro (ab 7 Arbeitsplätze);3;Großraumbüro;3.2;70;70;4.2;10;18.8;4;10;19;7;18;7;18
+Technikgebäude (Ver- und Entsorgung);Gebäude für Wasserversorgung;Großraumbüro (ab 7 Arbeitsplätze);3;Großraumbüro;3.2;70;70;4.2;10;18.8;4;10;19;7;18;7;18
+Technikgebäude (Ver- und Entsorgung);Gebäude für Abwasserbehandlung;Großraumbüro (ab 7 Arbeitsplätze);3;Großraumbüro;3.2;70;70;4.2;10;18.8;4;10;19;7;18;7;18
+Technikgebäude (Ver- und Entsorgung);Gebäude für Abfallbehandlung;Großraumbüro (ab 7 Arbeitsplätze);3;Großraumbüro;3.2;70;70;4.2;10;18.8;4;10;19;7;18;7;18
+Verkehrsgebäude;Park-/Garagengebäude, Fahrradparkhaus;Parkhaus (öffentliche Nutzung);33;Parkhaus;12.9;70;70;0;0;0;0.5;1;2;9;24;7;18
+Verkehrsgebäude;Halle für sonstige Verkehrsmittel (z.B. für Flugzeuge, Schienenfahrzeuge);Verkehrsfläche (Flur);19;Verkehrsfläche;12.1;70;70;0;0;0;0;0;0;7;18;6;19
+Verkehrsgebäude;Gebäude zur Pflege von Fahrzeugen (z.B. Waschstraße);Lagerhallen, Logistikhallen;41;Lagerhalle;10.1;70;90;0;0;0;0;0;0;0;24;0;24
+Verkehrsgebäude;Empfangsgebäude (Bahnhof, Busbahnhof, Flughafen, Schiffsterminal);Schalterhalle;5;Schalterhalle, Empfang;3.4;70;70;1.5;4;9.5;1.5;4;9.5;7;18;7;18
