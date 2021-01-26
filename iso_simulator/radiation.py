@@ -1,14 +1,17 @@
-
 """
-Tool to Evaluate Radiation incident on a surface of a set angle
+Module includes methods to calculate sun position, solar gains, illuminance and determine the nearest weather station of a building.
 
 
 Portions of this software are copyright of their respective authors and released under the MIT license:
 RC_BuildingSimulator, Copyright 2016 Architecture and Building Systems, ETH Zurich
+
+author: "Simon Knoll, Julian Bischof, Michael Hörner "
+copyright: "Copyright 2021, Institut Wohnen und Umwelt"
+license: "MIT"
+
 """
-__author__ = "Simon Knoll"
-__copyright__ = "Copyright 2020, Institut Wohnen und Umwelt"
-__credits__ = "Julian Bischof, Michael Hörner"
+__author__ = "Simon Knoll, Julian Bischof, Michael Hörner "
+__copyright__ = "Copyright 2021, Institut Wohnen und Umwelt"
 __license__ = "MIT"
 
 
@@ -20,11 +23,16 @@ import math
 import datetime
 from geopy.distance import geodesic
 
-
        
 
 class Location(object):
-    """Set the Location of the Simulation with an Energy Plus Weather File"""
+    """
+    Set the Location of the Simulation with an Energy Plus Weather File
+    
+    Methods:
+        getEPWFile: Function finds the epw file depending on building location
+        calc_sun_position: Calculates the sun position for a specific hour and location
+    """
 
     def __init__(self, epwfile_path):
 
@@ -78,17 +86,14 @@ class Location(object):
         # Distance 
         distance = distance = weatherfiles_stations.loc[weatherfiles_stations['distance'].idxmin(), 'distance']
         
-        # Year Min/Max
-        min_max_years = weatherfiles_stations.loc[weatherfiles_stations['distance'].idxmin(), ['Min', 'Max']].tolist()
-        
-        
-        return epw_filename, coordinates_station, distance, min_max_years 
+                
+        return epw_filename, coordinates_station, distance
     
                  
     
     def calc_sun_position(self, latitude_deg, longitude_deg, year, hoy):
         """
-        Calculates the Sun Position for a specific hour and location
+        Calculates the sun position for a specific hour and location
 
         :param latitude_deg: Geographical Latitude in Degrees
         :type latitude_deg: float
@@ -152,7 +157,13 @@ class Location(object):
 
 
 class Window(object):
-    """docstring for Window"""
+    """
+    Methods:
+        calc_solar_gains: Calculates the solar gains in the building zone through the set window
+        calc_illuminance: Calculates the illuminance in the building zone through the set window
+        calc_direct_solar_factor: Calculates the cosine of the angle of incidence on the window 
+        calc_diffuse_solar_factor: Calculates the proportion of diffuse radiation
+    """
 
     def __init__(self, azimuth_tilt, alititude_tilt = 90, 
                  glass_solar_transmittance = 0.7,
@@ -169,7 +180,7 @@ class Window(object):
 
     def calc_solar_gains(self, sun_altitude, sun_azimuth, normal_direct_radiation, horizontal_diffuse_radiation, t_air, hour):
         """
-        Calculates the Solar Gains in the building zone through the set Window
+        Calculates the solar gains in the building zone through the set window
 
         :param sun_altitude: Altitude Angle of the Sun in Degrees
         :type sun_altitude: float
@@ -224,7 +235,7 @@ class Window(object):
 
     def calc_illuminance(self, sun_altitude, sun_azimuth, normal_direct_illuminance, horizontal_diffuse_illuminance):
         """
-        Calculates the Illuminance in the building zone through the set Window
+        Calculates the illuminance in the building zone through the set window
 
         :param sun_altitude: Altitude Angle of the Sun in Degrees
         :type sun_altitude: float
@@ -274,7 +285,9 @@ class Window(object):
         return direct_factor
 
     def calc_diffuse_solar_factor(self):
-        """Calculates the proportion of diffuse radiation"""
+        """
+        Calculates the proportion of diffuse radiation
+        """
         # Proportion of incident light on the window surface
         return (1 + math.cos(self.alititude_tilt_rad)) / 2
 

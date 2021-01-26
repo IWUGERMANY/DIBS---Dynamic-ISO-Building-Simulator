@@ -1,16 +1,31 @@
 """
-Physics required to calculate sensible space heating and space cooling loads, and space lighting loads
-DIN EN ISO 13970:2008
+Physics required to calculate sensible space heating and space cooling loads, and space lighting loads (DIN EN ISO 13970:2008)
 
 The equations presented here is this code are derived from ISO 13790 Annex C, Methods are listed in order of apperance in the Annex 
 
-Daylighting is based on methods in 
-    Szokolay, S.V. (1980): Environmental Science Handbook vor architects and builders. Unknown Edition, The Construction Press, Lancaster/London/New York, ISBN: 0-86095-813-2, p. 105ff.
-    respectively
-    Szokolay, S.V. (2008): Introduction to Architectural Science. The Basis of Sustainable Design. 2nd Edition, Elsevier/Architectural Press, Oxford, ISBN: 978-0-7506-8704-1, p. 154ff.
+
+Portions of this software are copyright of their respective authors and released under the MIT license:
+RC_BuildingSimulator, Copyright 2016 Architecture and Building Systems, ETH Zurich
+
+author: "Simon Knoll, Julian Bischof, Michael Hörner "
+copyright: "Copyright 2021, Institut Wohnen und Umwelt"
+license: "MIT"
+
+"""
+__author__ = "Simon Knoll, Julian Bischof, Michael Hörner "
+__copyright__ = "Copyright 2021, Institut Wohnen und Umwelt"
+__license__ = "MIT"
+
+
+import supply_system
+import emission_system
+
+
+class Building(object):
+    """
+    Sets the parameters of the building.
     
-    
-INPUT PARAMETER DEFINITION 
+    INPUT PARAMETER DEFINITION 
     scr_gebaeude_id: Building Screening-ID
     plz: Zipcode of building location
     hk_geb: Usage type (main category)
@@ -26,12 +41,14 @@ INPUT PARAMETER DEFINITION
     net_room_area: Area of all floor areas from usable rooms including all floor plan levels of the building (Refers to "Netto-Raumfläche", DIN 277-1:2016-01)
     base_area: Area for the calculation of transmission heat losses to the soil. Also used to calculate the building's volume.
     energy_ref_area: Energy reference area of the building   
-    building_height: Mean hight of the building [m]
+    building_height: Mean height of the building [m]
     lighting_load: Lighting Load [W/m2] 
     lighting_control: Lux threshold at which the lights turn on [Lx]
-    glass_solar_transmittance: Amount of solar radiation passing through the window (g-value)
-    glass_solar_shading_transmittance: Amount of solar radiation passing through the window with active shading devices
-    glass_light_transmittance: Amount of solar illuminance passing through the window
+    lighting_utilisation_factor: A factor that determines how much natural solar lumminace is effectively utilised in the space
+    lighting_maintenance_factor: A factor based on how dirty the windows area
+    glass_solar_transmittance: Solar radiation passing through the window (g-value)
+    glass_solar_shading_transmittance: Solar radiation passing through the window with active shading devices
+    glass_light_transmittance: Solar illuminance passing through the window
     u_windows: U value of glazed surfaces [W/m2K]
     u_walls: U value of external walls  [W/m2K]
     u_roof: U value of the roof [W/m2K]
@@ -41,7 +58,7 @@ INPUT PARAMETER DEFINITION
     ach_inf: Air changes per hour through infiltration [Air Changes Per Hour] 
     ach_win: Air changes per hour through opened windows [Air Changes Per Hour]
     ach_vent: Air changes per hour through ventilation [Air Changes Per Hour]
-    ventilation_efficiency: The efficiency of the heat recovery system for ventilation. Set to 0 if there is no heat recovery 
+    ventilation_efficiency: Efficiency of the heat recovery system for ventilation. Set to 0 if there is no heat recovery 
     night_flushing_flow: Air changes per hour through night flushing [Air Changes Per Hour]                                                    
     thermal_capacitance: Thermal capacitance of the building [J/m2K]
     t_set_heating : Thermal heating set point [C]
@@ -54,7 +71,7 @@ INPUT PARAMETER DEFINITION
     cooling_emission_system: How the cooling energy is distributed to the building
 
 
-VARIABLE DEFINITION
+    VARIABLE DEFINITION
 
     internal_gains: Internal Heat Gains [W]
     solar_gains: Solar Heat Gains after transmitting through the window [W]
@@ -84,25 +101,8 @@ VARIABLE DEFINITION
     h_tr_1: combined heat conductance, see function for definition [W/K]
     h_tr_2: combined heat conductance, see function for definition [W/K]
     h_tr_3: combined heat conductance, see function for definition [W/K]
-
-
-
-Portions of this software are copyright of their respective authors and released under the MIT license:
-RC_BuildingSimulator, Copyright 2016 Architecture and Building Systems, ETH Zurich
-"""
-__author__ = "Simon Knoll"
-__copyright__ = "Copyright 2020, Institut Wohnen und Umwelt"
-__credits__ = "Julian Bischof, Michael Hörner"
-__license__ = "MIT"
-
-
-import supply_system
-import emission_system
-
-
-class Building(object):
-    '''Sets the parameters of the building. '''
-
+    """
+    
     def __init__(self,
                  scr_gebaeude_id,
                  plz,
@@ -123,7 +123,7 @@ class Building(object):
                  lighting_load,
                  lighting_control,
                  lighting_utilisation_factor,
-                 lighting_maintenance_factor,
+                     lighting_maintenance_factor,
                  glass_solar_transmittance,
                  glass_solar_shading_transmittance,
                  glass_light_transmittance,
@@ -414,6 +414,12 @@ class Building(object):
     def solve_building_lighting(self, illuminance, occupancy):
         """
         Calculates the lighting demand for a set timestep
+        
+        Daylighting is based on methods in 
+        Szokolay, S.V. (1980): Environmental Science Handbook vor architects and builders. Unknown Edition, The Construction Press, Lancaster/London/New York, ISBN: 0-86095-813-2, p. 105ff.
+        respectively
+        Szokolay, S.V. (2008): Introduction to Architectural Science. The Basis of Sustainable Design. 2nd Edition, Elsevier/Architectural Press, Oxford, ISBN: 978-0-7506-8704-1, p. 154ff.
+
 
         :param illuminance: Illuminance transmitted through the window [Lumens]
         :type illuminance: float
@@ -424,8 +430,6 @@ class Building(object):
         :rtype: float
 
         """
-        # Cite: Environmental Science Handbook, SV Szokolay, Section 2.2.1.3
-        # also, this might be sped up by pre-calculating the constants, but idk. first check with profiler...
         lux = (illuminance * self.lighting_utilisation_factor *
                self.lighting_maintenance_factor) / self.net_room_area  # [Lux]
 
@@ -703,10 +707,6 @@ class Building(object):
         Note that this equation has diverged slightly from the standard 
         as the heating/cooling node can enter any node depending on the
         emission system selected
-        
-        OldRadiators/NewRadiators/ChilledBeams/AirConditioning: Heat is emitted to the air node
-        FloorHeating: Heat is emitted to the surface node
-        TABS: Heat is emitted to the thermal mass node
         """
 
         # Calculates the heat flows to various points of the building based on the breakdown in section C.2, formulas C.1-C.3

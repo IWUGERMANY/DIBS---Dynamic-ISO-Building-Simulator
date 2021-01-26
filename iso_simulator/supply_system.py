@@ -7,14 +7,16 @@ TODO: Have a look at CEA calculation methodology
 https://github.com/architecture-building-systems/CEAforArcGIS/blob/master/cea/technologies/heatpumps.py
 
 
-
-
 Portions of this software are copyright of their respective authors and released under the MIT license:
 RC_BuildingSimulator, Copyright 2016 Architecture and Building Systems, ETH Zurich
+
+author: "Simon Knoll, Julian Bischof, Michael Hörner "
+copyright: "Copyright 2021, Institut Wohnen und Umwelt"
+license: "MIT"
+
 """
-__author__ = "Simon Knoll"
-__copyright__ = "Copyright 2020, Institut Wohnen und Umwelt"
-__credits__ = "Julian Bischof, Michael Hörner"
+__author__ = "Simon Knoll, Julian Bischof, Michael Hörner "
+__copyright__ = "Copyright 2021, Institut Wohnen und Umwelt"
 __license__ = "MIT"
 
 
@@ -65,10 +67,7 @@ class SupplySystemBase:
     
     
 ##############################################################################
-# Oil Boiler 
-#   Constant-temperature boiler (Standard)
-#   Low-temperature boiler (LowTemp)
-#   Condensing boiler (Condensing)
+# Oil Boilers 
 ##############################################################################    
 class OilBoilerStandardBefore86(SupplySystemBase):
     """
@@ -176,10 +175,7 @@ class OilBoilerCondensingImproved(SupplySystemBase):
 
 
 ##############################################################################
-# Gas Boiler
-#   Constant-temperature boiler (Standard)
-#   Low-temperature boiler (LowTemp)
-#   Condensing boiler (Condensing)
+# Gas Boilers
 ##############################################################################    
 class GasBoilerStandardBefore86(SupplySystemBase):
     """
@@ -482,10 +478,9 @@ class BiogasOilBoilerCondensingImproved(SupplySystemBase):
         system.electricity_out = 0
         return system       
     
+    
 ##############################################################################
-# Solid Fuel Boiler 
-#   Wood Chip fired
-#   Wood Pellet fired
+# Solid Fuel Boilers 
 ##############################################################################
 class WoodChipSolidFuelBoiler(SupplySystemBase):
     """
@@ -542,8 +537,6 @@ class CoalSolidFuelBoiler(SupplySystemBase):
     
 ##############################################################################
 # Furnaces
-#   Liquid Fuel Furnace
-#   Solid Fuel Furnace
 ##############################################################################    
 class SolidFuelLiquidFuelFurnace(SupplySystemBase):
     """
@@ -559,8 +552,6 @@ def calc_loads(self):
   
 ##############################################################################
 # Heat Pumps
-#   Air-water heat pump
-#   Ground-water heat pump
 ##############################################################################
 class HeatPumpAirSource(SupplySystemBase):
     """

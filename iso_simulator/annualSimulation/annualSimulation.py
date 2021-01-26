@@ -1,22 +1,25 @@
 """
 Dynamic ISO Building Simulator (DIBS)
 
-Portions of this software are copyright of their respective authors and released under the MIT license:
-RC_BuildingSimulator, Copyright 2016 Architecture and Building Systems, ETH Zurich
-
-
 HOW TO USE
 
 :: Install packages: pandas, numpy, namedlist and geopy 
 :: Simulate either 'Tiefenerhebung' or 'Breitenerhebung' 
-:: Specify in line 50 --> WhatToSimulate
+:: Specify in --> WhatToSimulate
 :: Run Simulation
 :: Results are stored in ./results/
 
+
+Portions of this software are copyright of their respective authors and released under the MIT license:
+RC_BuildingSimulator, Copyright 2016 Architecture and Building Systems, ETH Zurich
+
+author: "Simon Knoll, Julian Bischof, Michael Hörner "
+copyright: "Copyright 2021, Institut Wohnen und Umwelt"
+license: "MIT"
+
 """
-__author__ = "Simon Knoll"
-__copyright__ = "Copyright 2020, Institut Wohnen und Umwelt"
-__credits__ = "Julian Bischof, Michael Hörner"
+__author__ = "Simon Knoll, Julian Bischof, Michael Hörner "
+__copyright__ = "Copyright 2021, Institut Wohnen und Umwelt"
 __license__ = "MIT"
 
 
@@ -41,26 +44,14 @@ from radiation import Location
 from radiation import Window
 from auxiliary import scheduleReader
 from auxiliary import normReader
-from auxiliary import dataPreprocessingBE
-from auxiliary import dataPreprocessingTE
-
-
-
-## Specify Tiefenerhebung or Breitenerhebung
-WhatToSimulate = 'Tiefenerhebung'
-
-
-# Transformation of TE-Data/BE-Data to input DataFrame
-# See module dataPreprocessingTE or dataPreprocessingBE
-if WhatToSimulate == 'Tiefenerhebung':
-    building_data = dataPreprocessingTE.generateBuildingData()
-else:
-    building_data = dataPreprocessingBE.generateBuildingData()    
+ 
     
 # Create dictionary to store final DataFrames of the buildings
 dict_of_results = {}
 list_of_summary = []
   
+# Read data with all the buildings from csv file    
+building_data = pd.read_csv('SimulationData_Tiefenerhebung.csv', sep = ';', index_col = False, encoding = 'utf8') 
 
 # Create namedlist of building_data for further iterations
 def iterate_namedlist(building_data):
@@ -153,9 +144,6 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
 
     # Distance from weather station to the building
     distance = getEPWFile_list[2] 
-    # Minimum/Maximum year of the weather data
-    year_min = getEPWFile_list[3][0]
-    year_max = getEPWFile_list[3][1]
 
     # Extract coordinates of that weather station. Necessary for calc_sun_position()
     latitude_station = getEPWFile_list[1][0]      
@@ -402,6 +390,7 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
                                         'SolarGainsEastWindow': SolarGainsEastWindow_sum,
                                         'SolarGainsWestWindow': SolarGainsWestWindow_sum,
                                         'SolarGainsNorthWindow': SolarGainsNorthWindow_sum,
+                                        'Gebäudefunktion Hauptkategorie': i_gebaeudeparameter.hk_geb,
                                         'Gebäudefunktion Unterkategorie': i_gebaeudeparameter.uk_geb,
                                         'Profil SIA 2024': [schedule_name],
                                         'Profil 18599-10': [typ_norm],
@@ -415,7 +404,7 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     annualResults_summary.to_excel(r'./results/annualResults_summary.xlsx', index = False)
 
 
-# The function writes DataFrames of dict_of_results to the system (to_excel/to_csv)    
+# The function writes DataFrames of dict_of_results to the system (to_excel)    
 def save_dfs_dict(dictex):
     for key, val in dictex.items():
         val.to_excel(r'./results/{}.xlsx'.format(str(key)))
