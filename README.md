@@ -22,7 +22,7 @@ For further information see the [wiki](https://github.com/IWUGERMANY/DIBS---Dyna
 
 Dynamic ISO Building Simulator has been developed in context of the ENOB:DataNWG Forschungsdatenbank Nichtwohngebäude (www.datanwg.de) project at Institut Wohnen und Umwelt (IWU), Darmstadt.
 <p float="left">
-  <img src="doc/img/IWU_Logo.png" width="20%" /> 
+  <img src="doc/img/IWU_Logo.PNG" width="20%" /> 
 </p>  
 
 <b>Funding code:</b>  Fkz.: 03ET1315  
