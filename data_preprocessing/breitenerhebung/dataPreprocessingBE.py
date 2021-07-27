@@ -237,25 +237,25 @@ building_data['window_area_west'] = (building_data['Fen_ant']/100) * building_da
 # Dachfläche (roof_area)
 ##############################################################################
 # Map 'D_fl_be' from be_data_original to building_data as column 'roof_area'
-building_data['roof_area'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['D_fl_beheizt_be']) 
+building_data['roof_area'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['d_fl_be']) 
 
 
 # Netto-Raumfläche (net_room_area)
 ##############################################################################
-# Map 'NRF_2' from be_data_original to building_data as column 'net_room_area'
-building_data['net_room_area'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['NRF_2']) 
+# Map 'nrf_2' from be_data_original to building_data as column 'net_room_area'
+building_data['net_room_area'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['nrf_2']) 
 
 
 # Energiebezugsfläche (energy_ref_area)
 ##############################################################################
-# Map 'EBF' from be_data_original to building_data as column 'energy_ref_area'
-building_data['energy_ref_area'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['EBF']) 
+# Map 'ebf' from be_data_original to building_data as column 'energy_ref_area'
+building_data['energy_ref_area'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['ebf']) 
 
     
 # Fläche des unteren Gebäudeabschlusses (base_area)
 ##############################################################################
 # Map 'Mittlere Anzahl oberidrische Geschosse' from be_data_original to building_data as column 'Mittlere Anzahl oberidrische Geschosse'
-building_data['n_OG'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['n_OG']) 
+building_data['n_OG'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['n_og']) 
 # Calculate base_area
 building_data['base_area'] = building_data['energy_ref_area'] / (building_data['n_OG'] * 0.87)
 
@@ -271,8 +271,8 @@ building_data['building_height'] = building_data['scr_gebaeude_id'].map(be_data_
 # Create Subset for calculation of lighting_load 
 subset_lighting_load = building_data[['scr_gebaeude_id', 'typ_18599']]
 
-# Map 'qF1' (überw. Beleuchtungsart) from be_data_original to subset_lighting_load as column 'qF1'
-subset_lighting_load['qF1'] = subset_lighting_load['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qF1'])
+# Map 'qf1' (überw. Beleuchtungsart) from be_data_original to subset_lighting_load as column 'qf1'
+subset_lighting_load['qF1'] = subset_lighting_load['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qf1'])
 # Encode Labelling
 cleanup_beleuchtungsart = {'qF1':{
                                   1: 'Direkt (Licht fällt direkt auf den Arbeitsbereich)',                                           
@@ -281,7 +281,7 @@ cleanup_beleuchtungsart = {'qF1':{
 subset_lighting_load.replace(cleanup_beleuchtungsart, inplace = True)
 
 # Map 'qF1' (überw. Lampenart) from be_data_original to subset_lighting_load as column 'lampenart_be'
-subset_lighting_load['lampenart_be'] = subset_lighting_load['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['lampenart_be'])
+subset_lighting_load['lampenart_be'] = subset_lighting_load['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['lampenart'])
 # Encode Labelling
 cleanup_lampenart = {'lampenart_be':{
                                     1: 'Glüh- oder Halogenlampe',                                           
@@ -372,8 +372,8 @@ building_data['lighting_maintenance_factor'] = building_data.apply(set_lighting_
 
 # Energiedurchlassgrad der Verglasung (glass_solar_transmittance)
 ##############################################################################
-# Map 'Fen_glasart_1' from be_data_original as column 'glass_solar_transmittance' to building_data
-building_data['glass_solar_transmittance'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['Fen_glasart_1'])
+# Map 'fen_glasart_1' from be_data_original as column 'glass_solar_transmittance' to building_data
+building_data['glass_solar_transmittance'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['fen_glasart_1'])
 
 # 1: 1-S-Glas                                           
 # 2: 2-S-Glas
@@ -389,8 +389,8 @@ building_data.replace(cleanup_glass_solar_transmittance, inplace = True)
 
 # Energiedurchlassgrad der Verglasung bei aktiviertem Sonnenschutz (glass_solar_shading_transmittance)
 ##############################################################################
-# Map 'qD8' from be_data_original as column 'qD8' to building_data
-building_data['qD8'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qD8'])
+# Map 'qd8' from be_data_original as column 'qD8' to building_data
+building_data['qD8'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qd8'])
 
 # 1: 'Sonnenschutzverglasung',                                           
 # 2: 'Außenliegende variable Sonnenschutzvorrichtung (z.B. Lamellen-Raffstoren)', 
@@ -414,8 +414,8 @@ building_data['glass_solar_shading_transmittance'] = building_data['glass_solar_
 
 # Lichttransmissionsgrad der Verglasung (glass_light_transmittance)
 ##############################################################################
-# Map 'Fen_glasart_1' from be_data_original as column 'qD8' to building_data
-building_data['Fen_glasart_1'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['Fen_glasart_1'])
+# Map 'fen_glasart_1' from be_data_original as column 'qD8' to building_data
+building_data['Fen_glasart_1'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['fen_glasart_1'])
 
 # k_1 = 0.7 if no further information is available [See DIN V 18599-4:2018-09, p.39]
 building_data['k_1'] =  0.7
@@ -442,27 +442,27 @@ building_data['glass_light_transmittance'] = building_data['k_1'] * building_dat
 
 # U-Wert Fenster (u_windows)
 ##############################################################################
-building_data['u_windows'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['U_fen'])
+building_data['u_windows'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['u_fen'])
 
 
 # U-Wert Außenwände (u_walls)
 ##############################################################################
-building_data['u_walls'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['U_AW'])
+building_data['u_walls'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['u_aw'])
 
 
 # U-Wert Dach (u_roof)
 ##############################################################################
-building_data['u_roof'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['U_D'])
+building_data['u_roof'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['u_d_ges'])
 
 
 # U-Wert Bodenplatte/Kellerdecke (u_base)
 ##############################################################################
-building_data['u_base'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['U_K'])
+building_data['u_base'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['u_ug'])
 
 
 # Temperaturanpassungsfaktor unterer Gebäudeabschluss (temp_adj_base)
 ##############################################################################
-building_data['n_UG'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['n_UG'])
+building_data['n_UG'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['n_ug'])
 
 # Find corresponding case according to DIN V 4108-6:2003-06
 def fall_temp_adj_base(row):
@@ -550,7 +550,7 @@ building_data['bak_grob'] = building_data['scr_gebaeude_id'].map(be_data_origina
 # Min flow from DIN V 18599-10 in m³/hm², multiply by m²/m³ for air change rate
 building_data['ach_min'] = (building_data['V_min_18599'] * building_data['net_room_area']) / (building_data['net_room_area'] * (building_data['building_height']/building_data['n_OG']))
 
-building_data['qH1'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qH1'])
+building_data['qH1'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qh1'])
 cleanup_rlt_encode = {"qH1": {
                             1: 'Nein, Fensterlüftung',
                             2: 'Nein, nur dezentrale Anlage(n) vorhanden',
