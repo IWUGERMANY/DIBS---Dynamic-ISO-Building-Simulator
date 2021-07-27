@@ -715,7 +715,7 @@ building_data['t_set_cooling'] = building_data['typ_18599'].map(data_18599_10_4.
 
 # Nachtlüftung (night_flushing_flow)
 ##############################################################################
-building_data['night_flushing_flow'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qI1Av6'])
+building_data['night_flushing_flow'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['freie_kuehlung'])
 
 # Gebäude, ggf. zusätzlich, durch sommerliche Nachtlüftung passiv oder durch freie Kühlung gekühlt? 
 # 1: Ja, ausschließlich passive Kühlung durch sommerliche Nachtlüftung
@@ -926,7 +926,7 @@ building_data.replace(cleanup_cooling_supply_system_assignment, inplace = True)
 
 # Art der Wärmeübergabe (heating_emission_system)
 ##############################################################################
-building_data['heating_emission_system'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qG13'])
+building_data['heating_emission_system'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qg13'])
 
 # 1: Heizkörper
 # 2: Konvektoren
@@ -952,7 +952,7 @@ building_data['heating_emission_system'] = np.where(building_data['heating_suppl
 
 # Art der Kälteübergabe (cooling_emission_system)
 ##############################################################################
-building_data['cooling_emission_system'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qI11'])
+building_data['cooling_emission_system'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qi11'])
 
 # 1: Klimaanlage (raumlufttechnische Anlage)
 # 2: Ventilatorkonvektoren (z.B. in der Fensterbrüstung)
