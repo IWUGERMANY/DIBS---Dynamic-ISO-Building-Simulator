@@ -213,6 +213,15 @@ building_data['wall_area_ug'] = building_data['scr_gebaeude_id'].map(be_data_ori
 ##############################################################################
 # Map windows share and building area for each direction to building_data
 building_data['Fen_ant'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qd1'])
+# Encode Labelling
+cleanup_Fen_ant = {"Fen_ant": {'1': '100',                                           
+                               '2': '75',                                        
+                               '3': '50',                                               
+                               '4': '25',                       
+                               '5': '10',                                                 
+                               '6': '0'}}
+building_data.replace(cleanup_Fen_ant, inplace = True)
+
 building_data['geb_f_flaeche_n_iwu'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['geb_f_flaeche_n_iwu'])
 building_data['geb_f_flaeche_o_iwu'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['geb_f_flaeche_o_iwu'])
 building_data['geb_f_flaeche_s_iwu'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['geb_f_flaeche_s_iwu'])
