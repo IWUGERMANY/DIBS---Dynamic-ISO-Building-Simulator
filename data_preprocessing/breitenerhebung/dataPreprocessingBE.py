@@ -643,7 +643,7 @@ building_data['heat_recovery_efficiency'] = building_data.apply(find_heat_recove
 
 # Wärmespeicherfähigkeit (thermal_capacitance)
 ##############################################################################
-building_data['thermal_capacitance'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['AW_konstr_1']).astype(str)
+building_data['thermal_capacitance'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['aw_konstr_1']).astype(str)
 
 # 1,0: Massive Bauweise (z.B. Mauerwerk, Beton) / keine Angabe (weiß nicht)
 # 1,10: Massive Bauweise (z.B. Mauerwerk, Beton) / Einschalige, massive Bauweise mit leichten Baustoffen (z.B. Leicht- oder Porenbeton, Wärmedämmziegel)
@@ -664,24 +664,33 @@ building_data['thermal_capacitance'] = building_data['scr_gebaeude_id'].map(be_d
 
 # Seperated cleanup for better readability
 cleanup_thermal_capacitance_encode = {"thermal_capacitance": {
-                                                            '1,0': 'schwer',
-                                                            '1,10': 'mittel',
-                                                            '1,11': 'mittel',
-                                                            '1,20': 'schwer',
-                                                            '1,30': 'schwer',
-                                                            '1,40': 'schwer',
-                                                            '1,50': 'schwer',
-                                                            '2,0': 'leicht',
-                                                            '2,10': 'leicht',
-                                                            '2,20': 'leicht',
-                                                            '2,30': 'leicht',
-                                                            '3,0': 'mittel',
-                                                            '3,10': 'mittel',
-                                                            '3,20': 'mittel',
-                                                            '3,30': 'mittel',
-                                                            '3,40': 'mittel'}}
+                                                            '1': 'schwer',
+                                                            '2': 'leicht',
+                                                            '3': 'mittel'}}
 building_data.replace(cleanup_thermal_capacitance_encode, inplace = True)
 
+# =============================================================================
+# # detailed version, for consideration of primary (qB1) and secondary (qB2 - qB3) construction type. Not utilised, as DIBS so far only considers 'leicht', 'mittel' and 'schwer' if better data on thermal capacities was available, this could be enabled again!
+# cleanup_thermal_capacitance_encode = {"thermal_capacitance": {
+#                                                             '1,0': 'schwer',
+#                                                             '1,10': 'mittel',
+#                                                             '1,11': 'mittel',
+#                                                             '1,20': 'schwer',
+#                                                             '1,30': 'schwer',
+#                                                             '1,40': 'schwer',
+#                                                             '1,50': 'schwer',
+#                                                             '2,0': 'leicht',
+#                                                             '2,10': 'leicht',
+#                                                             '2,20': 'leicht',
+#                                                             '2,30': 'leicht',
+#                                                             '3,0': 'mittel',
+#                                                             '3,10': 'mittel',
+#                                                             '3,20': 'mittel',
+#                                                             '3,30': 'mittel',
+#                                                             '3,40': 'mittel'}}
+# building_data.replace(cleanup_thermal_capacitance_encode, inplace = True)
+# 
+# =============================================================================
 # See EN ISO 13790:2008-09, p. 81 
 cleanup_thermal_capacitance_assignment = {"thermal_capacitance": {
                                                               'schwer': 260000,
