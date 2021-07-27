@@ -1,5 +1,5 @@
 """
-Module serves for data generation from original BE-Data to a modified input dataset used as input in annualSimulation.py
+Module serves for data generation from original and imputated BE-Data to a modified input dataset used as input in annualSimulation.py
 
 
 Portions of this software are copyright of their respective authors and released under the MIT license:
