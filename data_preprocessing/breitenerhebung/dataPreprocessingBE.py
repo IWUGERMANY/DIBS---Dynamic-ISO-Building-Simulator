@@ -193,26 +193,26 @@ building_data['typ_18599'] = building_data['uk_geb'].map(profile_zuweisung_18599
 
 # Maximale Personenbelegung (max_occupancy)
 ##############################################################################
-# Map 'q25'(max. Personenbelegung) from be_data_original to building_data as column 'max_occupancy'
-building_data['max_occupancy'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['q25'])
+# Map 'q25_1'(max. Personenbelegung) from be_data_original to building_data as column 'max_occupancy'
+building_data['max_occupancy'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['q25_1'])
 
 
 # Oberirdische Außenwandfläche (wall_area_og)
 ##############################################################################
-# Map 'AW_fl' from be_data_original to building_data as column 'wall_area_og'
-building_data['wall_area_og'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['AW_fl'])
+# Map 'aw_fl' from be_data_original to building_data as column 'wall_area_og'
+building_data['wall_area_og'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['aw_fl'])
 
 
 # Unterirdische Außenwandfläche (wall_area_ug)
 ##############################################################################
-# Map 'unterAW_fl' from be_data_original to building_data as column 'wall_area_ug'
-building_data['wall_area_ug'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['unterAW_fl'])
+# Map 'unteraw_fl' from be_data_original to building_data as column 'wall_area_ug'
+building_data['wall_area_ug'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['unteraw_fl'])
 
 
 # Fensterflächen (window_area_north, window_area_east, window_area_south, window_area_west)
 ##############################################################################
 # Map windows share and building area for each direction to building_data
-building_data['Fen_ant'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qD1'])
+building_data['Fen_ant'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qd1'])
 building_data['geb_f_flaeche_n_iwu'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['geb_f_flaeche_n_iwu'])
 building_data['geb_f_flaeche_o_iwu'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['geb_f_flaeche_o_iwu'])
 building_data['geb_f_flaeche_s_iwu'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['geb_f_flaeche_s_iwu'])
