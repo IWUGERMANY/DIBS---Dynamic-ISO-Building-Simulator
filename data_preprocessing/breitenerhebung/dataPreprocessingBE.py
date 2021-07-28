@@ -619,26 +619,48 @@ building_data['ach_vent'] = building_data.apply(calc_ach_vent, axis = 1)
 
 # Wirkungsgrad der Wärmerückgewinnungseinheit RLT (heat_recovery_efficiency)
 ##############################################################################
-building_data['qH3'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qH3'])
+building_data['qH3'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qh3_1'])
 
 cleanup_rlt_funkt_encode = {"qH3": {
                             1: 'Wärmerückgewinnung',
-                            2: 'Heizen (zusätzlich zur Wärmerückgewinnung)',
-                            3: 'Kühlen',
-                            4: 'Befeuchten',
-                            5: 'Entfeuchten',
-                            6: 'Abluft',
-                            7: 'Zuluft',
-                            8: 'Umluft'}}
+                            0: 'keine Wärmerückgewinnung',
+                            -8: 'keine RLT vorhanden'}}
 building_data.replace(cleanup_rlt_funkt_encode, inplace = True)
 
 def find_heat_recovery_efficiency(row):
-    if row['qH3'] in ('Wärmerückgewinnung', 'Heizen (zusätzlich zur Wärmerückgewinnung)'):
+    if row['qH3'] in ('Wärmerückgewinnung'):
             heat_recovery_efficiency = 0.7
     else:
         heat_recovery_efficiency = 0
     return heat_recovery_efficiency  
 building_data['heat_recovery_efficiency'] = building_data.apply(find_heat_recovery_efficiency, axis = 1) 
+
+
+# Old Version of determination of Heat Recovery
+# =============================================================================
+# # Wirkungsgrad der Wärmerückgewinnungseinheit RLT (heat_recovery_efficiency)
+# ##############################################################################
+# building_data['qH3'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qH3'])
+# 
+# cleanup_rlt_funkt_encode = {"qH3": {
+#                             1: 'Wärmerückgewinnung',
+#                             2: 'Heizen (zusätzlich zur Wärmerückgewinnung)',
+#                             3: 'Kühlen',
+#                             4: 'Befeuchten',
+#                             5: 'Entfeuchten',
+#                             6: 'Abluft',
+#                             7: 'Zuluft',
+#                             8: 'Umluft'}}
+# building_data.replace(cleanup_rlt_funkt_encode, inplace = True)
+# 
+# def find_heat_recovery_efficiency(row):
+#     if row['qH3'] in ('Wärmerückgewinnung', 'Heizen (zusätzlich zur Wärmerückgewinnung)'):
+#             heat_recovery_efficiency = 0.7
+#     else:
+#         heat_recovery_efficiency = 0
+#     return heat_recovery_efficiency  
+# building_data['heat_recovery_efficiency'] = building_data.apply(find_heat_recovery_efficiency, axis = 1) 
+# =============================================================================
 
 
 # Wärmespeicherfähigkeit (thermal_capacitance)
