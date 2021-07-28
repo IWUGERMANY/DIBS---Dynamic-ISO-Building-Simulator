@@ -50,8 +50,10 @@ from auxiliary import normReader
 dict_of_results = {}
 list_of_summary = []
   
+# WhatToSimulate
 # Read data with all the buildings from csv file    
-building_data = pd.read_csv('SimulationData_Tiefenerhebung.csv', sep = ';', index_col = False, encoding = 'utf8') 
+# building_data = pd.read_csv('SimulationData_Tiefenerhebung.csv', sep = ';', index_col = False, encoding = 'utf8') 
+building_data = pd.read_csv('SimulationData_Breitenerhebung.csv', sep = ';', index_col = False, encoding = 'utf8') 
 
 # Create namedlist of building_data for further iterations
 def iterate_namedlist(building_data):
