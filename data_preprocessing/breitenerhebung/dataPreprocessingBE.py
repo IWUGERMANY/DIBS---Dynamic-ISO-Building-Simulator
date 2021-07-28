@@ -34,8 +34,13 @@ warnings.simplefilter(action = "ignore", category = SettingWithCopyWarning)
 # Import Data Breitenerhebung with relevant buildings
 be_data_original = pd.read_excel(r'BE_data/BE_BuildingData.xlsx')
 # Import Data from DIN V 18599-10:2018-09, DIN V 18599-4:2018-09
-profile_zuweisung_18599_10 = pd.read_excel(r'BE_data/normData.xlsx', sheet_name = 'profile_zuweisung_18599_10', decimal = ",")
-data_18599_10_4 = pd.read_excel(r'BE_data/normData.xlsx', sheet_name = 'data_18599_10_4', decimal = ",")
+data_18599_10_4 = pd.read_csv(r'BE_data/profile_18599_10_data.csv', sep = ';', encoding= 'unicode_escape', decimal=",")
+profile_zuweisung_18599_10 = pd.read_csv(r'BE_data/profile_18599_10_zuweisung.csv', sep = ';', encoding= 'unicode_escape', decimal=",")
+
+# =============================================================================
+# profile_zuweisung_18599_10 = pd.read_excel(r'BE_data/normData.xlsx', sheet_name = 'profile_zuweisung_18599_10', decimal = ",")
+# data_18599_10_4 = pd.read_excel(r'BE_data/normData.xlsx', sheet_name = 'data_18599_10_4', decimal = ",")
+# =============================================================================
 
 
 ##############################################################################
@@ -214,12 +219,12 @@ building_data['wall_area_ug'] = building_data['scr_gebaeude_id'].map(be_data_ori
 # Map windows share and building area for each direction to building_data
 building_data['Fen_ant'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qd1'])
 # Encode Labelling
-cleanup_Fen_ant = {"Fen_ant": {'1': '100',                                           
-                               '2': '75',                                        
-                               '3': '50',                                               
-                               '4': '25',                       
-                               '5': '10',                                                 
-                               '6': '0'}}
+cleanup_Fen_ant = {"Fen_ant": {1: 100,                                           
+                               2: 75,                                        
+                               3: 50,                                               
+                               4: 25,                       
+                               5: 10,                                                 
+                               6: 0}}
 building_data.replace(cleanup_Fen_ant, inplace = True)
 
 building_data['geb_f_flaeche_n_iwu'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['geb_f_flaeche_n_iwu'])
@@ -996,5 +1001,6 @@ building_data['cooling_emission_system'] = np.where(building_data['cooling_suppl
 # Delete unnecessary columns
 building_data.drop(['typ_18599', 'Fen_ant', 'geb_f_flaeche_n_iwu', 'geb_f_flaeche_o_iwu', 'geb_f_flaeche_s_iwu', 'geb_f_flaeche_w_iwu', 'building_length_n', 'building_length_s', 'building_length_o', 'building_length_w', 'n_OG', 'qD8', 'Fen_glasart_1', 'k_1', 'k_3', 'tau_D65SNA', 'case_temp_adj_base', 'B_raw', 'B', 'R_raw', 'R', 'case_temp_adj_walls_ug', 'V_min_18599', 'bak_grob', 'ach_min', 'qH1', 'n_50_standard_av', 'standard av-verhältnis', 'facade_area', 'av-verhältnis', 'n_50', 'qH3'], axis = 1, inplace = True)  
 
-# Save data to \iso_simulator\examples\SimulationData_Breitenerhebung.csv
-building_data.to_csv(r'..\..\iso_simulator\examples\SimulationData_Breitenerhebung.csv', index = False, sep = ';') 
+# Save data to \iso_simulator\annualSimulation\SimulationData_Breitenerhebung.csv
+# Formerly: Save data to \iso_simulator\examples\SimulationData_Breitenerhebung.csv
+building_data.to_csv(r'..\..\iso_simulator\annualSimulation\SimulationData_Breitenerhebung.csv', index = False, sep = ';') 
