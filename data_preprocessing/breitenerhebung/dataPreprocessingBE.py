@@ -488,7 +488,7 @@ building_data['lighting_maintenance_factor'] = building_data.apply(set_lighting_
 # Energiedurchlassgrad der Verglasung (glass_solar_transmittance)
 ##############################################################################
 # Map 'fen_glasart_1' from be_data_original as column 'glass_solar_transmittance' to building_data
-building_data['glass_solar_transmittance'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['fen_glasart_1'])
+building_data['glass_solar_transmittance'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['glasart_1'])
 
 # 1: 1-S-Glas                                           
 # 2: 2-S-Glas
@@ -530,7 +530,7 @@ building_data['glass_solar_shading_transmittance'] = building_data['glass_solar_
 # Lichttransmissionsgrad der Verglasung (glass_light_transmittance)
 ##############################################################################
 # Map 'fen_glasart_1' from be_data_original as column 'qD8' to building_data
-building_data['Fen_glasart_1'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['fen_glasart_1'])
+building_data['Fen_glasart_1'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['glasart_1'])
 
 # k_1 = 0.7 if no further information is available [See DIN V 18599-4:2018-09, p.39]
 building_data['k_1'] =  0.7
