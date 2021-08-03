@@ -567,7 +567,7 @@ building_data['u_walls'] = building_data['scr_gebaeude_id'].map(be_data_original
 
 # U-Wert Dach (u_roof)
 ##############################################################################
-building_data['u_roof'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['u_d_ges'])
+building_data['u_roof'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['d_u_ges'])
 
 
 # U-Wert Bodenplatte/Kellerdecke (u_base)
