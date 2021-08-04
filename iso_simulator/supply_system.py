@@ -543,12 +543,12 @@ class SolidFuelLiquidFuelFurnace(SupplySystemBase):
     Minimum efficiency according to '1. BImSchV, Anlage 4'
     """
 
-def calc_loads(self):
-    system = SupplyOut()
-    system.fossils_in = self.load / 0.7
-    system.electricity_in = 0
-    system.electricity_out = 0
-    return system   
+    def calc_loads(self):
+        system = SupplyOut()
+        system.fossils_in = self.load / 0.7
+        system.electricity_in = 0
+        system.electricity_out = 0
+        return system   
   
 ##############################################################################
 # Heat Pumps
