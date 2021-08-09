@@ -1181,6 +1181,7 @@ cleanup_cooling_supply_system_encode = {"cooling_supply_system": {
                                                             '21': 'Absorptionskälte-maschine (mit Wärme betrieben), Wasser-kühlung (trocken)',
                                                             '22': 'Absorptionskälte-maschine (mit Wärme betrieben), Wasser-kühlung (nass)',
                                                             '3': 'Nah- oder Fernkälte',
+                                                            '6': 'Gasmotorbetriebene Kältemaschiene',
                                                             '-8': 'trifft nicht zu',
                                                             '-7': 'weiß nicht'}}
 building_data.replace(cleanup_cooling_supply_system_encode, inplace = True)
@@ -1195,6 +1196,7 @@ cleanup_cooling_supply_system_assignment = {"cooling_supply_system": {
                                                             'Absorptionskälte-maschine (mit Wärme betrieben), Wasser-kühlung (trocken)': 'AbsorptionRefrigerationSystem',
                                                             'Absorptionskälte-maschine (mit Wärme betrieben), Wasser-kühlung (nass)': 'AbsorptionRefrigerationSystem',
                                                             'Nah- oder Fernkälte': 'DistrictCooling',
+                                                            'Gasmotorbetriebene Kältemaschiene': 'GasEnginePistonScroll',
                                                             'trifft nicht zu': 'NoCooling',
                                                             'weiß nicht': 'NoCooling'}}
 building_data.replace(cleanup_cooling_supply_system_assignment, inplace = True)
