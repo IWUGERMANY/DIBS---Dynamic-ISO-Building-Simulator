@@ -786,6 +786,22 @@ class DistrictCooling(SupplySystemBase):
         system.electricity_out = 0
         return system   
     
+
+##############################################################################
+# GasEnginePistonScroll #https://d-nb.info/1047203537/34 
+##############################################################################
+class GasEnginePistonScroll(SupplySystemBase):
+    """
+    DistrictCooling assumed with efficiency 100%
+    """
+
+    def calc_loads(self):
+        system = SupplyOut()
+        system.electricity_in = 0
+        system.fossils_in = self.load / 1.16 
+        system.electricity_out = 0
+        return system
+
 ##############################################################################
 # Direct Cooler for testing purposes
 ##############################################################################
