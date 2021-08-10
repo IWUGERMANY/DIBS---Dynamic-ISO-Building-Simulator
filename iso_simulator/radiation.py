@@ -63,7 +63,8 @@ class Location(object):
         """
         
         # Read data
-        plz_data = pd.read_csv(os.path.join('../auxiliary/weather_data/plzcodes.csv'), encoding = 'latin')
+        # plz_data = pd.read_csv(os.path.join('../auxiliary/weather_data/plzcodes.csv'), encoding = 'latin')
+        plz_data = pd.read_csv(os.path.join('../auxiliary/weather_data/plzcodes.csv'), encoding = 'latin', dtype={'zipcode': int})
         weatherfiles_stations = pd.read_csv(os.path.join('../auxiliary/weather_data/weatherfiles_stations_93.csv'), sep = ';')
         
         # Pick latitude and longitude from plz_data and put values into a list
