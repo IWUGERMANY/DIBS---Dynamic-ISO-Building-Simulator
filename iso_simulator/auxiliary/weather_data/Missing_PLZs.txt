@@ -23,4 +23,8 @@ As 06711 is occuring in the DataNWG BRE data it has been "assumed" the attribute
 
 DE,06711,Zeitz,Sachsen-Anhalt,ST,"",00,Burgenlandkreis,15084,51.0496,12.1369
 
+The same has been done for 99095 that has been included using data of 99195
+
+DE,99095,Eckstedt,Thüringen,TH,"",00,Landkreis Sömmerda,16068,51.0711,11.1461
+
 The Missing PLZs should be added to the data set if possible in the future!
