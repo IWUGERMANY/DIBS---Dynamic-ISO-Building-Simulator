@@ -1,0 +1,26 @@
+The following PLZs seem to be missing in the dataset plzcodes.csv (https://github.com/zauberware/postal-codes-json-xml-csv)
+
+06868
+99095
+33333
+99090
+06711
+06485
+06772
+09434
+15713
+22961
+25867
+04861
+82475
+39217
+15712
+39628
+64760
+98694
+
+As 06711 is occuring in the DataNWG BRE data it has been "assumed" the attributes of 06712 wich is direclty next to it:
+
+DE,06711,Zeitz,Sachsen-Anhalt,ST,"",00,Burgenlandkreis,15084,51.0496,12.1369
+
+The Missing PLZs should be added to the data set if possible in the future!
