@@ -377,6 +377,7 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     # Summary of building to a separate DataFrame
     annualResults_summary_temp = pd.DataFrame({
                                         'GebäudeID': i_gebaeudeparameter.scr_gebaeude_id,
+                                        'EnergyRefArea': BuildingInstance.energy_ref_area,
                                         'HeatingDemand': HeatingDemand_sum,
                                         'HeatingDemand [kwh/m2]': HeatingDemand_sum/BuildingInstance.energy_ref_area,
                                         'HeatingEnergy': HeatingEnergy_sum,
@@ -396,7 +397,9 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
                                         'Gebäudefunktion Unterkategorie': i_gebaeudeparameter.uk_geb,
                                         'Profil SIA 2024': [schedule_name],
                                         'Profil 18599-10': [typ_norm],
-                                        'EPW-File': [epw_filename]
+                                        'EPW-File': [epw_filename],
+                                        'HeatingSupplySystem': i_gebaeudeparameter.heating_supply_system,
+                                        'CoolingSupplySystem': i_gebaeudeparameter.cooling_supply_system
                                         })  
     # Append DataFrame to list_of_summary
     list_of_summary.append(annualResults_summary_temp)
