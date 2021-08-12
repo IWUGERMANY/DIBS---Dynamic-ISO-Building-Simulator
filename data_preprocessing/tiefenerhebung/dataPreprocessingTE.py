@@ -36,6 +36,10 @@ data_te = pd.read_excel(r'TE_data/#Alle_Daten_DB_TE_inkl_TEK_GEO_Auszug.xlsx', d
 # # Verwendet, da in im originalen BE Datensatz (data_be_original) für einige Gebäude die Angabe zur maximalen Personenbelegung fehlt
 max_occupancy_be_imputiert = pd.read_excel(r'TE_data/DB_BE_q25_1_imputiert_Auszug.xlsx')
 # max_occupancy_be_imputiert = pd.read_excel(r'TE_data/DB_BE_q25_1_imputiert.xlsx')
+
+# Auswahl des Heating Supply Systems via Excel # SIEHE UNTEN
+# heating_supply_system_more_than_one_adj = pd.read_excel(r'TE_data/heating_supply_system_more_than_one_adj_Auszug.xlsx')
+heating_supply_system_more_than_one_adj = pd.read_excel(r'TE_data/heating_supply_system_more_than_one_adj.xlsx')
   
 ##############################################################################
 # Verschneidungen
@@ -1249,7 +1253,7 @@ heating_supply_system_more_than_one = heating_supply_system_more_than_one.drop([
 # Auswahl nach:
 # 1. Priorität: total/high/medium/fix/low
 # 2. Priorität: Leistung des Wärmeerzeugers (höhere Leistung bevorzugt) 
-heating_supply_system_more_than_one_adj = pd.read_excel(r'TE_data/heating_supply_system_more_than_one_adj_Auszug.xlsx')
+# heating_supply_system_more_than_one_adj = pd.read_excel(r'TE_data/heating_supply_system_more_than_one_adj_Auszug.xlsx') # moved to top
 heating_supply_system_more_than_one_adj['sum_h_power'] = heating_supply_system_more_than_one_adj[['h_power_1',
                                                                                                   'h_power_2',
                                                                                                   'h_power_3',
