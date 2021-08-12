@@ -28,13 +28,14 @@ warnings.simplefilter(action = "ignore", category = SettingWithCopyWarning)
 # Inputdatensätze
 ##############################################################################
 # Datensatz Tiefenerhebung
-data_te = pd.read_excel(r'TE_data/#Alle_Daten_DB_TE_inkl_TEK_GEO_Auszug.xlsx')
+data_te = pd.read_excel(r'TE_data/#Alle_Daten_DB_TE_inkl_TEK_GEO_Auszug.xlsx', dtype={'TEK_res_energy_relevant_area': float})
+# data_te = pd.read_excel(r'TE_data/#Alle_Daten_DB_TE_inkl_TEK_GEOneu.xlsx', dtype={'TEK_res_energy_relevant_area': float}) #1
 
 
 # # (Imputierter) Datensatz mit Angaben zur maximalen Personenbelegung aus Breitenerhebung
 # # Verwendet, da in im originalen BE Datensatz (data_be_original) für einige Gebäude die Angabe zur maximalen Personenbelegung fehlt
 max_occupancy_be_imputiert = pd.read_excel(r'TE_data/DB_BE_q25_1_imputiert_Auszug.xlsx')
-
+# max_occupancy_be_imputiert = pd.read_excel(r'TE_data/DB_BE_q25_1_imputiert.xlsx')
   
 ##############################################################################
 # Verschneidungen
@@ -69,8 +70,8 @@ data_final['baujahr'] = data_final['scr_gebaeude_id'].map(data_te.set_index('pr_
 
 # hk_geb und uk_geb aus BE ###################################################
 ##############################################################################
-data_final['hk_geb'] = data_final['scr_gebaeude_id'].map(data_be_te.set_index('scr_gebaeude_id')['HK_Geb'])
-data_final['uk_geb'] = data_final['scr_gebaeude_id'].map(data_be_te.set_index('scr_gebaeude_id')['UK_Geb'])
+data_final['hk_geb'] = data_final['scr_gebaeude_id'].map(data_be_te.set_index('scr_gebaeude_id')['hk_geb'])
+data_final['uk_geb'] = data_final['scr_gebaeude_id'].map(data_be_te.set_index('scr_gebaeude_id')['uk_geb'])
 
 cleanup_hk_geb = {"hk_geb": {1: 'Büro-, Verwaltungs- oder Amtsgebäude',                                           
                              2: 'Gebäude für Forschung und Hochschullehre',                                        
@@ -1724,5 +1725,5 @@ SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.set_index('scr_geb
 SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.reset_index()
 
 # Save data to \iso_simulator\examples\SimulationData_Tiefenerhebung.csv
-SimulationData_Tiefenerhebung.to_csv(r'..\..\iso_simulator\examples\SimulationData_Tiefenerhebung.csv', index = False, sep = ';') 
+SimulationData_Tiefenerhebung.to_csv(r'..\..\iso_simulator\annualSimulation\SimulationData_Tiefenerhebung.csv', index = False, sep = ';') 
 
