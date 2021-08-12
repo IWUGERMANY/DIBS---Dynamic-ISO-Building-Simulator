@@ -69,9 +69,13 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
 
     # Empty Lists to store data
     HeatingDemand = []  
-    HeatingEnergy = []  
+    HeatingEnergy = []
+    Heating_Sys_Electricity = []
+    Heating_Sys_Fossils = []
     CoolingDemand = []  
-    CoolingEnergy = []  
+    CoolingEnergy = []
+    Cooling_Sys_Electricity = []
+    Cooling_Sys_Fossils = []
     TempAir = []
     OutsideTemp = []
     LightingDemand = []
@@ -305,8 +309,12 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
         # Append results to the created lists  
         HeatingDemand.append(BuildingInstance.heating_demand)
         HeatingEnergy.append(BuildingInstance.heating_energy)
+        Heating_Sys_Electricity.append(BuildingInstance.heating_sys_electricity)
+        Heating_Sys_Fossils.append(BuildingInstance.heating_sys_fossils)
         CoolingDemand.append(BuildingInstance.cooling_demand)
         CoolingEnergy.append(BuildingInstance.cooling_energy)
+        Cooling_Sys_Electricity.append(BuildingInstance.cooling_sys_electricity)
+        Cooling_Sys_Fossils.append(BuildingInstance.cooling_sys_fossils)
         TempAir.append(BuildingInstance.t_air)
         OutsideTemp.append(t_out)
         LightingDemand.append(BuildingInstance.lighting_demand)
@@ -323,8 +331,12 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     hourlyResults = pd.DataFrame({
         'HeatingDemand': HeatingDemand,
         'HeatingEnergy': HeatingEnergy,
+        'Heating_Sys_Electricity': Heating_Sys_Electricity,
+        'Heating_Sys_Fossils': Heating_Sys_Fossils,
         'CoolingDemand': CoolingDemand,
         'CoolingEnergy': CoolingEnergy,
+        'Cooling_Sys_Electricity': Cooling_Sys_Electricity,
+        'Cooling_Sys_Fossils': Cooling_Sys_Fossils,
         'IndoorAirTemperature': TempAir,
         'OutsideTemperature':  OutsideTemp,
         'LightingDemand': LightingDemand,
@@ -347,8 +359,12 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     # Some calculations used for the console prints
     HeatingDemand_sum = hourlyResults.HeatingDemand.sum()/1000
     HeatingEnergy_sum = hourlyResults.HeatingEnergy.sum()/1000
+    Heating_Sys_Electricity_sum = hourlyResults.Heating_Sys_Electricity.sum()/1000
+    Heating_Sys_Fossils_sum = hourlyResults.Heating_Sys_Fossils.sum()/1000
     CoolingDemand_sum = hourlyResults.CoolingDemand.sum()/1000
     CoolingEnergy_sum = hourlyResults.CoolingEnergy.sum()/1000
+    Cooling_Sys_Electricity_sum = hourlyResults.Cooling_Sys_Electricity.sum()/1000
+    Cooling_Sys_Fossils_sum = hourlyResults.Cooling_Sys_Fossils.sum()/1000
     InternalGains_sum = hourlyResults.InternalGains.sum()/1000
     LightingDemand_sum = hourlyResults.LightingDemand.sum()/1000
     SolarGainsSouthWindow_sum = hourlyResults.SolarGainsSouthWindow.sum()/1000
@@ -362,16 +378,20 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     print("HeatingDemand [kwh/m2]:", HeatingDemand_sum/BuildingInstance.energy_ref_area)
     print("HeatingEnergy [kwh]:", HeatingEnergy_sum)
     print("HeatingEnergy [kwh/m2]:", HeatingEnergy_sum/BuildingInstance.energy_ref_area)
+    # print("Heating_Sys_Electricity [kwh]:", Heating_Sys_Electricity_sum)
+    # print("Heating_Sys_Fossils [kwh]:", Heating_Sys_Fossils_sum)
     print("CoolingDemand [kwh]:", CoolingDemand_sum)
     print("CoolingDemand [kwh/m2]:", CoolingDemand_sum/BuildingInstance.energy_ref_area)
     print("CoolingEnergy [kwh]:", CoolingEnergy_sum)
     print("CoolingEnergy [kwh/m2]:", CoolingEnergy_sum/BuildingInstance.energy_ref_area)
+    # print("Cooling_Sys_Electricity [kwh]:", Cooling_Sys_Electricity_sum)
+    # print("Cooling_Sys_Fossils [kwh]:", Cooling_Sys_Fossils_sum)
     print("LightingDemand [kwh]:", LightingDemand_sum)
     print("InternalGains [kwh]:", InternalGains_sum)
-    print("SolarGainsSouthWindow [kwh]:", SolarGainsSouthWindow_sum)
-    print("SolarGainsEastWindow [kwh]:", SolarGainsEastWindow_sum)
-    print("SolarGainsWestWindow [kwh]:", SolarGainsWestWindow_sum)
-    print("SolarGainsNorthWindow [kwh]:", SolarGainsNorthWindow_sum)
+    # print("SolarGainsSouthWindow [kwh]:", SolarGainsSouthWindow_sum)
+    # print("SolarGainsEastWindow [kwh]:", SolarGainsEastWindow_sum)
+    # print("SolarGainsWestWindow [kwh]:", SolarGainsWestWindow_sum)
+    # print("SolarGainsNorthWindow [kwh]:", SolarGainsNorthWindow_sum)
     print("SolarGainsTotal [kwh]:", SolarGainsTotal_sum)
     
     # Summary of building to a separate DataFrame
@@ -382,10 +402,22 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
                                         'HeatingDemand [kwh/m2]': HeatingDemand_sum/BuildingInstance.energy_ref_area,
                                         'HeatingEnergy': HeatingEnergy_sum,
                                         'HeatingEnergy [kwh/m2]': HeatingEnergy_sum/BuildingInstance.energy_ref_area,
+                                        'Heating_Sys_Electricity': Heating_Sys_Electricity_sum,
+                                        'Heating_Sys_Electricity [kwh/m2]': Heating_Sys_Electricity_sum/BuildingInstance.energy_ref_area,
+                                        'Heating_Sys_Fossils': Heating_Sys_Fossils_sum,
+                                        'Heating_Sys_Fossils [kwh/m2]': Heating_Sys_Fossils_sum/BuildingInstance.energy_ref_area,
                                         'CoolingDemand': CoolingDemand_sum,
                                         'CoolingDemand [kwh/m2]': CoolingDemand_sum/BuildingInstance.energy_ref_area,
                                         'CoolingEnergy' : CoolingEnergy_sum,
                                         'CoolingEnergy [kwh/m2]': CoolingEnergy_sum/BuildingInstance.energy_ref_area,
+                                        'Cooling_Sys_Electricity': Cooling_Sys_Electricity_sum,
+                                        'Cooling_Sys_Electricity [kwh/m2]': Cooling_Sys_Electricity_sum/BuildingInstance.energy_ref_area,
+                                        'Cooling_Sys_Fossils': Cooling_Sys_Fossils_sum,
+                                        'Cooling_Sys_Fossils [kwh/m2]': Cooling_Sys_Fossils_sum/BuildingInstance.energy_ref_area,
+                                        'ElectricityDemandTotal': Heating_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + InternalGains_sum,
+                                        'ElectricityDemandTotal [kwh/m2]': (Heating_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + InternalGains_sum)/BuildingInstance.energy_ref_area,
+                                        'FossilsDemandTotal': Heating_Sys_Fossils_sum + Cooling_Sys_Fossils_sum,
+                                        'FossilsDemandTotal [kwh/m2]': (Heating_Sys_Fossils_sum + Cooling_Sys_Fossils_sum)/BuildingInstance.energy_ref_area,
                                         'LightingDemand': LightingDemand_sum,
                                         'InternalGains': InternalGains_sum,
                                         'SolarGainsTotal': SolarGainsTotal_sum,
