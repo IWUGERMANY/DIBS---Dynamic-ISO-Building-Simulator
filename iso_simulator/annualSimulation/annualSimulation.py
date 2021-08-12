@@ -373,6 +373,7 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     SolarGainsNorthWindow_sum = hourlyResults.SolarGainsNorthWindow.sum()/1000
     SolarGainsTotal_sum = hourlyResults.SolarGainsTotal.sum()/1000 
     
+    print("# ", iteration)
     print("GebäudeID:", i_gebaeudeparameter.scr_gebaeude_id)
     print("HeatingDemand [kwh]:", HeatingDemand_sum)
     print("HeatingDemand [kwh/m2]:", HeatingDemand_sum/BuildingInstance.energy_ref_area)
