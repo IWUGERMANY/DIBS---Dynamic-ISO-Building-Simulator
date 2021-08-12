@@ -1358,6 +1358,7 @@ cleanup_heating_emission_system = {"heating_emission_system": {
                                       'Luftheizung': 'AirConditioning',
                                       'Strahlungsheizung (Gas)': 'AirConditioning'}}
 heating_emission_system.replace(cleanup_heating_emission_system, inplace = True)
+heating_emission_system.replace(np.nan, 'AirConditioning',  inplace = True) #Replacing nan to 'AirConditioning'
    
 data_final['heating_emission_system'] = data_final['scr_gebaeude_id'].map(heating_emission_system.set_index('scr_gebaeude_id')['heating_emission_system'])
 
