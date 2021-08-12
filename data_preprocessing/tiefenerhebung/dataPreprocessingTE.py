@@ -1725,12 +1725,12 @@ SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.rename(columns = {
 # Entferne Gebäude RP90947_0_00, da keine Angaben zum Baujahr und Bauschwere
 # Entferne Gebäude NW977117_1_00, da keine Angaben zum Baujahr und Bauschwere
 SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.set_index('scr_gebaeude_id')
-#SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.drop('RP90947_0_00')
-#SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.drop('NW977117_1_00')
+# SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.drop('RP90947_0_00')
+# SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.drop('NW977117_1_00')
 # Entferne Gebäude RP2353061_1_00, da Angaben zum Wärmeübergabesystem
-#SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.drop('RP2353061_1_00')
+# SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.drop('RP2353061_1_00')
 # Entferne Gebäude NI4601502_0_00, da unbeheizt (building_area_value_heated_cooled = 0) und damit net_room_area = inf
-#SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.drop('NI4601502_0_00')
+# SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.drop('NI4601502_0_00')
 SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.reset_index()
 
 # Save data to \iso_simulator\examples\SimulationData_Tiefenerhebung.csv
