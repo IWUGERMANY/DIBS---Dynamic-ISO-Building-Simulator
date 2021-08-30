@@ -38,8 +38,8 @@ max_occupancy_be_imputiert = pd.read_excel(r'TE_data/DB_BE_q25_1_imputiert_Auszu
 # max_occupancy_be_imputiert = pd.read_excel(r'TE_data/DB_BE_q25_1_imputiert.xlsx')
 
 # Auswahl des Heating Supply Systems via Excel # SIEHE UNTEN
-# heating_supply_system_more_than_one_adj = pd.read_excel(r'TE_data/heating_supply_system_more_than_one_adj_Auszug.xlsx')
-heating_supply_system_more_than_one_adj = pd.read_excel(r'TE_data/heating_supply_system_more_than_one_adj.xlsx')
+heating_supply_system_more_than_one_adj = pd.read_excel(r'TE_data/heating_supply_system_more_than_one_adj_Auszug.xlsx')
+# heating_supply_system_more_than_one_adj = pd.read_excel(r'TE_data/heating_supply_system_more_than_one_adj.xlsx')
   
 ##############################################################################
 # Verschneidungen
@@ -795,8 +795,19 @@ data_final_sub_lighting_load = data_final[['scr_gebaeude_id', 'typ_18599']]
 data_te_sub_lighting_load = data_te[['pr_var_name']]
 
 
+
+# Finde im DataFrame data_te alle Spalten mit 'z_use_type_' im Spaltennamen und speichere den neuen DF als find_max_zones.
+# Hier 'z_use_type_' weil es andere Variablen gibt auf die der String 'l_type_' passt (z.B. 'b_gl_type_' oder 'c_chil_type_')
+find_max_zones = data_te.filter(regex = 'z_use_type_')
+# Lösche in diesem neuen DF alle Spalten mit NaN's und speichere/überschreibe den DF
+find_max_zones = find_max_zones.dropna(axis = 1, how = 'all')
+# Ermittle die Anzahl der Spalten von DataFrame find_max_zones und speichere das Ergebnis (int) als max_zones
+max_zones = len(find_max_zones.columns)
+Number_of_lights = max_zones
+
+
 # Erzeuge Subset von data_te 
-for x in range(26):
+for x in range(Number_of_lights):
     x += 1
     data_te_sub_lighting_load['z_use_type_' + str(x)] = data_te[['z_use_type_' + str(x)]]
     data_te_sub_lighting_load['l_type_' + str(x)] = data_te[['l_type_' + str(x)]]
@@ -809,7 +820,7 @@ subset_lighting_load = pd.merge(data_final_sub_lighting_load, data_te_sub_lighti
 
 
 # Ändere Labels von allen 26 Spalten l_lp_i
-for x in range(26):
+for x in range(Number_of_lights):
     x += 1
     
     # Füge Werte E_m, k_A, k_VB, k_WF, k (in Abhängigkeit des zugewiesenen Nutzungsprofils) zu subset_lighting_load hinzu 
@@ -888,7 +899,7 @@ p_j_lx['k'] = p_j_lx['k'].astype('float')
 p_j_lx = p_j_lx.rename(columns={'beleuchtungsart': 'l_type_'})
 
 # Ändere Labels aller 26 Spalten/Zonen
-for x in range(26):
+for x in range(Number_of_lights):
     x += 1
     cleanup_l_type_x = {'l_type_' + str(x): {
                                       'direct': 'Direkt (Licht fällt direkt auf den Arbeitsbereich)',                                           
@@ -898,7 +909,7 @@ for x in range(26):
 
 
 # Füge jeder Zone einen p_j_lx Wert hinzu
-for x in range(26):
+for x in range(Number_of_lights):
     x += 1
     subset_lighting_load = pd.merge(subset_lighting_load, p_j_lx, left_on = ['l_type_' + str(x), 'k_' + str(x)], right_on = ['l_type_', 'k'], how = 'left')
     subset_lighting_load = subset_lighting_load.rename(columns={'p_j_lx': 'p_j_lx_' + str(x)})
@@ -906,7 +917,7 @@ for x in range(26):
 
 # Berechne spez. elektr. Bewertungsleistung nach p_j = p_j_lx * E_m * k_WF * k_A * k_L * k_VB
 # Für alle 26 Zonen
-for x in range(26): 
+for x in range(Number_of_lights): 
     x += 1 
     subset_lighting_load['p_j_' + str(x)] = subset_lighting_load['p_j_lx_' + str(x)] * subset_lighting_load['E_m_' + str(x)] * \
                                 subset_lighting_load['k_WF_' + str(x)] * subset_lighting_load['k_L_' + str(x)] * subset_lighting_load['k_VB_' + str(x)]
@@ -918,41 +929,20 @@ subset_lighting_load.fillna(0, inplace = True)
 subset_lighting_load['sumproduct_zähler'] = 0
 subset_lighting_load['sumproduct_nenner'] = 0
 
-for i in range(1,27):
+for i in range(1,Number_of_lights+1):
     subset_lighting_load['sumproduct_zähler'] += subset_lighting_load['p_j_{}'.format(i)] * subset_lighting_load['z_area_{}'.format(i)] 
     subset_lighting_load['sumproduct_nenner'] += subset_lighting_load['z_area_{}'.format(i)]
     
 # Ergebnis     
 subset_lighting_load['lighting_load'] = subset_lighting_load['sumproduct_zähler'] / subset_lighting_load['sumproduct_nenner']
-                                                                                                                   
+      
+                                                                                                              
 subset_lighting_load_p_j_only = subset_lighting_load[['scr_gebaeude_id',
-                                                        'lighting_load', 
-                                                        'p_j_1',
-                                                        'p_j_2',
-                                                        'p_j_3',
-                                                        'p_j_4',
-                                                        'p_j_5',
-                                                        'p_j_6',
-                                                        'p_j_7',
-                                                        'p_j_8',
-                                                        'p_j_9',
-                                                        'p_j_10',
-                                                        'p_j_11',
-                                                        'p_j_12',
-                                                        'p_j_13',
-                                                        'p_j_14',
-                                                        'p_j_15',
-                                                        'p_j_16',
-                                                        'p_j_17',
-                                                        'p_j_18',
-                                                        'p_j_19',
-                                                        'p_j_20',
-                                                        'p_j_21',
-                                                        'p_j_22',
-                                                        'p_j_23',
-                                                        'p_j_24',
-                                                        'p_j_25',
-                                                        'p_j_26']] 
+                                                        'lighting_load']] 
+
+for x in range(Number_of_lights): 
+    x += 1    
+    subset_lighting_load_p_j_only['p_j_' + str(x)] = subset_lighting_load[['p_j_' + str(x)]]
                     
 # Füge Ergbebnisse für p_j_i data_final hinzu 
 data_final = pd.merge(data_final, subset_lighting_load_p_j_only, on = 'scr_gebaeude_id', how = 'left' )                           
@@ -1635,32 +1625,6 @@ data_final.drop([
                 'b_gl_type_west',
                 'b_gl_type_north',
                 'most_freq_verglasungstyp',
-                'p_j_1',
-                'p_j_2',
-                'p_j_3',
-                'p_j_4',
-                'p_j_5',
-                'p_j_6',
-                'p_j_7',
-                'p_j_8',
-                'p_j_9',
-                'p_j_10',
-                'p_j_11',
-                'p_j_12',
-                'p_j_13',
-                'p_j_14',
-                'p_j_15',
-                'p_j_16',
-                'p_j_17',
-                'p_j_18',
-                'p_j_19',
-                'p_j_20',
-                'p_j_21',
-                'p_j_22',
-                'p_j_23',
-                'p_j_24',
-                'p_j_25',
-                'p_j_26',
                 'bak',
                 'B',
                 'R',
@@ -1669,6 +1633,13 @@ data_final.drop([
                 'rlt_flow_ach_mean',
                 'rlt_flow_ach_sum',
                 'ach_inf_win'], axis = 1, inplace = True) 
+
+
+for x in range(Number_of_lights): 
+    x += 1    
+    data_final.drop(['p_j_' + str(x)], axis = 1, inplace = True)
+
+
 
 ##############################################################################
 ##############################################################################
@@ -1722,16 +1693,16 @@ SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.rename(columns = {
                                                                                     'cooling_emission_system_adj': 'cooling_emission_system'})
 
 
-# Entferne Gebäude RP90947_0_00, da keine Angaben zum Baujahr und Bauschwere
-# Entferne Gebäude NW977117_1_00, da keine Angaben zum Baujahr und Bauschwere
-SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.set_index('scr_gebaeude_id')
-SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.drop('RP90947_0_00')
-SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.drop('NW977117_1_00')
-# Entferne Gebäude RP2353061_1_00, da keine Angaben zum Wärmeübergabesystem
-SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.drop('RP2353061_1_00')
-# Entferne Gebäude NI4601502_0_00, da unbeheizt (building_area_value_heated_cooled = 0) und damit net_room_area = inf
-SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.drop('NI4601502_0_00')
-SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.reset_index()
+# # Entferne Gebäude RP90947_0_00, da keine Angaben zum Baujahr und Bauschwere
+# # Entferne Gebäude NW977117_1_00, da keine Angaben zum Baujahr und Bauschwere
+# SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.set_index('scr_gebaeude_id')
+# SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.drop('RP90947_0_00')
+# SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.drop('NW977117_1_00')
+# # Entferne Gebäude RP2353061_1_00, da keine Angaben zum Wärmeübergabesystem
+# SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.drop('RP2353061_1_00')
+# # Entferne Gebäude NI4601502_0_00, da unbeheizt (building_area_value_heated_cooled = 0) und damit net_room_area = inf
+# SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.drop('NI4601502_0_00')
+# SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.reset_index()
 
 # Save data to \iso_simulator\examples\SimulationData_Tiefenerhebung.csv
 SimulationData_Tiefenerhebung.to_csv(r'..\..\iso_simulator\annualSimulation\SimulationData_Tiefenerhebung.csv', index = False, sep = ';') 
