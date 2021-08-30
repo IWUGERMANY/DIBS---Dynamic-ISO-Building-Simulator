@@ -28,17 +28,17 @@ warnings.simplefilter(action = "ignore", category = SettingWithCopyWarning)
 # Inputdatensätze
 ##############################################################################
 # Datensatz Tiefenerhebung
-data_te = pd.read_excel(r'TE_data/#Alle_Daten_DB_TE_inkl_TEK_GEO_Auszug.xlsx', dtype={'TEK_res_energy_relevant_area': float})
+data_te = pd.read_excel(r'TE_data/#Alle_Daten_DB_TE_inkl_TEK_GEO_Dummy.xlsx', dtype={'TEK_res_energy_relevant_area': float})
 # data_te = pd.read_excel(r'TE_data/#Alle_Daten_DB_TE_inkl_TEK_GEOneu.xlsx', dtype={'TEK_res_energy_relevant_area': float}) #1
 
 
 # # (Imputierter) Datensatz mit Angaben zur maximalen Personenbelegung aus Breitenerhebung
 # # Verwendet, da in im originalen BE Datensatz (data_be_original) für einige Gebäude die Angabe zur maximalen Personenbelegung fehlt
-max_occupancy_be_imputiert = pd.read_excel(r'TE_data/DB_BE_q25_1_imputiert_Auszug.xlsx')
+max_occupancy_be_imputiert = pd.read_excel(r'TE_data/DB_BE_q25_1_imputiert_Dummy.xlsx')
 # max_occupancy_be_imputiert = pd.read_excel(r'TE_data/DB_BE_q25_1_imputiert.xlsx')
 
 # Auswahl des Heating Supply Systems via Excel # SIEHE UNTEN
-heating_supply_system_more_than_one_adj = pd.read_excel(r'TE_data/heating_supply_system_more_than_one_adj_Auszug.xlsx')
+heating_supply_system_more_than_one_adj = pd.read_excel(r'TE_data/heating_supply_system_more_than_one_adj_Dummy.xlsx')
 # heating_supply_system_more_than_one_adj = pd.read_excel(r'TE_data/heating_supply_system_more_than_one_adj.xlsx')
   
 ##############################################################################
