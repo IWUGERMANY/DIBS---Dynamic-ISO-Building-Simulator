@@ -32,7 +32,9 @@ warnings.simplefilter(action = "ignore", category = SettingWithCopyWarning)
 ##############################################################################
 ##############################################################################
 # Import Data Breitenerhebung with relevant buildings
-be_data_original = pd.read_excel(r'BE_data/BE_BuildingData.xlsx')
+be_data_original = pd.read_excel(r'BE_data/BE_BuildingData_Dummy.xlsx')
+# be_data_original = pd.read_excel(r'BE_data/BE_BuildingData.xlsx')
+
 # Import Data from DIN V 18599-10:2018-09, DIN V 18599-4:2018-09
 data_18599_10_4 = pd.read_csv(r'BE_data/profile_18599_10_data.csv', sep = ';', encoding= 'unicode_escape', decimal=",")
 profile_zuweisung_18599_10 = pd.read_csv(r'BE_data/profile_18599_10_zuweisung.csv', sep = ';', encoding= 'unicode_escape', decimal=",")
