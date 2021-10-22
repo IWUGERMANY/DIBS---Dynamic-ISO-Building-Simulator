@@ -293,6 +293,10 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
             appliance_gains * occupancy_schedule.loc[hour, 'Appliances'] * BuildingInstance.energy_ref_area + \
             BuildingInstance.lighting_demand
             
+        # Calculate appliance_gains as part of the internal_gains
+        Appliance_gains_demand = appliance_gains * occupancy_schedule.loc[hour, 'Appliances'] * BuildingInstance.energy_ref_area
+        
+            
         # Calculate energy demand for the time step             
         BuildingInstance.solve_building_energy(internal_gains=internal_gains,
                                      solar_gains=
@@ -341,6 +345,7 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
         'OutsideTemperature':  OutsideTemp,
         'LightingDemand': LightingDemand,
         'InternalGains': InternalGains,
+        'Appliance_gains_demand': Appliance_gains_demand,
         'SolarGainsSouthWindow': SolarGainsSouthWindow,
         'SolarGainsEastWindow': SolarGainsEastWindow,
         'SolarGainsWestWindow': SolarGainsWestWindow,
@@ -366,6 +371,7 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     Cooling_Sys_Electricity_sum = hourlyResults.Cooling_Sys_Electricity.sum()/1000
     Cooling_Sys_Fossils_sum = hourlyResults.Cooling_Sys_Fossils.sum()/1000
     InternalGains_sum = hourlyResults.InternalGains.sum()/1000
+    Appliance_gains_demand_sum = hourlyResults.Appliance_gains_demand.sum()/1000
     LightingDemand_sum = hourlyResults.LightingDemand.sum()/1000
     SolarGainsSouthWindow_sum = hourlyResults.SolarGainsSouthWindow.sum()/1000
     SolarGainsEastWindow_sum = hourlyResults.SolarGainsEastWindow.sum()/1000
@@ -388,6 +394,7 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     # print("Cooling_Sys_Electricity [kwh]:", Cooling_Sys_Electricity_sum)
     # print("Cooling_Sys_Fossils [kwh]:", Cooling_Sys_Fossils_sum)
     print("LightingDemand [kwh]:", LightingDemand_sum)
+    print("Appliance_gains_demand [kWh]:", Appliance_gains_demand_sum)
     print("InternalGains [kwh]:", InternalGains_sum)
     # print("SolarGainsSouthWindow [kwh]:", SolarGainsSouthWindow_sum)
     # print("SolarGainsEastWindow [kwh]:", SolarGainsEastWindow_sum)
@@ -415,11 +422,12 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
                                         'Cooling_Sys_Electricity [kwh/m2]': Cooling_Sys_Electricity_sum/BuildingInstance.energy_ref_area,
                                         'Cooling_Sys_Fossils': Cooling_Sys_Fossils_sum,
                                         'Cooling_Sys_Fossils [kwh/m2]': Cooling_Sys_Fossils_sum/BuildingInstance.energy_ref_area,
-                                        'ElectricityDemandTotal': Heating_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + InternalGains_sum,
-                                        'ElectricityDemandTotal [kwh/m2]': (Heating_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + InternalGains_sum)/BuildingInstance.energy_ref_area,
+                                        'ElectricityDemandTotal': Heating_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + Appliance_gains_demand_sum, 
+                                        'ElectricityDemandTotal [kwh/m2]': (Heating_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + Appliance_gains_demand_sum)/BuildingInstance.energy_ref_area, 
                                         'FossilsDemandTotal': Heating_Sys_Fossils_sum + Cooling_Sys_Fossils_sum,
                                         'FossilsDemandTotal [kwh/m2]': (Heating_Sys_Fossils_sum + Cooling_Sys_Fossils_sum)/BuildingInstance.energy_ref_area,
                                         'LightingDemand': LightingDemand_sum,
+                                        'Appliance_gains_demand': Appliance_gains_demand_sum,
                                         'InternalGains': InternalGains_sum,
                                         'SolarGainsTotal': SolarGainsTotal_sum,
                                         'SolarGainsSouthWindow': SolarGainsSouthWindow_sum,
