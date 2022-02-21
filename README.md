@@ -31,7 +31,7 @@ The Dynamic ISO Building Simulator has been developed in context of the ENOB:Dat
 <p float="left">
   <img src="doc/img/BMWi_Logo.png" width="30%" /> 
 </p> 
-in accordance with the parliamentary resolution of the German Parliament
+in accordance with the parliamentary resolution of the German Parliament.
 
 Total number of individual page views: 
  <a href="https://trackgit.com">
