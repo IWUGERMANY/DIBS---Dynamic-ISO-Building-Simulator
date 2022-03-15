@@ -6,12 +6,12 @@ Portions of this software are copyright of their respective authors and released
 RC_BuildingSimulator, Copyright 2016 Architecture and Building Systems, ETH Zurich
 
 author: "Simon Knoll, Julian Bischof, Michael Hörner "
-copyright: "Copyright 2021, Institut Wohnen und Umwelt"
+copyright: "Copyright 2022, Institut Wohnen und Umwelt"
 license: "MIT"
 
 """
 __author__ = "Simon Knoll, Julian Bischof, Michael Hörner "
-__copyright__ = "Copyright 2021, Institut Wohnen und Umwelt"
+__copyright__ = "Copyright 2022, Institut Wohnen und Umwelt"
 __license__ = "MIT"
 
 
@@ -201,12 +201,12 @@ class Window(object):
         :rtype: float
         """
         
-        # Check conditions cooling seasons == True and outdoor temperature > 22:
+        # Check conditions cooling seasons == True and outdoor temperature > 24 (requiered indoor temperature in the cooling case for 85% of usage zones according to DIN V 18599-10):
         # If condition is true, use reduced glass_solar_transmittance (called glass_solar_shading_transmittance) due to the use
         # of activated sunshadings 
         cooling_season = (2169 < hour < 6561)           # Assume cooling season from 01/04 9am - 01/10 9am
         
-        if t_air > 22 and (cooling_season == True):
+        if t_air > 24 and (cooling_season == True):
 
             direct_factor = self.calc_direct_solar_factor(sun_altitude, sun_azimuth,)
             diffuse_factor = self.calc_diffuse_solar_factor()
