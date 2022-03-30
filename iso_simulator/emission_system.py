@@ -16,7 +16,7 @@ license: "MIT"
 
 """
 __author__ = "Simon Knoll, Julian Bischof, Michael Hörner "
-__copyright__ = "Copyright 2021, Institut Wohnen und Umwelt"
+__copyright__ = "Copyright 2022, Institut Wohnen und Umwelt"
 __license__ = "MIT"
 
 
