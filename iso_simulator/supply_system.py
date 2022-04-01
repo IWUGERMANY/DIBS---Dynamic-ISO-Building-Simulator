@@ -363,7 +363,7 @@ class LGasBoilerCondensingBefore95(SupplySystemBase):
 class BiogasBoilerCondensingBefore95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
-    Brennwertkessel vor 1995 - Bio-Gas
+    Brennwertkessel vor 1995 - Biogas
     """
 
     def calc_loads(self):
@@ -376,7 +376,7 @@ class BiogasBoilerCondensingBefore95(SupplySystemBase):
 class BiogasBoilerCondensingFrom95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
-    Brennwertkessel nach 1995 - Bio-Gas
+    Brennwertkessel nach 1995 - Biogas
     """
 
     def calc_loads(self):
@@ -412,19 +412,20 @@ class LGasBoilerCondensingFrom95(SupplySystemBase):
         system.electricity_in = 0
         system.electricity_out = 0
         return system     
-    
-class BioGasBoilerCondensingFrom95(SupplySystemBase):
-    """
-    expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
-    Brennwertkessel ab 1995 - Biogas
-    """
 
-    def calc_loads(self):
-        system = SupplyOut()
-        system.fossils_in = self.load * 1.054
-        system.electricity_in = 0
-        system.electricity_out = 0
-        return system      
+# Double of above BiogasBoilerCondensingFrom95    
+# class BioGasBoilerCondensingFrom95(SupplySystemBase):
+#     """
+#     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
+#     Brennwertkessel ab 1995 - Biogas
+#     """
+
+#     def calc_loads(self):
+#         system = SupplyOut()
+#         system.fossils_in = self.load * 1.054
+#         system.electricity_in = 0
+#         system.electricity_out = 0
+#         return system      
     
 class BiogasOilBoilerCondensingFrom95(SupplySystemBase):
     """
