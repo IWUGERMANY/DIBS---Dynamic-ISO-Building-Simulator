@@ -62,6 +62,11 @@ def iterate_namedlist(building_data):
         yield Row(*row[1:])
 
 namedlist_of_buildings  = list(iterate_namedlist(building_data))   
+
+# Read Emission and Primary Energy Factors
+
+GWP_PE_Factors = pd.read_csv('LCA/Primary_energy_and_emission_factors.csv', sep = ';', decimal=',', index_col = False, encoding = 'cp1250') 
+
         
 # Outer loop: Iterate over all buildings in namedlist_of_buildings       
 for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
@@ -379,6 +384,132 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     SolarGainsNorthWindow_sum = hourlyResults.SolarGainsNorthWindow.sum()/1000
     SolarGainsTotal_sum = hourlyResults.SolarGainsTotal.sum()/1000 
     
+    
+    
+    
+    # ------------------------------------------------------------------------------------------------------------------------------
+    # Carbon Emissions
+    # ------------------------------------------------------------------------------------------------------------------------------
+    
+    # Calculation of Carbon Emission related to HEATING energy consumption
+    
+    if (i_gebaeudeparameter.heating_supply_system == 'BiogasBoilerCondensingBefore95') \
+        | (i_gebaeudeparameter.heating_supply_system == 'BiogasBoilerCondensingFrom95'):
+        Fuel_Type = 'Biogas (general)'
+    elif (i_gebaeudeparameter.heating_supply_system == 'BiogasOilBoilerLowTempBefore95') \
+        | (i_gebaeudeparameter.heating_supply_system == 'BiogasOilBoilerCondensingFrom95') \
+        | (i_gebaeudeparameter.heating_supply_system == 'BiogasOilBoilerCondensingImproved'):
+        Fuel_Type = 'Biogas Bio-oil Mix (general)'
+    elif (i_gebaeudeparameter.heating_supply_system == 'OilBoilerStandardBefore86') \
+        | (i_gebaeudeparameter.heating_supply_system == 'OilBoilerStandardFrom95') \
+        | (i_gebaeudeparameter.heating_supply_system == 'OilBoilerLowTempBefore87') \
+        | (i_gebaeudeparameter.heating_supply_system == 'OilBoilerLowTempBefore95') \
+        | (i_gebaeudeparameter.heating_supply_system == 'OilBoilerLowTempFrom95') \
+        | (i_gebaeudeparameter.heating_supply_system == 'OilBoilerCondensingBefore95') \
+        | (i_gebaeudeparameter.heating_supply_system == 'OilBoilerCondensingFrom95') \
+        | (i_gebaeudeparameter.heating_supply_system == 'OilBoilerCondensingImproved'):
+        Fuel_Type = 'Light fuel oil'
+    elif (i_gebaeudeparameter.heating_supply_system == 'LGasBoilerLowTempBefore95') | \
+    (i_gebaeudeparameter.heating_supply_system == 'LGasBoilerLowTempFrom95') | \
+    (i_gebaeudeparameter.heating_supply_system == 'LGasBoilerCondensingBefore95') | \
+    (i_gebaeudeparameter.heating_supply_system == 'LGasBoilerCondensingFrom95')| \
+    (i_gebaeudeparameter.heating_supply_system == 'LGasBoilerCondensingImproved')| \
+    (i_gebaeudeparameter.heating_supply_system == 'LGasBoilerLowTempBefore87'):
+        Fuel_Type = 'Natural gas'
+    elif (i_gebaeudeparameter.heating_supply_system == 'GasBoilerStandardBefore86') |\
+    (i_gebaeudeparameter.heating_supply_system == 'GasBoilerStandardBefore95') | \
+    (i_gebaeudeparameter.heating_supply_system == 'GasBoilerStandardFrom95') | \
+    (i_gebaeudeparameter.heating_supply_system == 'GasBoilerLowTempBefore87') | \
+    (i_gebaeudeparameter.heating_supply_system == 'GasBoilerLowTempBefore95') | \
+    (i_gebaeudeparameter.heating_supply_system == 'GasBoilerLowTempFrom95') | \
+    (i_gebaeudeparameter.heating_supply_system == 'GasBoilerLowTempSpecialFrom78') | \
+    (i_gebaeudeparameter.heating_supply_system == 'GasBoilerLowTempSpecialFrom95') | \
+    (i_gebaeudeparameter.heating_supply_system == 'GasBoilerCondensingBefore95') | \
+    (i_gebaeudeparameter.heating_supply_system == 'GasBoilerCondensingImproved') | \
+    (i_gebaeudeparameter.heating_supply_system == 'GasBoilerCondensingFrom95'):
+        Fuel_Type = 'Natural gas'
+    elif (i_gebaeudeparameter.heating_supply_system == 'WoodChipSolidFuelBoiler') | \
+    (i_gebaeudeparameter.heating_supply_system == 'WoodPelletSolidFuelBoiler') | \
+    (i_gebaeudeparameter.heating_supply_system == 'WoodSolidFuelBoilerCentral'):
+        Fuel_Type = 'Wood'
+    elif (i_gebaeudeparameter.heating_supply_system == 'CoalSolidFuelBoiler'):
+        Fuel_Type = 'Hard coal'
+    elif (i_gebaeudeparameter.heating_supply_system == 'SolidFuelLiquidFuelFurnace'):
+        Fuel_Type = 'Hard coal'
+    elif (i_gebaeudeparameter.heating_supply_system == 'HeatPumpAirSource') | \
+    (i_gebaeudeparameter.heating_supply_system == 'HeatPumpGroundSource'):
+        Fuel_Type = 'Electricity grid mix'
+    elif (i_gebaeudeparameter.heating_supply_system == 'GasCHP'):
+        Fuel_Type = 'Natural gas'
+    elif (i_gebaeudeparameter.heating_supply_system == 'DistrictHeating'):
+        Fuel_Type = 'District heating (Combined Heat and Power) Gas or Liquid fuels'
+    elif (i_gebaeudeparameter.heating_supply_system == 'ElectricHeating'):
+        Fuel_Type = 'Electricity grid mix'
+    elif (i_gebaeudeparameter.heating_supply_system == 'DirectHeater'):
+        Fuel_Type = 'District heating (Combined Heat and Power) Coal'
+    elif (i_gebaeudeparameter.heating_supply_system == 'NoHeating'):
+        Fuel_Type = 'None'
+    else: 
+        print("Error occured during calculation of GHG-Emission for Heating. The following heating_supply_system cannot be considered yet", i_gebaeudeparameter.heating_supply_system)
+
+    f_GHG = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'GWP spezific to heating value GEG [g/kWh]']
+    f_GHG = f_GHG.iloc[0]
+    Heating_Sys_Carbon_sum = (Heating_Sys_Fossils_sum * f_GHG) / 1000 # for kg CO2eq
+    Considered_fuel_type = Fuel_Type
+
+
+
+    # Calculation of Carbon Emission related to Cooling energy consumption
+    
+    if (i_gebaeudeparameter.cooling_supply_system == 'AirCooledPistonScroll') \
+        | (i_gebaeudeparameter.heating_supply_system == 'AirCooledPistonScrollMulti') \
+        | (i_gebaeudeparameter.heating_supply_system == 'WaterCooledPistonScroll') \
+        | (i_gebaeudeparameter.heating_supply_system == 'DirectCooler'):
+        Fuel_Type = 'Electricity grid mix'
+    elif (i_gebaeudeparameter.cooling_supply_system == 'AbsorptionRefrigerationSystem'):
+        Fuel_Type = 'Waste Heat generated close to building'
+    elif (i_gebaeudeparameter.cooling_supply_system == 'DistrictCooling'):
+        Fuel_Type = 'District cooling'
+    elif (i_gebaeudeparameter.cooling_supply_system == 'NoCooling'):
+        Fuel_Type = 'None'
+    else: 
+        print("Error occured during calculation of GHG-Emission for Cooling. The following cooling_supply_system cannot be considered yet", i_gebaeudeparameter.cooling_supply_system)
+        
+    f_GHG = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'GWP spezific to heating value GEG [g/kWh]']
+    f_GHG = f_GHG.iloc[0] # Selects first row (0) value
+    Cooling_Sys_Carbon_sum = (Cooling_Sys_Fossils_sum  * f_GHG) / 1000 # for kg CO2eq
+    Considered_fuel_type = Fuel_Type
+
+
+
+    # Calculation of Carbon Emission related to remaining Electric energy consumption (LightingDemand_sum + Appliance_gains_demand_sum)
+    
+    # Lighting
+    Fuel_Type = 'Electricity grid mix'
+    f_GHG = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'GWP spezific to heating value GEG [g/kWh]']
+    f_GHG = f_GHG.iloc[0]
+    LightingDemand_sum_Carbon_sum = (LightingDemand_sum * f_GHG) / 1000 # for kg CO2eq
+    Considered_fuel_type = Fuel_Type
+    
+    # Appliance
+    Fuel_Type = 'Electricity grid mix'
+    f_GHG = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'GWP spezific to heating value GEG [g/kWh]']
+    f_GHG = f_GHG.iloc[0]
+    Appliance_gains_demand_sum_Carbon_sum = (Appliance_gains_demand_sum * f_GHG) / 1000 # for kg CO2eq
+    Considered_fuel_type = Fuel_Type
+    
+    # Calculation of Carbon Emission related to the entire energy consumption (Heating_Sys_Carbon_sum + Cooling_Sys_Carbon_sum + LightingDemand_sum_Carbon_sum + Appliance_gains_demand_sum_Carbon_sum)
+    
+    Carbon_sum = Heating_Sys_Carbon_sum + Cooling_Sys_Carbon_sum + LightingDemand_sum_Carbon_sum + Appliance_gains_demand_sum_Carbon_sum
+    #! add DHW latter!
+    
+
+    
+
+    # ------------------------------------------------------------------------------------------------------------------------------
+    # Print selected Results in Console
+    # ------------------------------------------------------------------------------------------------------------------------------
+ 
     print("# ", iteration)
     print("GebäudeID:", i_gebaeudeparameter.scr_gebaeude_id)
     print("HeatingDemand [kwh]:", HeatingDemand_sum)
@@ -414,6 +545,8 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
                                         'Heating_Sys_Electricity [kwh/m2]': Heating_Sys_Electricity_sum/BuildingInstance.energy_ref_area,
                                         'Heating_Sys_Fossils': Heating_Sys_Fossils_sum,
                                         'Heating_Sys_Fossils [kwh/m2]': Heating_Sys_Fossils_sum/BuildingInstance.energy_ref_area,
+                                        'Heating_Sys_GWP [kg]': Heating_Sys_Carbon_sum, 
+                                        'Heating_Sys_GWP [kg/m2]': Heating_Sys_Carbon_sum/BuildingInstance.energy_ref_area, 
                                         'CoolingDemand': CoolingDemand_sum,
                                         'CoolingDemand [kwh/m2]': CoolingDemand_sum/BuildingInstance.energy_ref_area,
                                         'CoolingEnergy' : CoolingEnergy_sum,
@@ -422,12 +555,20 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
                                         'Cooling_Sys_Electricity [kwh/m2]': Cooling_Sys_Electricity_sum/BuildingInstance.energy_ref_area,
                                         'Cooling_Sys_Fossils': Cooling_Sys_Fossils_sum,
                                         'Cooling_Sys_Fossils [kwh/m2]': Cooling_Sys_Fossils_sum/BuildingInstance.energy_ref_area,
+                                        'Cooling_Sys_GWP [kg]': Cooling_Sys_Carbon_sum, 
+                                        'Cooling_Sys_GWP [kg/m2]': Cooling_Sys_Carbon_sum/BuildingInstance.energy_ref_area, 
                                         'ElectricityDemandTotal': Heating_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + Appliance_gains_demand_sum, 
                                         'ElectricityDemandTotal [kwh/m2]': (Heating_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + Appliance_gains_demand_sum)/BuildingInstance.energy_ref_area, 
                                         'FossilsDemandTotal': Heating_Sys_Fossils_sum + Cooling_Sys_Fossils_sum,
                                         'FossilsDemandTotal [kwh/m2]': (Heating_Sys_Fossils_sum + Cooling_Sys_Fossils_sum)/BuildingInstance.energy_ref_area,
                                         'LightingDemand': LightingDemand_sum,
+                                        'LightingDemand_GWP [kg]': LightingDemand_sum_Carbon_sum, 
+                                        'LightingDemand_GWP [kg/m2]': LightingDemand_sum_Carbon_sum/BuildingInstance.energy_ref_area, 
                                         'Appliance_gains_demand': Appliance_gains_demand_sum,
+                                        'Appliance_gains_demand_GWP [kg]': Appliance_gains_demand_sum_Carbon_sum, 
+                                        'Appliance_gains_demand_GWP [kg/m2]': Appliance_gains_demand_sum_Carbon_sum/BuildingInstance.energy_ref_area,
+                                        'GWP [kg]': Carbon_sum,
+                                        'GWP [kg/m2]': Carbon_sum/BuildingInstance.energy_ref_area,
                                         'InternalGains': InternalGains_sum,
                                         'SolarGainsTotal': SolarGainsTotal_sum,
                                         'SolarGainsSouthWindow': SolarGainsSouthWindow_sum,
