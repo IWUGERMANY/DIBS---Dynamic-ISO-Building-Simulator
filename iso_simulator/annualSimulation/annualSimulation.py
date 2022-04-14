@@ -44,6 +44,7 @@ from radiation import Location
 from radiation import Window
 from auxiliary import scheduleReader
 from auxiliary import normReader
+from auxiliary import TEKReader # 12.04.2022
  
     
 # Create dictionary to store final DataFrames of the buildings
@@ -81,6 +82,10 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     CoolingEnergy = []
     Cooling_Sys_Electricity = []
     Cooling_Sys_Fossils = []
+    HotWaterDemand = [] # 12.04.2022
+    HotWaterEnergy = [] # 12.04.2022
+    HotWater_Sys_Electricity = [] # 12.04.2022
+    HotWater_Sys_Fossils = [] # 12.04.2022
     TempAir = []
     OutsideTemp = []
     LightingDemand = []
@@ -203,6 +208,13 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     # Read specific occupancy schedule
     # Assignments see Excel/CSV-File in /auxiliary/occupancy_schedules/
     occupancy_schedule, schedule_name = scheduleReader.getSchedule(BuildingInstance.hk_geb, BuildingInstance.uk_geb)
+    
+    # 12.04.2022
+    TEK_dhw, TEK_name = TEKReader.getTEK(BuildingInstance.hk_geb, BuildingInstance.uk_geb) # TEK_dhw in kWh/m2*a
+    #print(TEK_name)
+    #print(TEK_dhw)
+    Occupancy_Full_Usage_Hours = occupancy_schedule.People.sum() # in h/a
+    TEK_dhw_per_Occupancy_Full_Usage_Hour = TEK_dhw / Occupancy_Full_Usage_Hours # in kWh/m2*h
       
    
     # Starting temperature of the building. Set to t_start
@@ -310,6 +322,27 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
                                      WestWindow.solar_gains + 
                                      NorthWindow.solar_gains,
                                      t_out=t_out, t_m_prev=t_m_prev)
+        
+        
+        # 12.04.2022
+        # Calculate hot water usage of the building for the time step
+        # with (BuildingInstance.heating_energy / BuildingInstance.heating_demand) represents the Efficiency of the heat generation in the building
+        hotwaterdemand = occupancy_schedule.loc[hour, 'People'] * TEK_dhw_per_Occupancy_Full_Usage_Hour * 1000 * BuildingInstance.energy_ref_area # in W
+        
+        if BuildingInstance.heating_demand > 0: # catch devision by zero error
+            hotwaterenergy = hotwaterdemand / (BuildingInstance.heating_energy / BuildingInstance.heating_demand)
+        else:
+            hotwaterenergy = hotwaterdemand
+        
+        if BuildingInstance.heating_sys_electricity > 0:
+            HotWaterSysElectricity = hotwaterenergy
+            HotWaterSysFossils = 0
+        elif BuildingInstance.heating_sys_fossils > 0:
+            HotWaterSysFossils = hotwaterenergy
+            HotWaterSysElectricity = 0
+        else:
+            HotWaterSysElectricity = 0
+            HotWaterSysFossils = 0
     
     
         # Set the previous temperature for the next time step
@@ -324,6 +357,10 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
         CoolingEnergy.append(BuildingInstance.cooling_energy)
         Cooling_Sys_Electricity.append(BuildingInstance.cooling_sys_electricity)
         Cooling_Sys_Fossils.append(BuildingInstance.cooling_sys_fossils)
+        HotWaterDemand.append(hotwaterdemand) # 12.04.2022
+        HotWaterEnergy.append(hotwaterenergy) # 12.04.2022
+        HotWater_Sys_Electricity.append(HotWaterSysElectricity) # 12.04.2022
+        HotWater_Sys_Fossils.append(HotWaterSysFossils) # 12.04.2022
         TempAir.append(BuildingInstance.t_air)
         OutsideTemp.append(t_out)
         LightingDemand.append(BuildingInstance.lighting_demand)
@@ -346,6 +383,10 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
         'CoolingEnergy': CoolingEnergy,
         'Cooling_Sys_Electricity': Cooling_Sys_Electricity,
         'Cooling_Sys_Fossils': Cooling_Sys_Fossils,
+        'HotWaterDemand': HotWaterDemand, # 12.04.2022
+        'HotWaterEnergy': HotWaterEnergy, # 12.04.2022
+        'HotWater_Sys_Electricity': HotWater_Sys_Electricity, # 12.04.2022
+        'HotWater_Sys_Fossils': HotWater_Sys_Fossils, # 12.04.2022
         'IndoorAirTemperature': TempAir,
         'OutsideTemperature':  OutsideTemp,
         'LightingDemand': LightingDemand,
@@ -375,6 +416,10 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     CoolingEnergy_sum = hourlyResults.CoolingEnergy.sum()/1000
     Cooling_Sys_Electricity_sum = hourlyResults.Cooling_Sys_Electricity.sum()/1000
     Cooling_Sys_Fossils_sum = hourlyResults.Cooling_Sys_Fossils.sum()/1000
+    HotWaterDemand_sum = hourlyResults.HotWaterDemand.sum()/1000 # 12.04.2022
+    HotWaterEnergy_sum = hourlyResults.HotWaterEnergy.sum()/1000 # 12.04.2022
+    HotWater_Sys_Electricity_sum = hourlyResults.HotWater_Sys_Electricity.sum()/1000 # 12.04.2022
+    HotWater_Sys_Fossils_sum = hourlyResults.HotWater_Sys_Fossils.sum()/1000 # 12.04.2022
     InternalGains_sum = hourlyResults.InternalGains.sum()/1000
     Appliance_gains_demand_sum = hourlyResults.Appliance_gains_demand.sum()/1000
     LightingDemand_sum = hourlyResults.LightingDemand.sum()/1000
@@ -452,10 +497,20 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     else: 
         print("Error occured during calculation of GHG-Emission for Heating. The following heating_supply_system cannot be considered yet", i_gebaeudeparameter.heating_supply_system)
 
+    # HEATING
     f_GHG = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'GWP spezific to heating value GEG [g/kWh]']
     f_GHG = f_GHG.iloc[0]
-    Heating_Sys_Carbon_sum = (Heating_Sys_Fossils_sum * f_GHG) / 1000 # for kg CO2eq
+    if Heating_Sys_Electricity_sum > 0: # 12.04.2022
+        Heating_Sys_Carbon_sum = (Heating_Sys_Electricity_sum * f_GHG) / 1000 # for kg CO2eq # 12.04.2022
+    else: # 12.04.2022
+        Heating_Sys_Carbon_sum = (Heating_Sys_Fossils_sum * f_GHG) / 1000 # for kg CO2eq # 12.04.2022
     Considered_fuel_type = Fuel_Type
+    
+    # HOT WATER
+    if HotWater_Sys_Electricity_sum > 0: # 12.04.2022
+        HotWater_Sys_Carbon_sum = (HotWater_Sys_Electricity_sum * f_GHG) / 1000 # for kg CO2eq # 12.04.2022
+    else: # 12.04.2022
+        HotWater_Sys_Carbon_sum = (HotWater_Sys_Fossils_sum * f_GHG) / 1000 # for kg CO2eq # 12.04.2022
 
 
 
@@ -477,7 +532,11 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
         
     f_GHG = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'GWP spezific to heating value GEG [g/kWh]']
     f_GHG = f_GHG.iloc[0] # Selects first row (0) value
-    Cooling_Sys_Carbon_sum = (Cooling_Sys_Fossils_sum  * f_GHG) / 1000 # for kg CO2eq
+    if Cooling_Sys_Electricity_sum > 0: # 12.04.2022
+        Cooling_Sys_Carbon_sum = (Cooling_Sys_Electricity_sum * f_GHG) / 1000 # for kg CO2eq # 12.04.2022
+    else: # 12.04.2022
+        Cooling_Sys_Carbon_sum = (Cooling_Sys_Fossils_sum  * f_GHG) / 1000 # for kg CO2eq # 12.04.2022
+    
     Considered_fuel_type = Fuel_Type
 
 
@@ -511,6 +570,7 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     # ------------------------------------------------------------------------------------------------------------------------------
  
     print("# ", iteration)
+    print("hk_geb:", BuildingInstance.hk_geb) # 12.04.2022
     print("GebäudeID:", i_gebaeudeparameter.scr_gebaeude_id)
     print("HeatingDemand [kwh]:", HeatingDemand_sum)
     print("HeatingDemand [kwh/m2]:", HeatingDemand_sum/BuildingInstance.energy_ref_area)
@@ -524,6 +584,10 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     print("CoolingEnergy [kwh/m2]:", CoolingEnergy_sum/BuildingInstance.energy_ref_area)
     # print("Cooling_Sys_Electricity [kwh]:", Cooling_Sys_Electricity_sum)
     # print("Cooling_Sys_Fossils [kwh]:", Cooling_Sys_Fossils_sum)
+    print("HotWaterDemand [kwh]:", HotWaterDemand_sum) # 12.04.2022
+    print("HotWaterDemand [kwh/m2]:", HotWaterDemand_sum/BuildingInstance.energy_ref_area) # 12.04.2022
+    print("HotWaterEnergy [kwh]:", HotWaterEnergy_sum) # 12.04.2022
+    print("HotWaterEnergy [kwh/m2]:", HotWaterEnergy_sum/BuildingInstance.energy_ref_area) # 12.04.2022
     print("LightingDemand [kwh]:", LightingDemand_sum)
     print("Appliance_gains_demand [kWh]:", Appliance_gains_demand_sum)
     print("InternalGains [kwh]:", InternalGains_sum)
@@ -557,6 +621,12 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
                                         'Cooling_Sys_Fossils [kwh/m2]': Cooling_Sys_Fossils_sum/BuildingInstance.energy_ref_area,
                                         'Cooling_Sys_GWP [kg]': Cooling_Sys_Carbon_sum, 
                                         'Cooling_Sys_GWP [kg/m2]': Cooling_Sys_Carbon_sum/BuildingInstance.energy_ref_area, 
+                                        'HotWaterDemand [kwh]': HotWaterDemand_sum, # 12.04.2022
+                                        'HotWaterDemand [kwh/m2]': HotWaterDemand_sum/BuildingInstance.energy_ref_area, # 12.04.2022
+                                        'HotWaterEnergy [kwh]': HotWaterEnergy_sum, # 12.04.2022
+                                        'HotWaterEnergy [kwh/m2]': HotWaterEnergy_sum/BuildingInstance.energy_ref_area, # 12.04.2022   
+                                        'HotWater_Sys_GWP [kg]': HotWater_Sys_Carbon_sum, # 12.04.2022
+                                        'HotWater_Sys_GWP [kg/m2]': HotWater_Sys_Carbon_sum/BuildingInstance.energy_ref_area, # 12.04.2022
                                         'ElectricityDemandTotal': Heating_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + Appliance_gains_demand_sum, 
                                         'ElectricityDemandTotal [kwh/m2]': (Heating_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + Appliance_gains_demand_sum)/BuildingInstance.energy_ref_area, 
                                         'FossilsDemandTotal': Heating_Sys_Fossils_sum + Cooling_Sys_Fossils_sum,
