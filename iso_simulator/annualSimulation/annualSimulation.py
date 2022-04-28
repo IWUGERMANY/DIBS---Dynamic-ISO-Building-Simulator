@@ -330,7 +330,7 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
         hotwaterdemand = occupancy_schedule.loc[hour, 'People'] * TEK_dhw_per_Occupancy_Full_Usage_Hour * 1000 * BuildingInstance.energy_ref_area # in W
         
         if BuildingInstance.heating_demand > 0: # catch devision by zero error
-            hotwaterenergy = hotwaterdemand / (BuildingInstance.heating_energy / BuildingInstance.heating_demand)
+            hotwaterenergy = hotwaterdemand * (BuildingInstance.heating_energy / BuildingInstance.heating_demand)
         else:
             hotwaterenergy = hotwaterdemand
         
