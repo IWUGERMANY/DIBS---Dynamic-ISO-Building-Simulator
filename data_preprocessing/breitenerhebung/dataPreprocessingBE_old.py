@@ -5,13 +5,13 @@ Module serves for data generation from original and imputated BE-Data to a modif
 Portions of this software are copyright of their respective authors and released under the MIT license:
 RC_BuildingSimulator, Copyright 2016 Architecture and Building Systems, ETH Zurich
 
-author: "Julian Bischof, Simon Knoll, Michael Hörner "
+author: "Simon Knoll, Julian Bischof, Michael Hörner "
 copyright: "Copyright 2021, Institut Wohnen und Umwelt"
 license: "MIT"
 
 """
-__author__ = "Julian Bischof, Simon Knoll, Michael Hörner "
-__copyright__ = "Copyright 2022, Institut Wohnen und Umwelt"
+__author__ = "Simon Knoll, Julian Bischof, Michael Hörner "
+__copyright__ = "Copyright 2021, Institut Wohnen und Umwelt"
 __license__ = "MIT"
 
 
@@ -21,9 +21,6 @@ import pandas as pd
 import warnings
 from pandas.core.common import SettingWithCopyWarning
 
-# To install this package with conda run one of the following:
-# conda install -c conda-forge pyreadr 
-import pyreadr as pr
 
 
 # Ignore CopyWarnings caused by map() [See: https://pandas.pydata.org/pandas-docs/stable/user_guide/indexing.html#returning-a-view-versus-a-copy]
@@ -34,21 +31,9 @@ warnings.simplefilter(action = "ignore", category = SettingWithCopyWarning)
 # Import Input Data
 ##############################################################################
 ##############################################################################
-
-# SELECT METHOD OF IMPORT
-#
-# import_method = "R"
-import_method = "Excel"
-
-if import_method == "R":
-    # Import Data Breitenerhebung with relevant buildings from R
-    rdata = pr.read_r('BE_data/dibs.bre.v2.rdata')
-    print(rdata.keys())
-    be_data_original = rdata['dibs_data.valid']
-else: 
-    # Import Data Breitenerhebung with relevant buildings from EXCEL
-    be_data_original = pd.read_excel(r'BE_data/BE_BuildingData_Dummy.xlsx')
-    # be_data_original = pd.read_excel(r'BE_data/BE_BuildingData.xlsx')
+# Import Data Breitenerhebung with relevant buildings
+be_data_original = pd.read_excel(r'BE_data/BE_BuildingData_Dummy.xlsx')
+# be_data_original = pd.read_excel(r'BE_data/BE_BuildingData.xlsx')
 
 # Import Data from DIN V 18599-10:2018-09, DIN V 18599-4:2018-09
 data_18599_10_4 = pd.read_csv(r'BE_data/profile_18599_10_data.csv', sep = ';', encoding= 'unicode_escape', decimal=",")
@@ -70,20 +55,20 @@ profile_zuweisung_18599_10 = pd.read_csv(r'BE_data/profile_18599_10_zuweisung.cs
 ##############################################################################
 # Create DataFrame building_data with column 'scr_gebaeude_id' including all buildings from be_data_original
 building_data = be_data_original[['scr_gebaeude_id']]
-# from R as character
+
 
 # PLZ (plz)
 ##############################################################################
 # Map 'scr_plz' from be_data_original to building_data and name column 'plz'
 building_data['plz'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['plz'])
-# from R as Integer
+
 
 # Gebäudefunktion Hauptkategorie/Unterkategorie (hk_geb, uk_geb)
 ##############################################################################
 # Map 'HK_Geb' and 'UK_Geb' to be_data_original
 building_data['hk_geb'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['hk_geb']).astype(str)
 building_data['uk_geb'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['uk_geb']).astype(str)
-# from R as Factor
+
 
 # Encode Labelling 
 cleanup_hk_geb = {"hk_geb": {'1': 'Büro-, Verwaltungs- oder Amtsgebäude',                                           
@@ -106,7 +91,6 @@ building_data.replace(cleanup_hk_geb, inplace = True)
 # These have been defined seperatly.  The old clean up versions are uncommented in the Script below.
 cleanup_uk_geb = {"uk_geb": { '1.00': 'Bürogebäude', #! Sonstige uk_geb: Annahme Zuweisung anders Profils, da diese nicht in Norm existiert. Zuweisung als 1.06 in DB_BE nicht umgesetzt!!! Sondern als 1 was in Imputation zu 1.00 korrigiert wird.
                               '1.0': 'Bürogebäude', #!1 From R to Python somehow the second 0 is lost (see 1.00 above)
-                              '1': 'Bürogebäude', # bei Übernahme aus R
                               '1.01': 'Parlaments- oder Gerichtsgebäude',                                                                                                                                 
                               '1.02': 'Öffentliches Verwaltungs- oder Ämtergebäude, Rathaus',                      
                               '1.03': 'Bürogebäude',                                                               
@@ -115,7 +99,6 @@ cleanup_uk_geb = {"uk_geb": { '1.00': 'Bürogebäude', #! Sonstige uk_geb: Annah
                               '1.06': 'Sonstige Gebäudefunktion', # nicht in Norm definiert!
                               '2.00': 'Verwaltungs- oder Seminargebäude', #! Sonstige uk_geb: Annahme Zuweisung anders Profils, da diese nicht in Norm existiert. Zuweisung als 2.08 in DB_BE nicht umgesetzt!!! Sondern als 2 was in Imputation zu 2.00 korrigiert wird. 
                               '2.0': 'Verwaltungs- oder Seminargebäude', #!1 see above
-                              '2': 'Verwaltungs- oder Seminargebäude', #!1 see above
                               '2.01': 'Hörsaalgebäude',                                                                                                                                                                                        
                               '2.02': 'Verwaltungs- oder Seminargebäude',                                                                                                                                                                
                               '2.03': 'Institutsgebäude für Forschung und Lehre (Labor mit geringen Anforderungen an die Raumlufttechnik, z.B. Medizin, Informatik)',
@@ -126,7 +109,6 @@ cleanup_uk_geb = {"uk_geb": { '1.00': 'Bürogebäude', #! Sonstige uk_geb: Annah
                               '2.08': 'Sonstiges Gebäudefunktion', # nicht in Norm definiert!
                               '3.00': 'Medizinisches Versorgungszentrum, Ärztehaus', #! Sonstige uk_geb: Annahme Zuweisung anders Profils, da diese nicht in Norm existiert. 
                               '3.0': 'Medizinisches Versorgungszentrum, Ärztehaus', #!1
-                              '3': 'Medizinisches Versorgungszentrum, Ärztehaus', #!1
                               '3.01': 'Hochschulklinik',                                                                                                                                          
                               '3.02': 'Krankenhaus',                                                                  
                               '3.03': 'Gebäude für teilstationäre Versorgung (z.B. Tagesklinik, Geburtshaus)',        
@@ -143,8 +125,7 @@ cleanup_uk_geb = {"uk_geb": { '1.00': 'Bürogebäude', #! Sonstige uk_geb: Annah
                               '3.13': 'Hospiz',                                                                     
                               '3.14': 'Sonstige Gebäudefunktion', # nicht in Norm definiert!
                               '4.00': 'Schule, allgemein', #! Sonstige uk_geb: Annahme Zuweisung anders Profils, da diese nicht in Norm existiert. 
-                              '4.0': 'Schule, allgemein', #!1
-                              '4': 'Schule, allgemein', #!1
+                              '4.0': 'Schule, allgemein', #!
                               '4.01': 'Schule, allgemein',
                               '4.02': 'Ganztagesschule',                                                              
                               '4.03': 'Internatsschule',                                                              
@@ -163,8 +144,7 @@ cleanup_uk_geb = {"uk_geb": { '1.00': 'Bürogebäude', #! Sonstige uk_geb: Annah
                               '4.15': 'Jugendzentrum',                                                                
                               '4.16': 'Sonstige Gebäudefunktion', # nicht in Norm definiert!
                               '5.00': 'Freizeit-, Gemeinschafts-, Bürgerhaus', #! Sonstige uk_geb: Annahme Zuweisung anders Profils, da diese nicht in Norm existiert.
-                              '5.0': 'Freizeit-, Gemeinschafts-, Bürgerhaus', #!1
-                              '5': 'Freizeit-, Gemeinschafts-, Bürgerhaus', #!1
+                              '5.0': 'Freizeit-, Gemeinschafts-, Bürgerhaus', #!
                               '5.01': 'Bibliothek/Archiv (einfach, z.B. Stadtbücherei)',                                                            
                               '5.02': 'Bibliothek/Archiv (höher technisiert, z.B. Unibibliothek)',       
                               '5.03': 'Ausstellungsgebäude (Museen, Galerien)',                          
@@ -173,8 +153,7 @@ cleanup_uk_geb = {"uk_geb": { '1.00': 'Bürogebäude', #! Sonstige uk_geb: Annah
                               '5.06': 'Spielkasino, -bank, -halle',                                      
                               '5.07': 'Sonstige Gebäudefunktion', # nicht in Norm definiert!
                               '6.00': 'Sporthalle mit Mehrzwecknutzung', #! Sonstige uk_geb: Annahme Zuweisung anders Profils, da diese nicht in Norm existiert.
-                              '6.0': 'Sporthalle mit Mehrzwecknutzung', #!1
-                              '6': 'Sporthalle mit Mehrzwecknutzung', #!1
+                              '6.0': 'Sporthalle mit Mehrzwecknutzung', #!
                               '6.01': 'Einfeldhalle',                                                                   
                               '6.02': 'Mehrfeldhalle',                                                   
                               '6.03': 'Gymnastikhalle',                                                  
@@ -194,8 +173,7 @@ cleanup_uk_geb = {"uk_geb": { '1.00': 'Bürogebäude', #! Sonstige uk_geb: Annah
                               '6.16': 'Gebäude für Sportaußenanlage (Tribünen-, Umkleidegebäude)',       
                               '6.17': 'Sonstige Gebäudefunktion', # nicht in Norm definiert!
                               '7.00': 'Herberge, Ferienheim, Ferienhaus, Hotel/Pension einfach', #! Sonstige uk_geb: Annahme Zuweisung anders Profils, da diese nicht in Norm existiert.
-                              '7.0': 'Herberge, Ferienheim, Ferienhaus, Hotel/Pension einfach', #!1
-                              '7': 'Herberge, Ferienheim, Ferienhaus, Hotel/Pension einfach', #!1
+                              '7.0': 'Herberge, Ferienheim, Ferienhaus, Hotel/Pension einfach', #!
                               '7.01': 'Herberge, Ferienheim, Ferienhaus, Hotel/Pension einfach',                                       
                               '7.02': 'Sterne-Hotel',                                                    
                               '7.03': 'Ausschankwirtschaft',                                             
@@ -206,7 +184,6 @@ cleanup_uk_geb = {"uk_geb": { '1.00': 'Bürogebäude', #! Sonstige uk_geb: Annah
                               '7.08': 'Sonstige Gebäudefunktion', # ist in norm profilen definiert
                               '8.00': 'Gebäude für gewerbliche Produktion und Verarbeitung (z.B. Brauerei, Molkerei, Schlachthof)', #! Sonstige uk_geb: Annahme Zuweisung anders Profils, da diese nicht in Norm existiert.
                               '8.0': 'Gebäude für gewerbliche Produktion und Verarbeitung (z.B. Brauerei, Molkerei, Schlachthof)', #!1
-                              '8': 'Gebäude für gewerbliche Produktion und Verarbeitung (z.B. Brauerei, Molkerei, Schlachthof)', #!1
                               '8.01': 'Gebäude für gewerbliche Produktion und Verarbeitung (z.B. Brauerei, Molkerei, Schlachthof)',              
                               '8.02': 'Gebäude für industrielle Produktion und Verarbeitung (z.B. Chemie, Metall, Textilien, Lebensmittel, Holz)',
                               '8.03': 'Werkstattgebäude allgemein (z.B. von Handwerksbetrieben wie Klempner, Schlosser, Schreiner)',             
@@ -222,7 +199,6 @@ cleanup_uk_geb = {"uk_geb": { '1.00': 'Bürogebäude', #! Sonstige uk_geb: Annah
                               '8.12': 'Sonstige Gebäudefunktion', # nicht in Norm definiert!
                               '9.00': 'Einkaufszentrum, Shopping-Mall', #! Sonstige uk_geb: Annahme Zuweisung anders Profils, da diese nicht in Norm existiert.
                               '9.0': 'Einkaufszentrum, Shopping-Mall', #!1
-                              '9': 'Einkaufszentrum, Shopping-Mall', #!1
                               '9.01': 'Handelsgebäude des Lebensmitteleinzel- und -großhandels',        
                               '9.02': 'Handelsgebäude des Non-Food-Einzel- und -Großhandels',            
                               '9.03': 'Einkaufszentrum, Shopping-Mall',                                  
@@ -232,7 +208,6 @@ cleanup_uk_geb = {"uk_geb": { '1.00': 'Bürogebäude', #! Sonstige uk_geb: Annah
                               '9.07': 'Sonstige Gebäudefunktion', # nicht in Norm definiert!
                               '10.00': 'Gebäude für Lenkung, Steuerung, Überwachung und Nachrichtenübermittlung (z.B. Stellwerk, Leuchtturm)', #! Sonstige uk_geb: Annahme Zuweisung anders Profils, da diese nicht in Norm existiert.
                               '10.0': 'Gebäude für Lenkung, Steuerung, Überwachung und Nachrichtenübermittlung (z.B. Stellwerk, Leuchtturm)', #!1
-                              '10': 'Gebäude für Lenkung, Steuerung, Überwachung und Nachrichtenübermittlung (z.B. Stellwerk, Leuchtturm)', #!1
                               '10.01': 'Kraftwerk (Gesamtanlage für Energieversorgung)',                                                                      
                               '10.02': 'Gebäude für Lenkung, Steuerung, Überwachung und Nachrichtenübermittlung (z.B. Stellwerk, Leuchtturm)',
                               '10.03': 'Gebäude für Energieversorgung (z.B. Fernheizwerk, Tankstelle)',                                       
@@ -242,7 +217,6 @@ cleanup_uk_geb = {"uk_geb": { '1.00': 'Bürogebäude', #! Sonstige uk_geb: Annah
                               '10.07': 'Sonstige Gebäudefunktion', # nicht in Norm definiert!
                               '11.00': 'Park-/Garagengebäude, Fahrradparkhaus', #! Sonstige uk_geb: Annahme Zuweisung anders Profils, da diese nicht in Norm existiert.
                               '11.0': 'Park-/Garagengebäude, Fahrradparkhaus', #!1
-                              '11': 'Park-/Garagengebäude, Fahrradparkhaus', #!1
                               '11.01': 'Park-/Garagengebäude, Fahrradparkhaus',                                                                                         
                               '11.02': 'Halle für sonstige Verkehrsmittel (z.B. für Flugzeuge, Schienenfahrzeuge)',
                               '11.03': 'Gebäude zur Pflege von Fahrzeugen (z.B. Waschstraße)',                    
@@ -359,7 +333,7 @@ building_data.replace(cleanup_uk_geb, inplace = True)
 #                              '11.05': 'Sonstige Gebäudefunktion'}}
 # building_data.replace(cleanup_uk_geb, inplace = True)
 
-# # Alternative clean up if Excel import is causing problems regarding , and .
+# # Alternative clean up if Excel import is cousing problems regarding , and .
 # cleanup_uk_geb = {"uk_geb": {'1,01': 'Parlaments- oder Gerichtsgebäude',                                                                                                                                 
 #                              '1,02': 'Öffentliches Verwaltungs- oder Ämtergebäude, Rathaus',                      
 #                              '1,03': 'Bürogebäude',                                                               
@@ -477,20 +451,18 @@ building_data['typ_18599'] = building_data['uk_geb'].map(profile_zuweisung_18599
 ##############################################################################
 # Map 'q25_1'(max. Personenbelegung) from be_data_original to building_data as column 'max_occupancy'
 building_data['max_occupancy'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['q25_1'])
-# from R as Integer
 
 
 # Oberirdische Außenwandfläche (wall_area_og)
 ##############################################################################
 # Map 'aw_fl' from be_data_original to building_data as column 'wall_area_og'
 building_data['wall_area_og'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['aw_fl'])
-# from R as Double
+
 
 # Unterirdische Außenwandfläche (wall_area_ug)
 ##############################################################################
 # Map 'unteraw_fl' from be_data_original to building_data as column 'wall_area_ug'
 building_data['wall_area_ug'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['unteraw_fl'])
-# from R as Double
 
 
 # Fensterflächen (window_area_north, window_area_east, window_area_south, window_area_west)
@@ -505,13 +477,11 @@ cleanup_Fen_ant = {"Fen_ant": {1: 100,
                                5: 10,                                                 
                                6: 0}}
 building_data.replace(cleanup_Fen_ant, inplace = True)
-# from R as Integer
 
 building_data['geb_f_flaeche_n_iwu'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['geb_f_flaeche_n_iwu'])
 building_data['geb_f_flaeche_o_iwu'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['geb_f_flaeche_o_iwu'])
 building_data['geb_f_flaeche_s_iwu'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['geb_f_flaeche_s_iwu'])
 building_data['geb_f_flaeche_w_iwu'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['geb_f_flaeche_w_iwu'])
-# from R as Double
 
 # Calculate window area for each directions                                                         
 building_data['window_area_north'] = (building_data['Fen_ant']/100) * building_data['geb_f_flaeche_n_iwu'] 
@@ -524,28 +494,24 @@ building_data['window_area_west'] = (building_data['Fen_ant']/100) * building_da
 ##############################################################################
 # Map 'D_fl_be' from be_data_original to building_data as column 'roof_area'
 building_data['roof_area'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['d_fl_be']) 
-# from R as Double
+
 
 # Netto-Raumfläche (net_room_area)
 ##############################################################################
 # Map 'nrf_2' from be_data_original to building_data as column 'net_room_area'
 building_data['net_room_area'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['nrf_2']) 
-# from R as Double
 
 
 # Energiebezugsfläche (energy_ref_area)
 ##############################################################################
 # Map 'ebf' from be_data_original to building_data as column 'energy_ref_area'
 building_data['energy_ref_area'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['ebf']) 
-# from R as Double
 
     
 # Fläche des unteren Gebäudeabschlusses (base_area)
 ##############################################################################
 # Map 'Mittlere Anzahl oberidrische Geschosse' from be_data_original to building_data as column 'Mittlere Anzahl oberidrische Geschosse'
 building_data['n_OG'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['n_og']) 
-# from R as Double
-
 # Calculate base_area
 building_data['base_area'] = building_data['energy_ref_area'] / (building_data['n_OG'] * 0.87)
 
@@ -554,7 +520,6 @@ building_data['base_area'] = building_data['energy_ref_area'] / (building_data['
 ##############################################################################
 # Map 'geb_f_hoehe_mittel_iwu' from be_data_original to building_data as column 'building_height'
 building_data['building_height'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['geb_f_hoehe_mittel_iwu'])
-# from R as Double
 
 
 # spezifische Beleuchtungsleistung (lighting_load)
@@ -564,8 +529,6 @@ subset_lighting_load = building_data[['scr_gebaeude_id', 'typ_18599']]
 
 # Map 'qf1' (überw. Beleuchtungsart) from be_data_original to subset_lighting_load as column 'qf1'
 subset_lighting_load['qF1'] = subset_lighting_load['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qf1'])
-# from R as Integer
-
 # Encode Labelling
 cleanup_beleuchtungsart = {'qF1':{
                                   1: 'Direkt (Licht fällt direkt auf den Arbeitsbereich)',                                           
@@ -573,17 +536,15 @@ cleanup_beleuchtungsart = {'qF1':{
                                   3: 'Indirekt (Licht, das von Decken und Wänden reflektiert wird)'}}
 subset_lighting_load.replace(cleanup_beleuchtungsart, inplace = True)
 
-# Map 'Lampenart' from be_data_original to subset_lighting_load as column 'lampenart_be'
+# Map 'qF1' (überw. Lampenart) from be_data_original to subset_lighting_load as column 'lampenart_be'
 subset_lighting_load['lampenart_be'] = subset_lighting_load['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['lampenart'])
-# from R as Integer
 # Encode Labelling
 cleanup_lampenart = {'lampenart_be':{
                                     1: 'Glüh- oder Halogenlampe',                                           
                                     2: 'Leuchtstofflampe', 
                                     3: 'LED (allgemein)',
-                                  #  3.1: 'LED-Ersatzlampe', # Da in den GEG-Rel. NWG die Ausprägungen 3.1 und 3.2 nicht gibt, wurden diese entfernt
-                                  #  3.2: 'LED-Speziallampe', # Da in den GEG-Rel. NWG die Ausprägungen 3.1 und 3.2 nicht gibt, wurden diese entfernt
-                                    4: 'Speziallampen (z.B. HQI)'}}
+                                    3.1: 'LED-Ersatzlampe',
+                                    3.2: 'LED-Speziallampe'}}
 subset_lighting_load.replace(cleanup_lampenart, inplace = True)
 
 ## Start with calculation: Tabellenverfahren nach 18599-4:2018-09, S. 25
@@ -595,9 +556,8 @@ cleanup_k_L = {'k_L':{
                     'Glüh- oder Halogenlampe': 5.5,                                           
                     'Leuchtstofflampe': 1.235, 
                     'LED (allgemein)': 1.09,
-                  #  'LED-Ersatzlampe': 0.605,
-                  #  'LED-Speziallampe': 0.465,
-                    'Speziallampen (z.B. HQI)': 1.3}}
+                    'LED-Ersatzlampe': 0.605,
+                    'LED-Speziallampe': 0.465}}
 subset_lighting_load.replace(cleanup_k_L, inplace = True)
 
 # Map 'E_m', 'k_A', 'k_VB', 'k_WF', 'k' from data_18599_10_4 as new columns to subset_lighting_load
@@ -670,7 +630,7 @@ building_data['lighting_maintenance_factor'] = building_data.apply(set_lighting_
 ##############################################################################
 # Map 'fen_glasart_1' from be_data_original as column 'glass_solar_transmittance' to building_data
 building_data['glass_solar_transmittance'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['glasart_1'])
-# from R as Integer
+
 # 1: 1-S-Glas                                           
 # 2: 2-S-Glas
 # 3: 3-S-Glas
@@ -687,7 +647,6 @@ building_data.replace(cleanup_glass_solar_transmittance, inplace = True)
 ##############################################################################
 # Map 'qd8' from be_data_original as column 'qD8' to building_data
 building_data['qD8'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qd8'])
-# from R as Integer
 
 # 1: 'Sonnenschutzverglasung',                                           
 # 2: 'Außenliegende variable Sonnenschutzvorrichtung (z.B. Lamellen-Raffstoren)', 
@@ -697,10 +656,8 @@ building_data['qD8'] = building_data['scr_gebaeude_id'].map(be_data_original.set
 # 6: 'Keine Sonnenschutzvorrichtung'
 
 # Shading factor (Abschattungsfaktor) Fc [See DIN 4108-2:2013-02, p. 25]
-# Sonnenschutzverglasung (1) erhält einen Fc = 0,49 (mal in DIN 18599-2 Tabelle 8: Mittelwert aus Reduktionsfaktor 2xWSV zu 2xSSV = 0.54 UND 3xWSV zu 3xSSV = 0.435 -> 0.4879)
-# da Sonnenschutzglas bei glass_solar_transmittance nicht berücksichtigt wurde. Daher wird hier von dem Faktor 1 aus der 4108-2 abgewichen.
 cleanup_glass_solar_shading_transmittance = {'qD8':{
-                                                    1: 0.49,                                           
+                                                    1: 1,                                           
                                                     2: 0.22, 
                                                     3: 0.32,
                                                     4: 0.78,
@@ -742,30 +699,26 @@ building_data['glass_light_transmittance'] = building_data['k_1'] * building_dat
 # U-Wert Fenster (u_windows)
 ##############################################################################
 building_data['u_windows'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['u_fen'])
-# from R as Double
+
 
 # U-Wert Außenwände (u_walls)
 ##############################################################################
 building_data['u_walls'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['u_aw'])
-# from R as Double
 
 
 # U-Wert Dach (u_roof)
 ##############################################################################
 building_data['u_roof'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['d_u_ges'])
-# from R as Double
 
 
 # U-Wert Bodenplatte/Kellerdecke (u_base)
 ##############################################################################
 building_data['u_base'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['u_ug'])
-# from R as Double
 
 
 # Temperaturanpassungsfaktor unterer Gebäudeabschluss (temp_adj_base)
 ##############################################################################
 building_data['n_UG'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['n_ug'])
-# from R as Double
 
 # Find corresponding case according to DIN V 4108-6:2003-06
 def fall_temp_adj_base(row):
@@ -923,7 +876,6 @@ building_data['ach_vent'] = building_data.apply(calc_ach_vent, axis = 1)
 # Wirkungsgrad der Wärmerückgewinnungseinheit RLT (heat_recovery_efficiency)
 ##############################################################################
 building_data['qH3'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qh3_1'])
-# form R as Integer
 
 cleanup_rlt_funkt_encode = {"qH3": {
                             1: 'Wärmerückgewinnung',
@@ -989,32 +941,11 @@ building_data['thermal_capacitance'] = building_data['scr_gebaeude_id'].map(be_d
 # 3,40: Fassadensystem (z.B. Glasfassade) / Doppelfassade
 
 # Seperated cleanup for better readability
-# cleanup_thermal_capacitance_encode = {"thermal_capacitance": {
-#                                                             '1': 'schwer',
-#                                                             '2': 'leicht',
-#                                                             '3': 'mittel'}}
-# building_data.replace(cleanup_thermal_capacitance_encode, inplace = True)
-
-# Seperated detailed clean up for updated Excel and R data sets
-# from R as Factor
 cleanup_thermal_capacitance_encode = {"thermal_capacitance": {
-                                                              '1': 'schwer',
-                                                              '1.1': 'mittel',
-                                                              '1.11': 'mittel',
-                                                              '1.2': 'schwer',
-                                                              '1.3': 'schwer',
-                                                              '1.4': 'schwer',
-                                                              '1.5': 'schwer',
-                                                              '2': 'leicht',
-                                                              '2.1': 'leicht',
-                                                              '2.2': 'leicht',
-                                                              '2.3': 'leicht',
-                                                              '3': 'mittel',
-                                                              '3.1': 'mittel',
-                                                              '3.2': 'mittel',
-                                                              '3.3': 'mittel',
-                                                              '3.4': 'mittel'}}
-
+                                                            '1': 'schwer',
+                                                            '2': 'leicht',
+                                                            '3': 'mittel'}}
+building_data.replace(cleanup_thermal_capacitance_encode, inplace = True)
 
 # =============================================================================
 # # detailed version, for consideration of primary (qB1) and secondary (qB2 - qB3) construction type. Not utilised, as DIBS so far only considers 'leicht', 'mittel' and 'schwer' if better data on thermal capacities was available, this could be enabled again!
@@ -1063,7 +994,6 @@ building_data['t_set_cooling'] = building_data['typ_18599'].map(data_18599_10_4.
 # Nachtlüftung (night_flushing_flow)
 ##############################################################################
 building_data['night_flushing_flow'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['freie_kuehlung'])
-# from R as Integer
 
 # Gebäude, ggf. zusätzlich, durch sommerliche Nachtlüftung passiv oder durch freie Kühlung gekühlt? 
 # 1: Ja, ausschließlich passive Kühlung durch sommerliche Nachtlüftung
@@ -1243,7 +1173,6 @@ building_data.replace(cleanup_heating_supply_system, inplace = True)
 # Art der Kühlanlage (cooling_supply_system)
 ##############################################################################
 building_data['cooling_supply_system'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['k_erz_art_rk']).astype(str)
-# from R as Integer
 
 cleanup_cooling_supply_system_encode = {"cooling_supply_system": {
                                                             '1': 'Kompressionskältemaschine (elektrisch betrieben), weiß nicht',
@@ -1255,7 +1184,6 @@ cleanup_cooling_supply_system_encode = {"cooling_supply_system": {
                                                             '22': 'Absorptionskälte-maschine (mit Wärme betrieben), Wasser-kühlung (nass)',
                                                             '3': 'Nah- oder Fernkälte',
                                                             '6': 'Gasmotorbetriebene Kältemaschiene',
-                                                            '0': 'trifft nicht zu',
                                                             '-8': 'trifft nicht zu',
                                                             '-7': 'weiß nicht'}}
 building_data.replace(cleanup_cooling_supply_system_encode, inplace = True)
@@ -1279,7 +1207,6 @@ building_data.replace(cleanup_cooling_supply_system_assignment, inplace = True)
 # Art der Wärmeübergabe (heating_emission_system)
 ##############################################################################
 building_data['heating_emission_system'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qg13'])
-# from R as Integer
 
 # 1: Heizkörper
 # 2: Konvektoren
@@ -1306,7 +1233,6 @@ building_data['heating_emission_system'] = np.where(building_data['heating_suppl
 # Art der Kälteübergabe (cooling_emission_system)
 ##############################################################################
 building_data['cooling_emission_system'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qi11'])
-# from R as Integer
 
 # 1: Klimaanlage (raumlufttechnische Anlage)
 # 2: Ventilatorkonvektoren (z.B. in der Fensterbrüstung)
@@ -1316,7 +1242,7 @@ building_data['cooling_emission_system'] = building_data['scr_gebaeude_id'].map(
 cleanup_cooling_emission_system = {"cooling_emission_system": {
                                       1: 'AirConditioning',
                                       2: 'AirConditioning',
-                                      3: 'ThermallyActivated',
+                                      3: 'AirConditioning',
                                       4: 'ThermallyActivated'}}
 building_data.replace(cleanup_cooling_emission_system, inplace = True)
 
