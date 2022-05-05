@@ -327,7 +327,7 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
         
         # Calculate hot water usage of the building for the time step
         # with (BuildingInstance.heating_energy / BuildingInstance.heating_demand) represents the Efficiency of the heat generation in the building
-        if i_gebaeudeparameter.dhw_system != 'NoDHW':
+        if i_gebaeudeparameter.dhw_system != 'NoDHW' and i_gebaeudeparameter.dhw_system != ' -':
             hotwaterdemand = occupancy_schedule.loc[hour, 'People'] * TEK_dhw_per_Occupancy_Full_Usage_Hour * 1000 * BuildingInstance.energy_ref_area # in W
         
             if BuildingInstance.heating_demand > 0: # catch devision by zero error

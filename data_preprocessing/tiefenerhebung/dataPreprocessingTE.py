@@ -5,13 +5,13 @@ Module serves for data generation from original TE-Data to a modified input data
 Portions of this software are copyright of their respective authors and released under the MIT license:
 RC_BuildingSimulator, Copyright 2016 Architecture and Building Systems, ETH Zurich
 
-author: "Simon Knoll, Julian Bischof, Michael Hörner "
-copyright: "Copyright 2021, Institut Wohnen und Umwelt"
+author: "Julian Bischof, Simon Knoll, Michael Hörner"
+copyright: "Copyright 2022, Institut Wohnen und Umwelt"
 license: "MIT"
 
 """
-__author__ = "Simon Knoll, Julian Bischof, Michael Hörner "
-__copyright__ = "Copyright 2021, Institut Wohnen und Umwelt"
+__author__ = "Julian Bischof, Simon Knoll, Michael Hörner"
+__copyright__ = "Copyright 2022, Institut Wohnen und Umwelt"
 __license__ = "MIT"
 
 import pandas as pd
@@ -66,6 +66,15 @@ data_final = pd.DataFrame(data_be_te['scr_gebaeude_id'].reset_index(drop = True)
 # PLZ aus data_te für jedes Gebäude in data_final überführen
 data_final['plz'] = data_final['scr_gebaeude_id'].map(data_te.set_index('pr_var_name')['PLZ_location_correct'])
 data_final['plz'] = data_final['plz'].astype(int)
+
+
+# dhw_system aus TE #################################################################
+##############################################################################
+# Art der Warmwassererzeugung (dhw_system)
+# dhw_system aus data_te für jedes Gebäude in data_final überführen
+data_final['dhw_system'] = data_final['scr_gebaeude_id'].map(data_te.set_index('pr_var_name')['bp_ww_gen_1'])
+data_final['dhw_system'] = data_final['dhw_system'].astype(str)
+
 
 # Baujahr ####################################################################
 ##############################################################################
@@ -1687,7 +1696,8 @@ SimulationData_Tiefenerhebung = data_final[[
                           'heating_supply_system',  
                           'cooling_supply_system_adj',
                           'heating_emission_system',
-                          'cooling_emission_system_adj']] 
+                          'cooling_emission_system_adj',
+                          'dhw_system']] 
 
 SimulationData_Tiefenerhebung = SimulationData_Tiefenerhebung.rename(columns = {'cooling_supply_system_adj': 'cooling_supply_system',
                                                                                     'cooling_emission_system_adj': 'cooling_emission_system'})
