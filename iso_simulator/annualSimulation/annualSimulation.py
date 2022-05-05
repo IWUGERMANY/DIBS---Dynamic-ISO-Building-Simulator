@@ -327,22 +327,26 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
         
         # Calculate hot water usage of the building for the time step
         # with (BuildingInstance.heating_energy / BuildingInstance.heating_demand) represents the Efficiency of the heat generation in the building
-        hotwaterdemand = occupancy_schedule.loc[hour, 'People'] * TEK_dhw_per_Occupancy_Full_Usage_Hour * 1000 * BuildingInstance.energy_ref_area # in W
+        if i_gebaeudeparameter.dhw_system != 'NoDHW':
+            hotwaterdemand = occupancy_schedule.loc[hour, 'People'] * TEK_dhw_per_Occupancy_Full_Usage_Hour * 1000 * BuildingInstance.energy_ref_area # in W
         
-        if BuildingInstance.heating_demand > 0: # catch devision by zero error
-            hotwaterenergy = hotwaterdemand * (BuildingInstance.heating_energy / BuildingInstance.heating_demand)
+            if BuildingInstance.heating_demand > 0: # catch devision by zero error
+                hotwaterenergy = hotwaterdemand * (BuildingInstance.heating_energy / BuildingInstance.heating_demand)
+            else:
+                hotwaterenergy = hotwaterdemand
+            
+            if BuildingInstance.heating_sys_electricity > 0:
+                HotWaterSysElectricity = hotwaterenergy
+                HotWaterSysFossils = 0
+            elif BuildingInstance.heating_sys_fossils > 0:
+                HotWaterSysFossils = hotwaterenergy
+                HotWaterSysElectricity = 0
+            else:
+                HotWaterSysElectricity = 0
+                HotWaterSysFossils = 0
         else:
-            hotwaterenergy = hotwaterdemand
-        
-        if BuildingInstance.heating_sys_electricity > 0:
-            HotWaterSysElectricity = hotwaterenergy
-            HotWaterSysFossils = 0
-        elif BuildingInstance.heating_sys_fossils > 0:
-            HotWaterSysFossils = hotwaterenergy
-            HotWaterSysElectricity = 0
-        else:
-            HotWaterSysElectricity = 0
-            HotWaterSysFossils = 0
+            hotwaterdemand = 0
+            hotwaterenergy = 0
     
     
         # Set the previous temperature for the next time step

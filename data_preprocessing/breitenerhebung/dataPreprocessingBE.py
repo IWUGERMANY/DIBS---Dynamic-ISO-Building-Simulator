@@ -1324,6 +1324,28 @@ building_data.replace(cleanup_cooling_emission_system, inplace = True)
 building_data['cooling_emission_system'] = np.where(building_data['cooling_supply_system'] == 'NoCooling', 'NoCooling', building_data['cooling_emission_system'])
 
 
+
+# Art der Warmwassererzeugung (dhw_system) (BRE: qg21)
+##############################################################################
+building_data['dhw_system'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qg21'])
+
+# Wie wird das Trinkwarmwasser überwiegend erwärmt?
+# 1: Über die Heizung (d.h. über das vorher genannte zentrale Wärmeerzeugungssystem für die Heizung)
+# 2: Eigenes zentrales Wärmeerzeugungssystem nur für Trinkwasser 
+# 3: Dezentrale elektrisch betriebene Wärmeerzeuger (z.B. elektrischer Untertischspeicher)
+# 4: Dezentrale brennstoffbetriebene Wärmeerzeuger (z.B. Gas-Durchlauferhitzer)
+# 5: Es gibt keine Trinkwarmwasser-Erwärmung
+
+cleanup_DHW_system = {"dhw_system": {
+                                      1: 'CentralHeating',
+                                      2: 'CentralDHW',
+                                      3: 'DecentralElectricDHW',
+                                      4: 'DecentralFuelBasedDHW',
+                                      5: 'NoDHW'}}
+building_data.replace(cleanup_DHW_system, inplace = True)
+
+
+
 ##############################################################################
 # Delete unnecessary columns
 building_data.drop(['typ_18599', 'Fen_ant', 'geb_f_flaeche_n_iwu', 'geb_f_flaeche_o_iwu', 'geb_f_flaeche_s_iwu', 'geb_f_flaeche_w_iwu', 'building_length_n', 'building_length_s', 'building_length_o', 'building_length_w', 'n_OG', 'qD8', 'Fen_glasart_1', 'k_1', 'k_3', 'tau_D65SNA', 'case_temp_adj_base', 'B_raw', 'B', 'R_raw', 'R', 'case_temp_adj_walls_ug', 'V_min_18599', 'bak_grob', 'ach_min', 'qH1', 'n_50_standard_av', 'standard av-verhältnis', 'facade_area', 'av-verhältnis', 'n_50', 'qH3'], axis = 1, inplace = True)  
