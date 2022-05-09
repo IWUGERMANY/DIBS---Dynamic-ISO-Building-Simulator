@@ -70,6 +70,7 @@ namedlist_of_buildings  = list(iterate_namedlist(building_data))
 
 GWP_PE_Factors = pd.read_csv('LCA/Primary_energy_and_emission_factors.csv', sep = ';', decimal=',', index_col = False, encoding = 'cp1250') 
 
+length_iteration = len(namedlist_of_buildings)
         
 # Outer loop: Iterate over all buildings in namedlist_of_buildings       
 for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
@@ -662,19 +663,20 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     # take end time for calculation of one building
     end_time_building = time.time()
     time_building = end_time_building - start_time_building
-    remaining_buildings = enumerate(namedlist_of_buildings) - iteration
-    remaining_calculation_time_2_saving_annualResults_summary = remaining_buildings * time_building
-    calculation_time_4_saving_hourlyResults = enumerate(namedlist_of_buildings) * time_building
-    remaining_time_total = remaining_calculation_time_2_saving_annualResults_summary + calculation_time_4_saving_hourlyResults
-    print("Estimated time for simulation and saving of annualResults_summary.xlsx", remaining_calculation_time_2_saving_annualResults_summary)
-    print("Estimated time for simulation, saving of annualResults_summary.xlsx and saving of hourly results", remaining_time_total)
+    remaining_buildings = length_iteration - iteration
+    remaining_calculation_time_2_saving_annualResults_summary = (remaining_buildings * time_building) / 3600 # in Minutes
+    calculation_time_4_saving_hourlyResults = (length_iteration * time_building) / 3600 # in Minutes
+    remaining_time_total = remaining_calculation_time_2_saving_annualResults_summary + calculation_time_4_saving_hourlyResults # in Minutes
+    print("ETA:")
+    print("Estimated time for simulation and saving of annualResults_summary.xlsx", remaining_calculation_time_2_saving_annualResults_summary, "minutes")
+    print("Estimated time for simulation, saving of annualResults_summary.xlsx and saving of hourly results", remaining_time_total, "minutes")
 
     # Merge all summary DataFrames and save to disc 
-    print("Saving annualResults_summary.xlsx")
+    #print("Saving annualResults_summary.xlsx")
     annualResults_summary = pd.concat(list_of_summary)
     annualResults_summary.to_excel(r'./results/annualResults_summary.xlsx', index = False)
-    print("annualResults_summary.xlsx is now available in the DIBS---Dynamic-ISO-Building-Simulator\iso_simulator\annualSimulation\results folder")
-
+    
+print("annualResults_summary.xlsx is now available in the DIBS---Dynamic-ISO-Building-Simulator\iso_simulator\annualSimulation\results folder")
 print("Saving hourly results of each building to *BuildingID*.xlsx")
 print("This might take as long or longer than the simulation of the buildings before. You can savely abort the script if only the annualResults_summary.xlsx data is requiered.")
 # The function writes DataFrames of dict_of_results to the system (to_excel)    
