@@ -14,12 +14,12 @@ Portions of this software are copyright of their respective authors and released
 RC_BuildingSimulator, Copyright 2016 Architecture and Building Systems, ETH Zurich
 
 author: "Julian Bischof, Simon Knoll, Michael Hörner "
-copyright: "Copyright 2022, Institut Wohnen und Umwelt"
+copyright: "Copyright 2023, Institut Wohnen und Umwelt"
 license: "MIT"
 
 """
 __author__ = "Julian Bischof, Simon Knoll, Michael Hörner "
-__copyright__ = "Copyright 2022, Institut Wohnen und Umwelt"
+__copyright__ = "Copyright 2023, Institut Wohnen und Umwelt"
 __license__ = "MIT"
 
 
@@ -101,7 +101,11 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     SolarGainsNorthWindow = []
     SolarGainsTotal = []
     DayTime = []
-    
+    hotwaterdemand = 0
+    hotwaterenergy = 0
+    HotWaterSysElectricity = 0
+    HotWaterSysFossils = 0
+
                
     # Initialise an instance of the building
     BuildingInstance = Building(scr_gebaeude_id = i_gebaeudeparameter.scr_gebaeude_id,
@@ -334,25 +338,26 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
         # with (BuildingInstance.heating_energy / BuildingInstance.heating_demand) represents the Efficiency of the heat generation in the building
         if i_gebaeudeparameter.dhw_system != 'NoDHW' and i_gebaeudeparameter.dhw_system != ' -':
             hotwaterdemand = occupancy_schedule.loc[hour, 'People'] * TEK_dhw_per_Occupancy_Full_Usage_Hour * 1000 * BuildingInstance.energy_ref_area # in W
-        
+            
             if BuildingInstance.heating_demand > 0: # catch devision by zero error
                 hotwaterenergy = hotwaterdemand * (BuildingInstance.heating_energy / BuildingInstance.heating_demand)
             else:
                 hotwaterenergy = hotwaterdemand
-            
-            if BuildingInstance.heating_sys_electricity > 0:
-                HotWaterSysElectricity = hotwaterenergy
+           
+            if (i_gebaeudeparameter.dhw_system == 'DecentralElectricDHW') or \
+                (((i_gebaeudeparameter.dhw_system == 'CentralHeating') | (i_gebaeudeparameter.dhw_system == 'CentralDHW')) \
+                 and ((i_gebaeudeparameter.heating_supply_system == 'HeatPumpAirSource') | (i_gebaeudeparameter.heating_supply_system == 'HeatPumpGroundSource') |\
+                      (i_gebaeudeparameter.heating_supply_system == 'ElectricHeating'))):
+                HotWaterSysElectricity = hotwaterenergy 
                 HotWaterSysFossils = 0
-            elif BuildingInstance.heating_sys_fossils > 0:
+            else:
                 HotWaterSysFossils = hotwaterenergy
                 HotWaterSysElectricity = 0
-            else:
-                HotWaterSysElectricity = 0
-                HotWaterSysFossils = 0
         else:
             hotwaterdemand = 0
             hotwaterenergy = 0
-    
+            HotWaterSysElectricity = 0 
+            HotWaterSysFossils = 0
     
         # Set the previous temperature for the next time step
         t_m_prev = BuildingInstance.t_m_next
@@ -381,7 +386,8 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
         SolarGainsTotal.append(SouthWindow.solar_gains+EastWindow.solar_gains+WestWindow.solar_gains+NorthWindow.solar_gains)
         DayTime.append(hour%24)
         
-            
+    # hier endet die Inner Loop
+        
     # DataFrame with hourly results of specific building 
     hourlyResults = pd.DataFrame({
         'HeatingDemand': HeatingDemand,
@@ -438,14 +444,15 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     SolarGainsNorthWindow_sum = hourlyResults.SolarGainsNorthWindow.sum()/1000
     SolarGainsTotal_sum = hourlyResults.SolarGainsTotal.sum()/1000 
     
-    
+    # the fuel-related final energy sums, f.i. HeatingEnergy_sum, are calculated based upon the superior heating value Hs
+    # since the corresponding expenditure factors from TEK 9.24 represent the ration of Hs-related final energy to useful energy
     
     
     # ------------------------------------------------------------------------------------------------------------------------------
-    # Carbon Emissions
+    # Carbon Emissions, Primary Energy and Hi-related Final Energy
     # ------------------------------------------------------------------------------------------------------------------------------
     
-    # Calculation of Carbon Emission related to HEATING energy consumption
+    # Calculation  related to HEATING and Hotwater energy
     
     if (i_gebaeudeparameter.heating_supply_system == 'BiogasBoilerCondensingBefore95') \
         | (i_gebaeudeparameter.heating_supply_system == 'BiogasBoilerCondensingFrom95'):
@@ -507,23 +514,81 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
         print("Error occured during calculation of GHG-Emission for Heating. The following heating_supply_system cannot be considered yet", i_gebaeudeparameter.heating_supply_system)
 
     # HEATING
+    # GHG-Faktor Heating
     f_GHG = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'GWP spezific to heating value GEG [g/kWh]']
     f_GHG = f_GHG.iloc[0]
+
+    # PE-Faktor Heating
+    f_PE = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'Primary Energy Factor GEG   [-]']
+    f_PE = f_PE.iloc[0]
+
+    # Umrechnungsfaktor von Brennwert (Hs) zu Heizwert (Hi) einlesen
+    f_Hs_Hi = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'Relation Calorific to Heating Value GEG  [-]']
+    f_Hs_Hi = f_Hs_Hi.iloc[0]
+    
+    Heating_Sys_Electricity_Hi_sum = 0
+    Heating_Sys_Fossils_Hi_sum = 0
+    
     if Heating_Sys_Electricity_sum > 0: 
-        Heating_Sys_Carbon_sum = (Heating_Sys_Electricity_sum * f_GHG) / 1000 # for kg CO2eq 
+        Heating_Sys_Electricity_Hi_sum = Heating_Sys_Electricity_sum / f_Hs_Hi # for kWhHi Final Energy Demand  
+        Heating_Sys_Carbon_sum = (Heating_Sys_Electricity_Hi_sum * f_GHG) / 1000 # for kg CO2eq 
+        Heating_Sys_PE_sum = Heating_Sys_Electricity_Hi_sum * f_PE # for kWh Primary Energy Demand  
     else: 
-        Heating_Sys_Carbon_sum = (Heating_Sys_Fossils_sum * f_GHG) / 1000 # for kg CO2eq 
-    Considered_fuel_type = Fuel_Type
+        Heating_Sys_Fossils_Hi_sum = Heating_Sys_Fossils_sum / f_Hs_Hi # for kWhHi Final Energy Demand  
+        Heating_Sys_Carbon_sum = (Heating_Sys_Fossils_Hi_sum * f_GHG) / 1000 # for kg CO2eq 
+        Heating_Sys_PE_sum = Heating_Sys_Fossils_Hi_sum * f_PE # for kWh Primary Energy Demand  
+
+    Heating_Sys_Hi_sum = Heating_Sys_Electricity_Hi_sum + Heating_Sys_Fossils_Hi_sum
+
+    Heating_fuel_type = Fuel_Type
+    Heating_f_GHG = f_GHG
+    Heating_f_PE = f_PE
+    Heating_f_Hs_Hi = f_Hs_Hi
+    
     
     # HOT WATER
+    # Assumption: Central DHW-Systems use the same Fuel_type as Heating-Systems, only decentral DHW-Systems might have another Fuel-Type
+    if (i_gebaeudeparameter.dhw_system == 'DecentralElectricDHW'):
+        Fuel_Type = 'Electricity grid mix'
+    elif (i_gebaeudeparameter.dhw_system == 'DecentralFuelBasedDHW'):
+        Fuel_Type = 'Natural gas'
+    else:
+        Fuel_Type = Heating_fuel_type
+        
+    # GHG-Faktor Hotwater        
+    f_GHG = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'GWP spezific to heating value GEG [g/kWh]']
+    f_GHG = f_GHG.iloc[0]
+
+    # PE-Faktor Hotwater
+    f_PE = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'Primary Energy Factor GEG   [-]']
+    f_PE = f_PE.iloc[0]
+
+    # Umrechnungsfaktor von Brennwert (Hs) zu Heizwert (Hi) einlesen
+    f_Hs_Hi = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'Relation Calorific to Heating Value GEG  [-]']
+    f_Hs_Hi = f_Hs_Hi.iloc[0]
+    
+    
+    HotWater_Sys_Electricity_Hi_sum = 0
+    HotWater_Sys_Fossils_Hi_sum = 0
+    
     if HotWater_Sys_Electricity_sum > 0: 
-        HotWater_Sys_Carbon_sum = (HotWater_Sys_Electricity_sum * f_GHG) / 1000 # for kg CO2eq 
+        HotWater_Sys_Electricity_Hi_sum = HotWater_Sys_Electricity_sum / f_Hs_Hi # for kWhHi Final Energy Demand          
+        HotWater_Sys_PE_sum = HotWater_Sys_Electricity_Hi_sum * f_PE # for kWh Primary Energy Demand  
+        HotWater_Sys_Carbon_sum = (HotWater_Sys_Electricity_Hi_sum * f_GHG) / 1000 # for kg CO2eq 
     else: 
-        HotWater_Sys_Carbon_sum = (HotWater_Sys_Fossils_sum * f_GHG) / 1000 # for kg CO2eq 
+        HotWater_Sys_Fossils_Hi_sum = HotWater_Sys_Fossils_sum / f_Hs_Hi
+        HotWater_Sys_PE_sum = HotWater_Sys_Fossils_Hi_sum * f_PE # for kWh Primary Energy Demand  
+        HotWater_Sys_Carbon_sum = (HotWater_Sys_Fossils_Hi_sum * f_GHG) / 1000 # for kg CO2eq 
+
+    HotWaterEnergy_Hi_sum = HotWater_Sys_Electricity_Hi_sum + HotWater_Sys_Fossils_Hi_sum
+
+    Hotwater_fuel_type = Fuel_Type
+    Hotwater_f_GHG = f_GHG
+    Hotwater_f_PE = f_PE
+    Hotwater_f_Hs_Hi = f_Hs_Hi
 
 
-
-    # Calculation of Carbon Emission related to Cooling energy consumption
+    # Cooling energy 
     
     if (i_gebaeudeparameter.cooling_supply_system == 'AirCooledPistonScroll') \
         | (i_gebaeudeparameter.heating_supply_system == 'AirCooledPistonScrollMulti') \
@@ -539,40 +604,79 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     else: 
         print("Error occured during calculation of GHG-Emission for Cooling. The following cooling_supply_system cannot be considered yet", i_gebaeudeparameter.cooling_supply_system)
         
+
+    # GEG-Faktor Cooling
+    # warum hier nochmal definieren??? Weil anderer Fuel_Type!!
     f_GHG = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'GWP spezific to heating value GEG [g/kWh]']
     f_GHG = f_GHG.iloc[0] # Selects first row (0) value
+
+    # PE-Faktor Cooling
+    f_PE = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'Primary Energy Factor GEG   [-]']
+    f_PE = f_PE.iloc[0]
+
+    # Umrechnungsfaktor von Brennwert (Hs) zu Heizwert (Hi) einlesen
+    f_Hs_Hi = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'Relation Calorific to Heating Value GEG  [-]']
+    f_Hs_Hi = f_Hs_Hi.iloc[0]
+
+    Cooling_Sys_Electricity_Hi_sum = 0
+    Cooling_Sys_Fossils_Hi_sum = 0
+    
+    
     if Cooling_Sys_Electricity_sum > 0: 
-        Cooling_Sys_Carbon_sum = (Cooling_Sys_Electricity_sum * f_GHG) / 1000 # for kg CO2eq 
+        Cooling_Sys_Electricity_Hi_sum = Cooling_Sys_Electricity_sum / f_Hs_Hi # for kWhHi Final Energy Demand  
+        Cooling_Sys_Carbon_sum = (Cooling_Sys_Electricity_Hi_sum * f_GHG) / 1000 # for kg CO2eq 
+        Cooling_Sys_PE_sum = Cooling_Sys_Electricity_Hi_sum * f_PE # for kWh Primary Energy Demand  
     else: 
-        Cooling_Sys_Carbon_sum = (Cooling_Sys_Fossils_sum  * f_GHG) / 1000 # for kg CO2eq 
+        Cooling_Sys_Fossils_Hi_sum = Cooling_Sys_Fossils_sum / f_Hs_Hi # for kWhHi Final Energy Demand  
+        Cooling_Sys_Carbon_sum = (Cooling_Sys_Fossils_Hi_sum  * f_GHG) / 1000 # for kg CO2eq 
+        Cooling_Sys_PE_sum = Cooling_Sys_Fossils_Hi_sum * f_PE # for kWh Primary Energy Demand  
     
-    Considered_fuel_type = Fuel_Type
-
-
-
-    # Calculation of Carbon Emission related to remaining Electric energy consumption (LightingDemand_sum + Appliance_gains_demand_sum)
+    Cooling_Sys_Hi_sum = Cooling_Sys_Electricity_Hi_sum + Cooling_Sys_Fossils_Hi_sum
     
+    Cooling_fuel_type = Fuel_Type
+    Cooling_f_GHG = f_GHG
+    Cooling_f_PE = f_PE
+    Cooling_f_Hs_Hi = f_Hs_Hi
+
+    # remaining Electric energy (LightingDemand_sum + Appliance_gains_demand_sum)
     # Lighting
     Fuel_Type = 'Electricity grid mix'
     f_GHG = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'GWP spezific to heating value GEG [g/kWh]']
     f_GHG = f_GHG.iloc[0]
-    LightingDemand_sum_Carbon_sum = (LightingDemand_sum * f_GHG) / 1000 # for kg CO2eq
-    Considered_fuel_type = Fuel_Type
-    
-    # Appliance
-    Fuel_Type = 'Electricity grid mix'
-    f_GHG = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'GWP spezific to heating value GEG [g/kWh]']
-    f_GHG = f_GHG.iloc[0]
-    Appliance_gains_demand_sum_Carbon_sum = (Appliance_gains_demand_sum * f_GHG) / 1000 # for kg CO2eq
-    Considered_fuel_type = Fuel_Type
-    
-    # Calculation of Carbon Emission related to the entire energy consumption (Heating_Sys_Carbon_sum + Cooling_Sys_Carbon_sum + LightingDemand_sum_Carbon_sum + Appliance_gains_demand_sum_Carbon_sum)
-    
-    Carbon_sum = Heating_Sys_Carbon_sum + Cooling_Sys_Carbon_sum + LightingDemand_sum_Carbon_sum + Appliance_gains_demand_sum_Carbon_sum
-    #! add DHW latter!
-    
 
+    # PE-Faktor Lighting
+    f_PE = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'Primary Energy Factor GEG   [-]']
+    f_PE = f_PE.iloc[0]
+
+    # Umrechnungsfaktor von Brennwert (Hs) zu Heizwert (Hi) einlesen
+    f_Hs_Hi = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'Relation Calorific to Heating Value GEG  [-]']
+    f_Hs_Hi = f_Hs_Hi.iloc[0]
+
+    LightingDemand_Hi_sum = LightingDemand_sum / f_Hs_Hi # for kWhHi Final Energy Demand
+    LightingDemand_Carbon_sum = (LightingDemand_Hi_sum * f_GHG) / 1000 # for kg CO2eq
+    LightingDemand_PE_sum = LightingDemand_Hi_sum * f_PE # for kWhHs Primary Energy Demand
     
+    # Appliances
+    Appliance_gains_demand_Hi_sum = Appliance_gains_demand_sum / f_Hs_Hi # for kWhHi Final Energy Demand
+    Appliance_gains_demand_PE_sum = Appliance_gains_demand_Hi_sum * f_PE # for kWhHs Primary Energy Demand
+    Appliance_gains_demand_Carbon_sum = (Appliance_gains_demand_Hi_sum * f_GHG) / 1000 # for kg CO2eq
+     
+    LightAppl_fuel_type = Fuel_Type
+    LightAppl_f_GHG = f_GHG
+    LightAppl_f_PE = f_PE
+    LightAppl_f_Hs_Hi = f_Hs_Hi
+   
+    # Calculation of Carbon Emission related to the entire energy consumption (Heating_Sys_Carbon_sum + Cooling_Sys_Carbon_sum + LightingDemand_Carbon_sum + Appliance_gains_demand_Carbon_sum)
+    Carbon_sum = Heating_Sys_Carbon_sum + Cooling_Sys_Carbon_sum + LightingDemand_Carbon_sum + Appliance_gains_demand_Carbon_sum + HotWater_Sys_Carbon_sum
+    # Calculation of Primary Energy Demand related to the entire energy consumption (Heating_Sys_PE_sum + Cooling_Sys_PE_sum + LightingDemand_PE_sum + Appliance_gains_demand_PE_sum + HotWater_Sys_PE_sum)
+    PE_sum = Heating_Sys_PE_sum + Cooling_Sys_PE_sum + LightingDemand_PE_sum + Appliance_gains_demand_PE_sum + HotWater_Sys_PE_sum
+    # Calculation of Final Energy Hi Demand related to the entire energy consumption
+    FE_Hi_sum = Heating_Sys_Hi_sum + Cooling_Sys_Hi_sum + LightingDemand_Hi_sum + Appliance_gains_demand_Hi_sum + HotWaterEnergy_Hi_sum
+    
+     
+     
+     
+    # ---------------------------------------------------------------------------------------- 
 
     # ------------------------------------------------------------------------------------------------------------------------------
     # Print selected Results in Console
@@ -581,22 +685,27 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     print("# ", iteration)
     print("hk_geb:", BuildingInstance.hk_geb) 
     print("GebäudeID:", i_gebaeudeparameter.scr_gebaeude_id)
-    print("HeatingDemand [kwh]:", HeatingDemand_sum)
-    print("HeatingDemand [kwh/m2]:", HeatingDemand_sum/BuildingInstance.energy_ref_area)
-    print("HeatingEnergy [kwh]:", HeatingEnergy_sum)
+    # print("HeatingDemand [kwh]:", HeatingDemand_sum)
+    # print("HeatingDemand [kwh/m2]:", HeatingDemand_sum/BuildingInstance.energy_ref_area)
+    # print("HeatingEnergy [kwh]:", HeatingEnergy_sum)
+    # print("HeatingEnergy_Hi [kwh]:", Heating_Sys_Hi_sum)
     print("HeatingEnergy [kwh/m2]:", HeatingEnergy_sum/BuildingInstance.energy_ref_area)
     # print("Heating_Sys_Electricity [kwh]:", Heating_Sys_Electricity_sum)
     # print("Heating_Sys_Fossils [kwh]:", Heating_Sys_Fossils_sum)
-    print("CoolingDemand [kwh]:", CoolingDemand_sum)
-    print("CoolingDemand [kwh/m2]:", CoolingDemand_sum/BuildingInstance.energy_ref_area)
-    print("CoolingEnergy [kwh]:", CoolingEnergy_sum)
+    # print("CoolingDemand [kwh]:", CoolingDemand_sum)
+    # print("CoolingDemand [kwh/m2]:", CoolingDemand_sum/BuildingInstance.energy_ref_area)
+    # print("CoolingEnergy [kwh]:", CoolingEnergy_sum)
     print("CoolingEnergy [kwh/m2]:", CoolingEnergy_sum/BuildingInstance.energy_ref_area)
     # print("Cooling_Sys_Electricity [kwh]:", Cooling_Sys_Electricity_sum)
     # print("Cooling_Sys_Fossils [kwh]:", Cooling_Sys_Fossils_sum)
-    print("HotWaterDemand [kwh]:", HotWaterDemand_sum) 
-    print("HotWaterDemand [kwh/m2]:", HotWaterDemand_sum/BuildingInstance.energy_ref_area) 
-    print("HotWaterEnergy [kwh]:", HotWaterEnergy_sum) 
+    # print("HotWaterDemand [kwh]:", HotWaterDemand_sum) 
+    # print("HotWaterDemand [kwh/m2]:", HotWaterDemand_sum/BuildingInstance.energy_ref_area) 
+    # print("HotWaterEnergy [kwh]:", HotWaterEnergy_sum) 
     print("HotWaterEnergy [kwh/m2]:", HotWaterEnergy_sum/BuildingInstance.energy_ref_area) 
+    # print("HotWater_Sys_Electricity [kwh]:", HotWater_Sys_Electricity_sum) 
+    # print("HotWater_Sys_Fossils [kwh]:", HotWater_Sys_Fossils_sum) 
+    # print("HotWaterEnergy_Hi [kwh]:", HotWaterEnergy_Hi_sum) 
+    # print("HotWater_Sys_GWP [kg]:", HotWater_Sys_Carbon_sum)
     print("LightingDemand [kwh]:", LightingDemand_sum)
     print("Appliance_gains_demand [kWh]:", Appliance_gains_demand_sum)
     print("InternalGains [kwh]:", InternalGains_sum)
@@ -605,62 +714,104 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     # print("SolarGainsWestWindow [kwh]:", SolarGainsWestWindow_sum)
     # print("SolarGainsNorthWindow [kwh]:", SolarGainsNorthWindow_sum)
     print("SolarGainsTotal [kwh]:", SolarGainsTotal_sum)
+    print("CarbonSumTotal [kgCO2e]:", Carbon_sum)
+    print("PrimaryEnergyTotal [kWh]:", PE_sum)
+    print("FinalEnergyTotal [kWhHi]:", FE_Hi_sum)
+    print("Heating_fuel_type:", Heating_fuel_type)
+    # print("Heating_f_GHG [g/kWhHi]:", Heating_f_GHG)
+    # print("Heating_f_PE [kWhPE/kWhHi]:",  Heating_f_PE)
+    # print("Heating_f_Hs_Hi [kWhHs/kWhHi]:", Heating_f_Hs_Hi)
+
     
     # Summary of building to a separate DataFrame
     annualResults_summary_temp = pd.DataFrame({
                                         'GebäudeID': i_gebaeudeparameter.scr_gebaeude_id,
                                         'EnergyRefArea': BuildingInstance.energy_ref_area,
-                                        'HeatingDemand': HeatingDemand_sum,
+                                        'HeatingDemand [kWh]': HeatingDemand_sum,
                                         'HeatingDemand [kwh/m2]': HeatingDemand_sum/BuildingInstance.energy_ref_area,
-                                        'HeatingEnergy': HeatingEnergy_sum,
-                                        'HeatingEnergy [kwh/m2]': HeatingEnergy_sum/BuildingInstance.energy_ref_area,
-                                        'Heating_Sys_Electricity': Heating_Sys_Electricity_sum,
+                                        'HeatingEnergy [kWhHs]': HeatingEnergy_sum,
+                                        'HeatingEnergy [kwhHs/m2]': HeatingEnergy_sum/BuildingInstance.energy_ref_area,
+                                        'HeatingEnergy_Hi [kWhHi]': Heating_Sys_Hi_sum,
+                                        'Heating_Sys_Electricity [kWh]': Heating_Sys_Electricity_sum,
                                         'Heating_Sys_Electricity [kwh/m2]': Heating_Sys_Electricity_sum/BuildingInstance.energy_ref_area,
-                                        'Heating_Sys_Fossils': Heating_Sys_Fossils_sum,
-                                        'Heating_Sys_Fossils [kwh/m2]': Heating_Sys_Fossils_sum/BuildingInstance.energy_ref_area,
+                                        'Heating_Sys_Electricity_Hi [kWhHi]': Heating_Sys_Electricity_Hi_sum,
+                                        'Heating_Sys_Fossils [kWhHs]': Heating_Sys_Fossils_sum,
+                                        'Heating_Sys_Fossils [kwhHs/m2]': Heating_Sys_Fossils_sum/BuildingInstance.energy_ref_area,
+                                        'Heating_Sys_Fossils_Hi [kWhHi]': Heating_Sys_Fossils_Hi_sum,
                                         'Heating_Sys_GWP [kg]': Heating_Sys_Carbon_sum, 
                                         'Heating_Sys_GWP [kg/m2]': Heating_Sys_Carbon_sum/BuildingInstance.energy_ref_area, 
-                                        'CoolingDemand': CoolingDemand_sum,
+                                        'Heating_Sys_PE [kWh]': Heating_Sys_PE_sum, 
+                                        'Heating_Sys_PE [kWh/m2]': Heating_Sys_PE_sum/BuildingInstance.energy_ref_area,                                         
+                                        'CoolingDemand [kWh]': CoolingDemand_sum,
                                         'CoolingDemand [kwh/m2]': CoolingDemand_sum/BuildingInstance.energy_ref_area,
-                                        'CoolingEnergy' : CoolingEnergy_sum,
-                                        'CoolingEnergy [kwh/m2]': CoolingEnergy_sum/BuildingInstance.energy_ref_area,
-                                        'Cooling_Sys_Electricity': Cooling_Sys_Electricity_sum,
+                                        'CoolingEnergy [kWhHs]' : CoolingEnergy_sum,
+                                        'CoolingEnergy [kwhHs/m2]': CoolingEnergy_sum/BuildingInstance.energy_ref_area,
+                                        'Cooling_Sys_Electricity [kWh]': Cooling_Sys_Electricity_sum,
                                         'Cooling_Sys_Electricity [kwh/m2]': Cooling_Sys_Electricity_sum/BuildingInstance.energy_ref_area,
-                                        'Cooling_Sys_Fossils': Cooling_Sys_Fossils_sum,
-                                        'Cooling_Sys_Fossils [kwh/m2]': Cooling_Sys_Fossils_sum/BuildingInstance.energy_ref_area,
+                                        'Cooling_Sys_Fossils [kWhHs]': Cooling_Sys_Fossils_sum,
+                                        'Cooling_Sys_Fossils [kwhHs/m2]': Cooling_Sys_Fossils_sum/BuildingInstance.energy_ref_area,
                                         'Cooling_Sys_GWP [kg]': Cooling_Sys_Carbon_sum, 
                                         'Cooling_Sys_GWP [kg/m2]': Cooling_Sys_Carbon_sum/BuildingInstance.energy_ref_area, 
+                                        'Cooling_Sys_PE [kWh]': Cooling_Sys_PE_sum, 
+                                        'Cooling_Sys_PE [kWh/m2]': Cooling_Sys_PE_sum/BuildingInstance.energy_ref_area, 
                                         'HotWaterDemand [kwh]': HotWaterDemand_sum, 
                                         'HotWaterDemand [kwh/m2]': HotWaterDemand_sum/BuildingInstance.energy_ref_area, 
-                                        'HotWaterEnergy [kwh]': HotWaterEnergy_sum, 
-                                        'HotWaterEnergy [kwh/m2]': HotWaterEnergy_sum/BuildingInstance.energy_ref_area,    
+                                        'HotWaterEnergy [kwhHs]': HotWaterEnergy_sum, 
+                                        'HotWaterEnergy [kwhHs/m2]': HotWaterEnergy_sum/BuildingInstance.energy_ref_area,    
+                                        'HotWaterEnergy_Hi [kwhHi]': HotWaterEnergy_Hi_sum,
+                                        'HeatingSupplySystem': i_gebaeudeparameter.heating_supply_system,
+                                        'CoolingSupplySystem': i_gebaeudeparameter.cooling_supply_system,
+                                        'DHWSupplySystem': i_gebaeudeparameter.dhw_system,
+                                        'Heating_fuel_type': Heating_fuel_type,
+                                        'Heating_f_GHG [g/kWhHi]': Heating_f_GHG,
+                                        'Heating_f_PE [kWhPE/kWhHi]':  Heating_f_PE,
+                                        'Heating_f_Hs_Hi [kWhHs/kWhHi]': Heating_f_Hs_Hi,
+                                        'Hotwater_fuel_type': Hotwater_fuel_type,
+                                        'Hotwater_f_GHG [g/kWhHi]': Hotwater_f_GHG,
+                                        'Hotwater_f_PE [kWhPE/kWhHi]':  Hotwater_f_PE,
+                                        'Hotwater_f_Hs_Hi [kWhHs/kWhHi]': Hotwater_f_Hs_Hi,
+                                        'Cooling_fuel_type': Cooling_fuel_type,
+                                        'Cooling_f_GHG [g/kWhHi]': Cooling_f_GHG,
+                                        'Cooling_f_PE [kWhPE/kWhHi]':  Cooling_f_PE,
+                                        'Cooling_f_Hs_Hi [kWhHs/kWhHi]': Cooling_f_Hs_Hi,
+                                        'LightAppl_fuel_type': LightAppl_fuel_type,
+                                        'LightAppl_f_GHG [g/kWhHi]': LightAppl_f_GHG,
+                                        'LightAppl_f_PE [kWhPE/kWhHi]':  LightAppl_f_PE,
+                                        'LightAppl_f_Hs_Hi [kWhHs/kWhHi]': LightAppl_f_Hs_Hi,
                                         'HotWater_Sys_GWP [kg]': HotWater_Sys_Carbon_sum, 
                                         'HotWater_Sys_GWP [kg/m2]': HotWater_Sys_Carbon_sum/BuildingInstance.energy_ref_area, 
-                                        'ElectricityDemandTotal': Heating_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + Appliance_gains_demand_sum, 
+                                        'HotWater_Sys_PE [kWh]': HotWater_Sys_PE_sum, 
+                                        'HotWater_Sys_PE [kWh/m2]': HotWater_Sys_PE_sum/BuildingInstance.energy_ref_area, 
+                                        'ElectricityDemandTotal [kWh]': Heating_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + Appliance_gains_demand_sum, 
                                         'ElectricityDemandTotal [kwh/m2]': (Heating_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + Appliance_gains_demand_sum)/BuildingInstance.energy_ref_area, 
-                                        'FossilsDemandTotal': Heating_Sys_Fossils_sum + Cooling_Sys_Fossils_sum,
+                                        'FossilsDemandTotal [kWh]': Heating_Sys_Fossils_sum + Cooling_Sys_Fossils_sum,
                                         'FossilsDemandTotal [kwh/m2]': (Heating_Sys_Fossils_sum + Cooling_Sys_Fossils_sum)/BuildingInstance.energy_ref_area,
-                                        'LightingDemand': LightingDemand_sum,
-                                        'LightingDemand_GWP [kg]': LightingDemand_sum_Carbon_sum, 
-                                        'LightingDemand_GWP [kg/m2]': LightingDemand_sum_Carbon_sum/BuildingInstance.energy_ref_area, 
-                                        'Appliance_gains_demand': Appliance_gains_demand_sum,
-                                        'Appliance_gains_demand_GWP [kg]': Appliance_gains_demand_sum_Carbon_sum, 
-                                        'Appliance_gains_demand_GWP [kg/m2]': Appliance_gains_demand_sum_Carbon_sum/BuildingInstance.energy_ref_area,
+                                        'LightingDemand [kWh]': LightingDemand_sum,
+                                        'LightingDemand_GWP [kg]': LightingDemand_Carbon_sum, 
+                                        'LightingDemand_GWP [kg/m2]': LightingDemand_Carbon_sum/BuildingInstance.energy_ref_area, 
+                                        'LightingDemand_PE [kWh]': LightingDemand_PE_sum, 
+                                        'LightingDemand_PE [kWh/m2]': LightingDemand_PE_sum/BuildingInstance.energy_ref_area, 
+                                        'Appliance_gains_demand [kWh]': Appliance_gains_demand_sum,
+                                        'Appliance_gains_demand_GWP [kg]': Appliance_gains_demand_Carbon_sum, 
+                                        'Appliance_gains_demand_GWP [kg/m2]': Appliance_gains_demand_Carbon_sum/BuildingInstance.energy_ref_area,
+                                        'Appliance_gains_demand_PE [kWh]': Appliance_gains_demand_PE_sum, 
+                                        'Appliance_gains_demand_PE [kWh/m2]': Appliance_gains_demand_PE_sum/BuildingInstance.energy_ref_area,
                                         'GWP [kg]': Carbon_sum,
                                         'GWP [kg/m2]': Carbon_sum/BuildingInstance.energy_ref_area,
-                                        'InternalGains': InternalGains_sum,
-                                        'SolarGainsTotal': SolarGainsTotal_sum,
-                                        'SolarGainsSouthWindow': SolarGainsSouthWindow_sum,
-                                        'SolarGainsEastWindow': SolarGainsEastWindow_sum,
-                                        'SolarGainsWestWindow': SolarGainsWestWindow_sum,
-                                        'SolarGainsNorthWindow': SolarGainsNorthWindow_sum,
+                                        'PE [kWh]': PE_sum,
+                                        'PE [kWh/m2]': PE_sum/BuildingInstance.energy_ref_area,
+                                        'FinalEnergy_Hi [kWhHi]': FE_Hi_sum,
+                                        'InternalGains [kWh]': InternalGains_sum,
+                                        'SolarGainsTotal [kWh]': SolarGainsTotal_sum,
+                                        'SolarGainsSouthWindow [kWh]': SolarGainsSouthWindow_sum,
+                                        'SolarGainsEastWindow [kWh]': SolarGainsEastWindow_sum,
+                                        'SolarGainsWestWindow [kWh]': SolarGainsWestWindow_sum,
+                                        'SolarGainsNorthWindow [kWh]': SolarGainsNorthWindow_sum,
                                         'Gebäudefunktion Hauptkategorie': i_gebaeudeparameter.hk_geb,
                                         'Gebäudefunktion Unterkategorie': i_gebaeudeparameter.uk_geb,
                                         'Profil SIA 2024': [schedule_name],
                                         'Profil 18599-10': [typ_norm],
-                                        'EPW-File': [epw_filename],
-                                        'HeatingSupplySystem': i_gebaeudeparameter.heating_supply_system,
-                                        'CoolingSupplySystem': i_gebaeudeparameter.cooling_supply_system
+                                        'EPW-File': [epw_filename]
                                         })  
     # Append DataFrame to list_of_summary
     list_of_summary.append(annualResults_summary_temp)
@@ -679,6 +830,8 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     #print("Saving annualResults_summary.xlsx")
     annualResults_summary = pd.concat(list_of_summary)
     annualResults_summary.to_excel(r'./results/annualResults_summary.xlsx', index = False)
+
+# hier endet outer loop pro Gebäude
     
 print("annualResults_summary.xlsx is now available in the DIBS---Dynamic-ISO-Building-Simulator\iso_simulator\annualSimulation\results folder")
 print("Saving hourly results of each building to *BuildingID*.xlsx")
