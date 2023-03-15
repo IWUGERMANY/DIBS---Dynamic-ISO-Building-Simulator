@@ -48,3 +48,13 @@ Total number of individual page views:
  <a href="https://trackgit.com">
 <img src="https://us-central1-trackgit-analytics.cloudfunctions.net/token/ping/kye4dwl8mw0i15cfzxfk" alt="trackgit-views" />
 </a>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BQJ4ZSW2KZ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-BQJ4ZSW2KZ');
+</script>
