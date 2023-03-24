@@ -591,14 +591,16 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     # Cooling energy 
     
     if (i_gebaeudeparameter.cooling_supply_system == 'AirCooledPistonScroll') \
-        | (i_gebaeudeparameter.heating_supply_system == 'AirCooledPistonScrollMulti') \
-        | (i_gebaeudeparameter.heating_supply_system == 'WaterCooledPistonScroll') \
-        | (i_gebaeudeparameter.heating_supply_system == 'DirectCooler'):
+        | (i_gebaeudeparameter.cooling_supply_system == 'AirCooledPistonScrollMulti') \
+        | (i_gebaeudeparameter.cooling_supply_system == 'WaterCooledPistonScroll') \
+        | (i_gebaeudeparameter.cooling_supply_system == 'DirectCooler'):
         Fuel_Type = 'Electricity grid mix'
     elif (i_gebaeudeparameter.cooling_supply_system == 'AbsorptionRefrigerationSystem'):
         Fuel_Type = 'Waste Heat generated close to building'
     elif (i_gebaeudeparameter.cooling_supply_system == 'DistrictCooling'):
         Fuel_Type = 'District cooling'
+    elif (i_gebaeudeparameter.cooling_supply_system == 'GasEnginePistonScroll'):
+        Fuel_Type = 'Natural gas'    
     elif (i_gebaeudeparameter.cooling_supply_system == 'NoCooling'):
         Fuel_Type = 'None'
     else: 

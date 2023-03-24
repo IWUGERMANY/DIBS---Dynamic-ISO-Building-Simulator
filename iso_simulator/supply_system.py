@@ -793,7 +793,10 @@ class DistrictCooling(SupplySystemBase):
 ##############################################################################
 class GasEnginePistonScroll(SupplySystemBase):
     """
-    DistrictCooling assumed with efficiency 100%
+    ANALYSIS OF ENERGY EFFICIENCY OF GAS DRIVEN HEAT PUMPS - PhD Work of
+    M.Sc. Essam Mahrous Elgenady Elgendy
+    Fakultaet fuer Verfahrens- und Systemtechnik 
+    der Otto-von-Guericke-Universitaet Magdeburg
     """
 
     def calc_loads(self):
