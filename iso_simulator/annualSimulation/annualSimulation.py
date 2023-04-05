@@ -821,12 +821,12 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     end_time_building = time.time()
     time_building = end_time_building - start_time_building
     remaining_buildings = length_iteration - iteration
-    remaining_calculation_time_2_saving_annualResults_summary = (remaining_buildings * time_building) / 3600 # in Minutes
-    calculation_time_4_saving_hourlyResults = (length_iteration * time_building) / 3600 # in Minutes
-    remaining_time_total = remaining_calculation_time_2_saving_annualResults_summary + calculation_time_4_saving_hourlyResults # in Minutes
+    remaining_calculation_time_2_saving_annualResults_summary = (remaining_buildings * time_building) / 3600 # in Hours
+    calculation_time_4_saving_hourlyResults = (length_iteration * time_building) / 3600 # in Hours
+    remaining_time_total = remaining_calculation_time_2_saving_annualResults_summary + calculation_time_4_saving_hourlyResults # in Hours
     print("ETA:")
-    print("Estimated time for simulation and saving of annualResults_summary.xlsx", remaining_calculation_time_2_saving_annualResults_summary, "minutes")
-    print("Estimated time for simulation, saving of annualResults_summary.xlsx and saving of hourly results", remaining_time_total, "minutes")
+    print("Estimated time for simulation and saving of annualResults_summary.xlsx", remaining_calculation_time_2_saving_annualResults_summary, "hours")
+    print("Estimated time for simulation, saving of annualResults_summary.xlsx and saving of hourly results", remaining_time_total, "hours")
 
     # Merge all summary DataFrames and save to disc 
     #print("Saving annualResults_summary.xlsx")
