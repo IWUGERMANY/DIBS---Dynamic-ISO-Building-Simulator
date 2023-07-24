@@ -1,0 +1,322 @@
+--- OLD: 2023_07_24_Sicherung_DIBS---Dynamic-ISO-Building-Simulator\data_preprocessing\breitenerhebung\dataPreprocessingBE.py
++++ NEW: DIBS---Dynamic-ISO-Building-Simulator\data_preprocessing\breitenerhebung\dataPreprocessingBE.py
+
+###########################################################
+###########################################################
+Several improvements were added to the dataPreprocessingBE.py, as a detailed verification of the initially made assumptions and equations was undertaken, revealing some typo bugs that were removed. One Bug was the missing consideration of n_UG in calculating the base_area. This influences the A/V and therefore
+to a certain amount, the energy balance (generally removing slightly the space heating energy demand).
+
+Lines starting with "-" were removed and
+Lines starting with "+" were added to the last DIBS Version
+###########################################################
+###########################################################
+
+
+@@ -6,12 +6,12 @@
+ RC_BuildingSimulator, Copyright 2016 Architecture and Building Systems, ETH Zurich
+ 
+ author: "Julian Bischof, Simon Knoll, Michael Hörner "
+-copyright: "Copyright 2021, Institut Wohnen und Umwelt"
++copyright: "Copyright 2023, Institut Wohnen und Umwelt"
+ license: "MIT"
+ 
+ """
+ __author__ = "Julian Bischof, Simon Knoll, Michael Hörner "
+-__copyright__ = "Copyright 2022, Institut Wohnen und Umwelt"
++__copyright__ = "Copyright 2023, Institut Wohnen und Umwelt"
+ __license__ = "MIT"
+ 
+ 
+@@ -529,6 +529,7 @@
+ # Netto-Raumfläche (net_room_area)
+ ##############################################################################
+ # Map 'nrf_2' from be_data_original to building_data as column 'net_room_area'
++# comprises Above-ground floors and underground floors
+ building_data['net_room_area'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['nrf_2']) 
+ # from R as Double
+ 
+@@ -536,18 +537,25 @@
+ # Energiebezugsfläche (energy_ref_area)
+ ##############################################################################
+ # Map 'ebf' from be_data_original to building_data as column 'energy_ref_area'
++# comprises Above-ground floors and underground floors
+ building_data['energy_ref_area'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['ebf']) 
+ # from R as Double
+ 
+-    
++   
+ # Fläche des unteren Gebäudeabschlusses (base_area)
+ ##############################################################################
+ # Map 'Mittlere Anzahl oberidrische Geschosse' from be_data_original to building_data as column 'Mittlere Anzahl oberidrische Geschosse'
+ building_data['n_OG'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['n_og']) 
+ # from R as Double
++# and also underground floors
++building_data['n_UG'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['n_ug']) 
++# from R as Double
+ 
+ # Calculate base_area
+-building_data['base_area'] = building_data['energy_ref_area'] / (building_data['n_OG'] * 0.87)
++building_data['base_area'] = building_data['energy_ref_area'] / (building_data['n_OG'] + building_data['n_UG']) 
++building_data['gross_base_area'] = building_data['base_area'] / 0.87
++# Old replaced Version (Date of change: 24.07.2023 by JB after verification with MH):
++# building_data['base_area'] = building_data['energy_ref_area'] / (building_data['n_OG'] * 0.87)
+ 
+ 
+ # Mittlere Gebäudehöhe (building_height)
+@@ -557,6 +565,19 @@
+ # from R as Double
+ 
+ 
++# thermally conditioned net_volume und gross_volume
++##############################################################################
++building_data['net_volume'] = building_data['building_height'] * building_data['base_area']
++building_data['gross_volume'] = building_data['building_height'] * building_data['gross_base_area']
++
++
++# Gebaeudehuellflaeche (envelope_area)
++##############################################################################
++building_data['facade_area'] = building_data['geb_f_flaeche_n_iwu'] + building_data['geb_f_flaeche_o_iwu'] + building_data['geb_f_flaeche_s_iwu'] + building_data['geb_f_flaeche_w_iwu']
++building_data['envelope_area'] = building_data['roof_area'] + building_data['facade_area'] + building_data['gross_base_area']
++
++
++
+ # spezifische Beleuchtungsleistung (lighting_load)
+ ##############################################################################
+ # Create Subset for calculation of lighting_load 
+@@ -569,8 +590,8 @@
+ # Encode Labelling
+ cleanup_beleuchtungsart = {'qF1':{
+                                   1: 'Direkt (Licht fällt direkt auf den Arbeitsbereich)',                                           
+-                                  2: 'Direkt / indirekt', 
+-                                  3: 'Indirekt (Licht, das von Decken und Wänden reflektiert wird)'}}
++                                  2: 'Indirekt (Licht, das von Decken und Wänden reflektiert wird)',
++                                  3: 'Direkt / indirekt'}}
+ subset_lighting_load.replace(cleanup_beleuchtungsart, inplace = True)
+ 
+ # Map 'Lampenart' from be_data_original to subset_lighting_load as column 'lampenart_be'
+@@ -593,7 +614,7 @@
+ # Encode Labelling
+ cleanup_k_L = {'k_L':{
+                     'Glüh- oder Halogenlampe': 5.5,                                           
+-                    'Leuchtstofflampe': 1.235, 
++                    'Leuchtstofflampe': 1.235, # mean value over all fluorescent lamps, rod-shaped and compact
+                     'LED (allgemein)': 1.09,
+                   #  'LED-Ersatzlampe': 0.605,
+                   #  'LED-Speziallampe': 0.465,
+@@ -636,13 +657,14 @@
+ # Calculate 'p_j'
+ # p_j = p_j_lx * E_m * k_WF * k_A * k_L * k_VB [See: DIN V 18599-4:2018-09, S. 25]
+ subset_lighting_load['p_j'] = subset_lighting_load['p_j_lx'] * subset_lighting_load['E_m'] * \
+-                                subset_lighting_load['k_WF'] * subset_lighting_load['k_L'] * subset_lighting_load['k_VB']
++                                subset_lighting_load['k_WF'] * subset_lighting_load['k_A'] * \
++                                    subset_lighting_load['k_L'] * subset_lighting_load['k_VB']
+ 
+ # Map 'p_j' from subset_lighting_load as column 'lighting_load' to building_data
+ building_data['lighting_load'] = building_data['scr_gebaeude_id'].map(subset_lighting_load.set_index('scr_gebaeude_id')['p_j'])
+ 
+ 
+-# Lichtausnutzungsgrad der Verglasung (lighting_control)
++# Lichtausnutzungsgrad der Verglasung (lighting_control), Lux threshold at which the light turns on
+ ##############################################################################
+ # Map 'E_m' from data_18599_10_4 to building_data
+ building_data['lighting_control'] = building_data['typ_18599'].map(data_18599_10_4.set_index('typ_18599')['E_m'])
+@@ -664,6 +686,42 @@
+         lighting_maintenance_factor = 0.9
+     return lighting_maintenance_factor
+ building_data['lighting_maintenance_factor'] = building_data.apply(set_lighting_maintenance_factor, axis = 1)    
++
++
++# Aussenwandkonstruktion (aw_construction)
++##############################################################################
++building_data['aw_construction'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['aw_konstr_1']).astype(str)
++
++
++# Energiedurchlassgrad der Verglasung bei aktiviertem Sonnenschutz 
++# glass_solar_shading_transmittance = gtot = Fc * g = shading_solar_transmittance * glass_solar_transmittance
++##############################################################################
++# Map 'qd8' from be_data_original as column 'shading_device' to building_data, später  für Lichttransmissionsgrad tau
++building_data['shading_device'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qd8'])
++# from R as Integer
++# qD8 in shading_solar_transmittace, Fc-Wert, umbenannt
++building_data['shading_solar_transmittance'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qd8'])
++
++# 1: 'Sonnenschutzverglasung',                                           
++# 2: 'Außenliegende variable Sonnenschutzvorrichtung (z.B. Lamellen-Raffstoren)', 
++# 3: 'Außenliegende feststehende Sonnenschutzvorrichtung',
++# 4: 'In der Verglasung liegende Sonnenschutzvorrichtung',
++# 5: 'Innenliegende Sonnenschutzvorrichtung',
++# 6: 'Keine Sonnenschutzvorrichtung'
++
++# Shading factor (Abschattungsfaktor) Fc [See DIN 4108-2:2013-02, p. 25]
++# Sonnenschutzverglasung (1) erhält einen Fc = 0,49 (mal in DIN 18599-2 Tabelle 8: Mittelwert aus Reduktionsfaktor 2xWSV zu 2xSSV = 0.54 UND 3xWSV zu 3xSSV = 0.435 -> 0.4879)
++# da Sonnenschutzglas bei glass_solar_transmittance nicht berücksichtigt wurde. Daher wird hier von dem Faktor 1 aus der 4108-2 abgewichen.
++cleanup_shading_solar_transmittance = {'shading_solar_transmittance':{
++                                                    1: 0.49,                                           
++                                                    2: 0.22, 
++                                                    3: 0.32,
++                                                    4: 0.78,
++                                                    5: 0.78,
++                                                    6: 1}}
++building_data.replace(cleanup_shading_solar_transmittance, inplace = True)
++
++
+ 
+ 
+ # Energiedurchlassgrad der Verglasung (glass_solar_transmittance)
+@@ -682,33 +740,7 @@
+                                                                 4: 0.53}}
+ building_data.replace(cleanup_glass_solar_transmittance, inplace = True)
+ 
+-
+-# Energiedurchlassgrad der Verglasung bei aktiviertem Sonnenschutz (glass_solar_shading_transmittance)
+-##############################################################################
+-# Map 'qd8' from be_data_original as column 'qD8' to building_data
+-building_data['qD8'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qd8'])
+-# from R as Integer
+-
+-# 1: 'Sonnenschutzverglasung',                                           
+-# 2: 'Außenliegende variable Sonnenschutzvorrichtung (z.B. Lamellen-Raffstoren)', 
+-# 3: 'Außenliegende feststehende Sonnenschutzvorrichtung',
+-# 4: 'In der Verglasung liegende Sonnenschutzvorrichtung',
+-# 5: 'Innenliegende Sonnenschutzvorrichtung',
+-# 6: 'Keine Sonnenschutzvorrichtung'
+-
+-# Shading factor (Abschattungsfaktor) Fc [See DIN 4108-2:2013-02, p. 25]
+-# Sonnenschutzverglasung (1) erhält einen Fc = 0,49 (mal in DIN 18599-2 Tabelle 8: Mittelwert aus Reduktionsfaktor 2xWSV zu 2xSSV = 0.54 UND 3xWSV zu 3xSSV = 0.435 -> 0.4879)
+-# da Sonnenschutzglas bei glass_solar_transmittance nicht berücksichtigt wurde. Daher wird hier von dem Faktor 1 aus der 4108-2 abgewichen.
+-cleanup_glass_solar_shading_transmittance = {'qD8':{
+-                                                    1: 0.49,                                           
+-                                                    2: 0.22, 
+-                                                    3: 0.32,
+-                                                    4: 0.78,
+-                                                    5: 0.78,
+-                                                    6: 1}}
+-building_data.replace(cleanup_glass_solar_shading_transmittance, inplace = True)
+-
+-building_data['glass_solar_shading_transmittance'] = building_data['glass_solar_transmittance'] * building_data['qD8']   
++building_data['glass_solar_shading_transmittance'] = building_data['glass_solar_transmittance'] * building_data['shading_solar_transmittance']
+ 
+ 
+ # Lichttransmissionsgrad der Verglasung (glass_light_transmittance)
+@@ -764,8 +796,6 @@
+ 
+ # Temperaturanpassungsfaktor unterer Gebäudeabschluss (temp_adj_base)
+ ##############################################################################
+-building_data['n_UG'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['n_ug'])
+-# from R as Double
+ 
+ # Find corresponding case according to DIN V 4108-6:2003-06
+ def fall_temp_adj_base(row):
+@@ -843,6 +873,7 @@
+ ##############################################################################
+ # Map minimum flow rate from data_18599_10_4 to building_data
+ building_data['V_min_18599'] = building_data['typ_18599'].map(data_18599_10_4.set_index('typ_18599')['Außenluftvolumenstrom'])
++# building_data['V_min_18599'] = building_data['typ_18599'].map(data_18599_10_4.set_index('typ_18599')['Aussenluftvolumenstrom'])
+ 
+ # Map bak_grob
+ # 1: Altbau bis einschl. 1978
+@@ -850,8 +881,10 @@
+ # 3: Neubau ab 2010
+ building_data['bak_grob'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['bak_grob'])
+ 
+-# Min flow from DIN V 18599-10 in m³/hm², multiply by m²/m³ for air change rate
+-building_data['ach_min'] = (building_data['V_min_18599'] * building_data['net_room_area']) / (building_data['net_room_area'] * (building_data['building_height']/building_data['n_OG']))
++# Min air flow from DIN V 18599-10 in m3/hm2, divide by room height in m for air change rate in 1/h
++# building_data['ach_min'] = (building_data['V_min_18599'] * building_data['net_room_area']) / (building_data['net_room_area'] * (building_data['building_height']/building_data['n_OG']))
++# ach_min vereinfacht: net_room_area gestrichen
++building_data['ach_min'] = building_data['V_min_18599'] / (building_data['building_height'] / building_data['n_OG'])
+ 
+ building_data['qH1'] = building_data['scr_gebaeude_id'].map(be_data_original.set_index('scr_gebaeude_id')['qh1'])
+ cleanup_rlt_encode = {"qH1": {
+@@ -882,14 +915,15 @@
+    
+ building_data['n_50_standard_av'] = building_data.apply(assign_n_50_standard_av, axis = 1)  
+       
+-building_data['standard av-verhältnis'] = 0.9
++# building_data['standard av-verhältnis'] = 0.9
++building_data['standard_av_verhaeltnis'] = 0.9
+ 
+ # AV-Verhältnis Gebäude = Thermische Hüllfläche des Gebäudes / beheiztes Bruttogebäudevolumen
+-building_data['facade_area'] = building_data['geb_f_flaeche_n_iwu'] + building_data['geb_f_flaeche_o_iwu'] + building_data['geb_f_flaeche_s_iwu'] + building_data['geb_f_flaeche_w_iwu']
+-building_data['av-verhältnis'] = (building_data['facade_area'] + building_data['roof_area'] + (building_data['base_area'])) / (building_data['base_area'] * building_data['building_height'])
++building_data['av_verhaeltnis'] = (building_data['facade_area'] + building_data['roof_area'] + building_data['gross_base_area']) / (building_data['gross_base_area'] * building_data['building_height'])
++# building_data['n_50'] = building_data['n_50_standard_av'] * building_data['av-verhältnis'] / building_data['standard av-verhältnis']
+ 
+ # Luftdichtheit n50
+-building_data['n_50'] = building_data['n_50_standard_av'] * building_data['av-verhältnis'] / building_data['standard av-verhältnis']
++building_data['n_50'] = building_data['n_50_standard_av'] * building_data['av_verhaeltnis'] / building_data['standard_av_verhaeltnis']
+ 
+ # Abschätzung der Infiltrationsluftwechselrate nach ISO 13789 bzw. der früheren EN 832
+ # ach_inf = n_50 * e * fATD
+@@ -900,6 +934,9 @@
+ 
+ # Luftwechselrate Fenster (ach_win)
+ ##############################################################################
++# DIN V 18599-2:2018-09, S. 62: 6.3.2.2 Bestimmung des Fensterluftwechsels
++# Soweit in der Gebäudezone Öffnungen (z. B. öffenbare Fenster oder Außenluftdurchlässe) zur Außenluft vorhanden sind, 
++# ist unabhängig von Infiltrations- und Anlagenluftwechsel ein Mindestwert von nwin,min = 0,1 h−1 für den Fensterluftwechsel anzusetzen.
+ def calc_ach_win(row):
+     if row['qH1'] in ('Nein, Fensterlüftung', 'Nein, nur dezentrale Anlage(n) vorhanden', 'Weiß nicht'):
+         ach_win = max(0.1, (row['ach_min'] - row['ach_inf']))
+@@ -999,6 +1036,7 @@
+ # from R as Factor
+ cleanup_thermal_capacitance_encode = {"thermal_capacitance": {
+                                                               '1': 'schwer',
++                                                              '1.0': 'schwer',
+                                                               '1.1': 'mittel',
+                                                               '1.11': 'mittel',
+                                                               '1.2': 'schwer',
+@@ -1006,10 +1044,12 @@
+                                                               '1.4': 'schwer',
+                                                               '1.5': 'schwer',
+                                                               '2': 'leicht',
++                                                              '2.0': 'leicht',
+                                                               '2.1': 'leicht',
+                                                               '2.2': 'leicht',
+                                                               '2.3': 'leicht',
+                                                               '3': 'mittel',
++                                                              '3.0': 'mittel',
+                                                               '3.1': 'mittel',
+                                                               '3.2': 'mittel',
+                                                               '3.3': 'mittel',
+@@ -1058,6 +1098,7 @@
+ # Sollwert Kühlung (t_set_cooling)
+ ##############################################################################
+ building_data['t_set_cooling'] = building_data['typ_18599'].map(data_18599_10_4.set_index('typ_18599')['Raum-Solltemperatur Kühlung'])
++# building_data['t_set_cooling'] = building_data['typ_18599'].map(data_18599_10_4.set_index('typ_18599')['Raum-Solltemperatur Kuehlung'])
+ 
+ 
+ # Nachtlüftung (night_flushing_flow)
+@@ -1293,9 +1334,9 @@
+                                                               1: 'AirConditioning',
+                                                               2: 'AirConditioning',
+                                                               3: 'SurfaceHeatingCooling',
+-                                                              4: 'AirConditioning',
++                                                              4: 'SurfaceHeatingCooling',
+                                                               5: 'ThermallyActivated',
+-                                                              6: 'AirConditioning',
++                                                              6: 'SurfaceHeatingCooling',
+                                                               7: 'AirConditioning'}}
+ building_data.replace(cleanup_heating_emission_system, inplace = True)
+ 
+@@ -1316,7 +1357,7 @@
+ cleanup_cooling_emission_system = {"cooling_emission_system": {
+                                       1: 'AirConditioning',
+                                       2: 'AirConditioning',
+-                                      3: 'ThermallyActivated',
++                                      3: 'SurfaceHeatingCooling',
+                                       4: 'ThermallyActivated'}}
+ building_data.replace(cleanup_cooling_emission_system, inplace = True)
+ 
+@@ -1348,7 +1389,10 @@
+ 
+ ##############################################################################
+ # Delete unnecessary columns
+-building_data.drop(['typ_18599', 'Fen_ant', 'geb_f_flaeche_n_iwu', 'geb_f_flaeche_o_iwu', 'geb_f_flaeche_s_iwu', 'geb_f_flaeche_w_iwu', 'building_length_n', 'building_length_s', 'building_length_o', 'building_length_w', 'n_OG', 'qD8', 'Fen_glasart_1', 'k_1', 'k_3', 'tau_D65SNA', 'case_temp_adj_base', 'B_raw', 'B', 'R_raw', 'R', 'case_temp_adj_walls_ug', 'V_min_18599', 'bak_grob', 'ach_min', 'qH1', 'n_50_standard_av', 'standard av-verhältnis', 'facade_area', 'av-verhältnis', 'n_50', 'qH3'], axis = 1, inplace = True)  
++building_data.drop(['typ_18599', 'Fen_ant', 'geb_f_flaeche_n_iwu', 'geb_f_flaeche_o_iwu', 'geb_f_flaeche_s_iwu', 'geb_f_flaeche_w_iwu', 'building_length_n', 'building_length_s', 'building_length_o', 'building_length_w', 'n_OG', 'Fen_glasart_1', 'k_1', 'k_3', 'tau_D65SNA', 'case_temp_adj_base', 'B_raw', 'B', 'R_raw', 'R', 'case_temp_adj_walls_ug', 'V_min_18599', 'bak_grob', 'ach_min', 'qH1', 'n_50_standard_av', 'standard_av_verhaeltnis', 'facade_area', 'av_verhaeltnis', 'n_50', 'qH3'], axis = 1, inplace = True)  
++# building_data.drop(['typ_18599', 'Fen_ant', 'geb_f_flaeche_n_iwu', 'geb_f_flaeche_o_iwu', 'geb_f_flaeche_s_iwu', 'geb_f_flaeche_w_iwu', 'building_length_n', 'building_length_s', 'building_length_o', 'building_length_w', 'n_OG', 'Fen_glasart_1', 'k_1', 'k_3', 'tau_D65SNA', 'case_temp_adj_base', 'B_raw', 'B', 'R_raw', 'R', 'case_temp_adj_walls_ug', 'bak_grob'], axis = 1, inplace = True)  
++
++
+ 
+ # Save data to \iso_simulator\annualSimulation\SimulationData_Breitenerhebung.csv
+ # Formerly: Save data to \iso_simulator\examples\SimulationData_Breitenerhebung.csv
