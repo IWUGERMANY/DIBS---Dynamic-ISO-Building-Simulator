@@ -29,6 +29,7 @@ import os
 
 # Set root folder one level up
 mainPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+# add mainPath to sys.path, at the beginning of the the list of directory paths that Python searches when trying to import a module
 sys.path.insert(0, mainPath)
 
 # Import more packages
@@ -304,6 +305,7 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
                                      horizontal_diffuse_illuminance=building_location.weather_data['difhorillum_lux'][hour])
         
         # Occupancy for the time step
+        occupancy_percent = occupancy_schedule.loc[hour, 'People']
         occupancy = occupancy_schedule.loc[hour, 'People'] * BuildingInstance.max_occupancy
         
         # Calculate the lighting of the building for the time step
@@ -312,9 +314,10 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
                                        EastWindow.transmitted_illuminance +
                                        WestWindow.transmitted_illuminance +
                                        NorthWindow.transmitted_illuminance, 
-                                       occupancy=occupancy)
+                                       occupancy=occupancy_percent)
     
         # Calculate gains from occupancy and appliances
+        # This is thermal gains. Negative appliance_gains are heat sinks!
         internal_gains = occupancy * gain_per_person + \
             appliance_gains * occupancy_schedule.loc[hour, 'Appliances'] * BuildingInstance.energy_ref_area + \
             BuildingInstance.lighting_demand
@@ -322,7 +325,17 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
         # Calculate appliance_gains as part of the internal_gains
         Appliance_gains_demand = appliance_gains * occupancy_schedule.loc[hour, 'Appliances'] * BuildingInstance.energy_ref_area
         
+        # Appliance_gains equal the electric energy that appliances use, except for negative appliance_gains of refrigerated counters in trade buildings for food!
+        if appliance_gains < 0:
+            appliance_gains_elt = -1 * appliance_gains / 2
+            # The assumption is: negative appliance_gains come from referigerated counters with heat pumps for which we assume a COP = 2.            
+        else:
+            appliance_gains_elt = appliance_gains
             
+        Appliance_gains_elt_demand = appliance_gains_elt * occupancy_schedule.loc[hour, 'Appliances'] * BuildingInstance.energy_ref_area
+        
+            
+        
         # Calculate energy demand for the time step             
         BuildingInstance.solve_building_energy(internal_gains=internal_gains,
                                      solar_gains=
@@ -407,6 +420,7 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
         'LightingDemand': LightingDemand,
         'InternalGains': InternalGains,
         'Appliance_gains_demand': Appliance_gains_demand,
+        'Appliance_gains_elt_demand': Appliance_gains_elt_demand,
         'SolarGainsSouthWindow': SolarGainsSouthWindow,
         'SolarGainsEastWindow': SolarGainsEastWindow,
         'SolarGainsWestWindow': SolarGainsWestWindow,
@@ -437,6 +451,7 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     HotWater_Sys_Fossils_sum = hourlyResults.HotWater_Sys_Fossils.sum()/1000 
     InternalGains_sum = hourlyResults.InternalGains.sum()/1000
     Appliance_gains_demand_sum = hourlyResults.Appliance_gains_demand.sum()/1000
+    Appliance_gains_elt_demand_sum = hourlyResults.Appliance_gains_elt_demand.sum()/1000
     LightingDemand_sum = hourlyResults.LightingDemand.sum()/1000
     SolarGainsSouthWindow_sum = hourlyResults.SolarGainsSouthWindow.sum()/1000
     SolarGainsEastWindow_sum = hourlyResults.SolarGainsEastWindow.sum()/1000
@@ -640,7 +655,7 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     Cooling_f_PE = f_PE
     Cooling_f_Hs_Hi = f_Hs_Hi
 
-    # remaining Electric energy (LightingDemand_sum + Appliance_gains_demand_sum)
+    # remaining Electric energy (LightingDemand_sum + Appliance_gains_elt_demand_sum)
     # Lighting
     Fuel_Type = 'Electricity grid mix'
     f_GHG = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'GWP spezific to heating value GEG [g/kWh]']
@@ -653,13 +668,14 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     # Umrechnungsfaktor von Brennwert (Hs) zu Heizwert (Hi) einlesen
     f_Hs_Hi = GWP_PE_Factors.loc[GWP_PE_Factors['Energy Carrier'] == Fuel_Type, 'Relation Calorific to Heating Value GEG  [-]']
     f_Hs_Hi = f_Hs_Hi.iloc[0]
-
+    
+    # electrical energy for lighting
     LightingDemand_Hi_sum = LightingDemand_sum / f_Hs_Hi # for kWhHi Final Energy Demand
     LightingDemand_Carbon_sum = (LightingDemand_Hi_sum * f_GHG) / 1000 # for kg CO2eq
     LightingDemand_PE_sum = LightingDemand_Hi_sum * f_PE # for kWhHs Primary Energy Demand
     
-    # Appliances
-    Appliance_gains_demand_Hi_sum = Appliance_gains_demand_sum / f_Hs_Hi # for kWhHi Final Energy Demand
+    # electrical energy for Appliances
+    Appliance_gains_demand_Hi_sum = Appliance_gains_elt_demand_sum / f_Hs_Hi # for kWhHi Final Energy Demand
     Appliance_gains_demand_PE_sum = Appliance_gains_demand_Hi_sum * f_PE # for kWhHs Primary Energy Demand
     Appliance_gains_demand_Carbon_sum = (Appliance_gains_demand_Hi_sum * f_GHG) / 1000 # for kg CO2eq
      
@@ -710,6 +726,7 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     # print("HotWater_Sys_GWP [kg]:", HotWater_Sys_Carbon_sum)
     print("LightingDemand [kwh]:", LightingDemand_sum)
     print("Appliance_gains_demand [kWh]:", Appliance_gains_demand_sum)
+    print("Appliance_gains_elt_demand [kWh]:", Appliance_gains_elt_demand_sum)
     print("InternalGains [kwh]:", InternalGains_sum)
     # print("SolarGainsSouthWindow [kwh]:", SolarGainsSouthWindow_sum)
     # print("SolarGainsEastWindow [kwh]:", SolarGainsEastWindow_sum)
@@ -761,6 +778,8 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
                                         'HotWaterEnergy [kwhHs]': HotWaterEnergy_sum, 
                                         'HotWaterEnergy [kwhHs/m2]': HotWaterEnergy_sum/BuildingInstance.energy_ref_area,    
                                         'HotWaterEnergy_Hi [kwhHi]': HotWaterEnergy_Hi_sum,
+                                        'HotWater_Sys_Electricity [kWh]': HotWater_Sys_Electricity_sum,
+                                        'HotWater_Sys_Fossils [kWhHs]': HotWater_Sys_Fossils_sum,
                                         'HeatingSupplySystem': i_gebaeudeparameter.heating_supply_system,
                                         'CoolingSupplySystem': i_gebaeudeparameter.cooling_supply_system,
                                         'DHWSupplySystem': i_gebaeudeparameter.dhw_system,
@@ -784,8 +803,8 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
                                         'HotWater_Sys_GWP [kg/m2]': HotWater_Sys_Carbon_sum/BuildingInstance.energy_ref_area, 
                                         'HotWater_Sys_PE [kWh]': HotWater_Sys_PE_sum, 
                                         'HotWater_Sys_PE [kWh/m2]': HotWater_Sys_PE_sum/BuildingInstance.energy_ref_area, 
-                                        'ElectricityDemandTotal [kWh]': Heating_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + Appliance_gains_demand_sum, 
-                                        'ElectricityDemandTotal [kwh/m2]': (Heating_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + Appliance_gains_demand_sum)/BuildingInstance.energy_ref_area, 
+                                        'ElectricityDemandTotal [kWh]': Heating_Sys_Electricity_sum + HotWater_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + Appliance_gains_elt_demand_sum, 
+                                        'ElectricityDemandTotal [kwh/m2]': (Heating_Sys_Electricity_sum + HotWater_Sys_Electricity_sum + Cooling_Sys_Electricity_sum + LightingDemand_sum + Appliance_gains_elt_demand_sum)/BuildingInstance.energy_ref_area, 
                                         'FossilsDemandTotal [kWh]': Heating_Sys_Fossils_sum + Cooling_Sys_Fossils_sum,
                                         'FossilsDemandTotal [kwh/m2]': (Heating_Sys_Fossils_sum + Cooling_Sys_Fossils_sum)/BuildingInstance.energy_ref_area,
                                         'LightingDemand [kWh]': LightingDemand_sum,
@@ -794,6 +813,7 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
                                         'LightingDemand_PE [kWh]': LightingDemand_PE_sum, 
                                         'LightingDemand_PE [kWh/m2]': LightingDemand_PE_sum/BuildingInstance.energy_ref_area, 
                                         'Appliance_gains_demand [kWh]': Appliance_gains_demand_sum,
+                                        'Appliance_gains_elt_demand [kWh]': Appliance_gains_elt_demand_sum,  
                                         'Appliance_gains_demand_GWP [kg]': Appliance_gains_demand_Carbon_sum, 
                                         'Appliance_gains_demand_GWP [kg/m2]': Appliance_gains_demand_Carbon_sum/BuildingInstance.energy_ref_area,
                                         'Appliance_gains_demand_PE [kWh]': Appliance_gains_demand_PE_sum, 
@@ -828,12 +848,23 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     print("Estimated time for simulation and saving of annualResults_summary.xlsx", remaining_calculation_time_2_saving_annualResults_summary, "hours")
     print("Estimated time for simulation, saving of annualResults_summary.xlsx and saving of hourly results", remaining_time_total, "hours")
 
-    # Merge all summary DataFrames and save to disc 
-    #print("Saving annualResults_summary.xlsx")
-    annualResults_summary = pd.concat(list_of_summary)
-    annualResults_summary.to_excel(r'./results/annualResults_summary.xlsx', index = False)
+    # # Merge all summary DataFrames and save to disc 
+    # # Here every building is saved as seperate row in the excel file after it has been cacluated. In case of a crash, the results are saved.
+    # # THIS TAKES A LOT OF TIME; TURN OF IF NOT NEEDED -> THAN TURN ON SAVING OUTSIDE THE LOOP!
+    # # print("Saving annualResults_summary.xlsx")
+    # ################
+    # annualResults_summary = pd.concat(list_of_summary)
+    # annualResults_summary.to_excel(r'./results/annualResults_summary.xlsx', index = False)
+    # ################
 
 # hier endet outer loop pro Gebäude
+
+# Merge all summary DataFrames of all simulated buildings and save to disc
+# outside of LOOP, to save "save to Excel" time
+################
+annualResults_summary = pd.concat(list_of_summary)
+annualResults_summary.to_excel(r'./results/annualResults_summary.xlsx', index = False)
+################
     
 print("annualResults_summary.xlsx is now available in the DIBS---Dynamic-ISO-Building-Simulator\iso_simulator\annualSimulation\results folder")
 print("Saving hourly results of each building to *BuildingID*.xlsx")
