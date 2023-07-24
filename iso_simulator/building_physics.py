@@ -8,12 +8,12 @@ Portions of this software are copyright of their respective authors and released
 RC_BuildingSimulator, Copyright 2016 Architecture and Building Systems, ETH Zurich
 
 author: "Julian Bischof, Simon Knoll, Michael Hörner "
-copyright: "Copyright 2022, Institut Wohnen und Umwelt"
+copyright: "Copyright 2023, Institut Wohnen und Umwelt"
 license: "MIT"
 
 """
 __author__ = "Julian Bischof, Simon Knoll, Michael Hörner "
-__copyright__ = "Copyright 2022, Institut Wohnen und Umwelt"
+__copyright__ = "Copyright 2023, Institut Wohnen und Umwelt"
 __license__ = "MIT"
 
 
@@ -123,7 +123,7 @@ class Building(object):
                  lighting_load,
                  lighting_control,
                  lighting_utilisation_factor,
-                     lighting_maintenance_factor,
+                 lighting_maintenance_factor,
                  glass_solar_transmittance,
                  glass_solar_shading_transmittance,
                  glass_light_transmittance,
@@ -435,7 +435,7 @@ class Building(object):
 
         if lux < self.lighting_control and occupancy > 0:
             # Lighting demand for the hour
-            self.lighting_demand = self.lighting_load * self.net_room_area
+            self.lighting_demand = self.lighting_load * self.net_room_area * occupancy
         else:
             self.lighting_demand = 0
               
