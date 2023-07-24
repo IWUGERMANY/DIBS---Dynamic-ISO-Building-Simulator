@@ -1,0 +1,3 @@
+The weather data files were updated on 13.07.2023, using the following data source: https://climate.onebuilding.org/WMO_Region_6_Europe/DEU_Germany/index.html
+16 additional weather stations were added, reaching 109 stations in total. 
+The columns Jan-Dec were not updated for the 93 "older" stations.
