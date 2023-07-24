@@ -59,6 +59,10 @@ list_of_summary = []
 # building_data = pd.read_csv('SimulationData_Tiefenerhebung.csv', sep = ';', index_col = False, encoding = 'utf8') 
 building_data = pd.read_csv('SimulationData_Breitenerhebung.csv', sep = ';', index_col = False, encoding = 'utf8') 
 
+#What weather data periode to use for simulation
+weather_period = "2004-2018"
+# weather_period = "2007-2021"
+
 # Create namedlist of building_data for further iterations
 def iterate_namedlist(building_data):
     Row = namedlist('Gebaeude', building_data.columns)
@@ -164,9 +168,12 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     
 
     # Initialize the buildings location with a weather file from the nearest weather station depending on the plz
-    getEPWFile_list = Location.getEPWFile(BuildingInstance.plz)
-    epw_filename = getEPWFile_list[0]                
-    building_location = Location(epwfile_path = os.path.join(mainPath, 'auxiliary/weather_data', epw_filename))
+    getEPWFile_list = Location.getEPWFile(BuildingInstance.plz, weather_period)
+    epw_filename = getEPWFile_list[0]      
+    if (weather_period == "2007-2021"):
+        building_location = Location(epwfile_path = os.path.join(mainPath, 'auxiliary/weather_data/weather_data_TMYx_2007_2021', epw_filename))
+    else:      
+        building_location = Location(epwfile_path = os.path.join(mainPath, 'auxiliary/weather_data', epw_filename))
 
     # Distance from weather station to the building
     distance = getEPWFile_list[2] 

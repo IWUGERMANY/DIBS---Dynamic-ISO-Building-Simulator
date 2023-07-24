@@ -48,7 +48,7 @@ class Location(object):
         self.weather_data = pd.read_csv(
             epwfile_path, skiprows=8, header=None, names=epw_labels).drop('datasource', axis=1)
         
-    def getEPWFile(plz):  
+    def getEPWFile(plz, weather_period):  
         """
         Function finds the epw file depending on building location
         
@@ -65,7 +65,12 @@ class Location(object):
         # Read data
         # plz_data = pd.read_csv(os.path.join('../auxiliary/weather_data/plzcodes.csv'), encoding = 'latin')
         plz_data = pd.read_csv(os.path.join('../auxiliary/weather_data/plzcodes.csv'), encoding = 'latin', dtype={'zipcode': int})
-        weatherfiles_stations = pd.read_csv(os.path.join('../auxiliary/weather_data/weatherfiles_stations_93.csv'), sep = ';')
+        
+        if (weather_period == "2007-2021"):
+            weatherfiles_stations = pd.read_csv(os.path.join('../auxiliary/weather_data/weather_data_TMYx_2007_2021/weatherfiles_stations_109.csv'), sep = ';')
+        else:      
+            weatherfiles_stations = pd.read_csv(os.path.join('../auxiliary/weather_data/weatherfiles_stations_93.csv'), sep = ';')
+        
         
         # Pick latitude and longitude from plz_data and put values into a list
         coordinates_plz = plz_data.loc[plz_data['zipcode'] == plz, ['latitude', 'longitude']].iloc[0].tolist()
