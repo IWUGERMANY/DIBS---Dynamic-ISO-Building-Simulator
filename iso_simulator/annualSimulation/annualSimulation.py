@@ -26,6 +26,9 @@ __license__ = "MIT"
 # Import packages
 import sys
 import os
+import logging
+import csv 
+import json
 
 # Set root folder one level up
 mainPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -35,6 +38,7 @@ sys.path.insert(0, mainPath)
 # Import more packages
 import numpy as np
 import pandas as pd
+import openpyxl
 
 # Import modules
 from namedlist import namedlist
@@ -46,9 +50,11 @@ from radiation import Window
 from auxiliary import scheduleReader
 from auxiliary import normReader
 from auxiliary import TEKReader 
+from collections import namedtuple
 
 import time
  
+logging.basicConfig( filename='sample.log', level=logging.INFO, filemode='w')
     
 # Create dictionary to store final DataFrames of the buildings
 dict_of_results = {}
@@ -59,13 +65,20 @@ list_of_summary = []
 # building_data = pd.read_csv('SimulationData_Tiefenerhebung.csv', sep = ';', index_col = False, encoding = 'utf8') 
 building_data = pd.read_csv('SimulationData_Breitenerhebung.csv', sep = ';', index_col = False, encoding = 'utf8') 
 
+
+# json_building_data = building_data.to_json(orient='records', lines=True)
+
+# with open('jsonData.json', 'w') as json_file:
+#     json_file.write(json_building_data)
+
 #What weather data periode to use for simulation
 weather_period = "2004-2018"
 # weather_period = "2007-2021"
 
 # Create namedlist of building_data for further iterations
 def iterate_namedlist(building_data):
-    Row = namedlist('Gebaeude', building_data.columns)
+    # Row = namedlist('Gebaeude', building_data.columns)
+    Row = namedtuple('Gebaeude', building_data.columns)
     for row in building_data.itertuples():
         yield Row(*row[1:])
 
