@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="f8a305c9-302c-4a20-9c51-d96e230ec763" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/iso_simulator/auxiliary/readData.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/BuerosSchalterhalleempfang.csv.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/OccupancySchedulesZuweisungen.csv.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/OccupancySchedulesZuweisungen.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/Produktiongrob.csv.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/Restaurant.csv.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/SchulzimmerHoersaal.csv.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/TekNwgVergleichswerteZuweisung.csv.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/TekNwgVergleichswerteZuweisung.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/Vorstellungsraum.csv.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/annualSimulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/annualSimulation/annualSimulation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_00.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_00.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_01.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_01.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_02.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_02.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_03.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_03.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_04.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_04.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_05.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_05.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_06.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_06.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_07.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_07.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_08.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/AB123456_1_08.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/annualResults_summary.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/annualSimulation/results/annualResults_summary.xlsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/sample.log" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/annualSimulation/sample.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/auxiliary/TEKReader.py" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/auxiliary/TEKReader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/auxiliary/normReader.py" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/auxiliary/normReader.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/auxiliary/scheduleReader.py" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/auxiliary/scheduleReader.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 6
+}]]></component>
+  <component name="ProjectId" id="2Xz82FDDzim5hAhjto71EFxrQZA" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "nopandas",
+    "last_opened_file_path": "C:/Users/wail/Desktop/Neuer Dibs/DIBS---Dynamic-ISO-Building-Simulator",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="f8a305c9-302c-4a20-9c51-d96e230ec763" name="Changes" comment="" />
+      <created>1699620338467</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1699620338467</updated>
+      <workItem from="1699620339505" duration="345000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/DIBS___Dynamic_ISO_Building_Simulator$annualSimulation.coverage" NAME="annualSimulation Coverage Results" MODIFIED="1699620533828" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/iso_simulator/annualSimulation" />
+  </component>
+</project>
