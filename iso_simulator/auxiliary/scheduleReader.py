@@ -9,12 +9,16 @@ __author__ = "Simon Knoll"
 __copyright__ = "Copyright 2020, Institut Wohnen und Umwelt"
 __credits__ = "Julian Bischof, Michael Hörner"
 __license__ = "MIT"
+
 import os
 import pandas as pd
+from .readData import ReadCsvAndConvertToJSON
+import logging
 
   
 
 def getSchedule(hk_geb, uk_geb):
+
     """
     Find occupancy schedule from SIA2024, depending on hk_geb, uk_geb
     
@@ -30,7 +34,38 @@ def getSchedule(hk_geb, uk_geb):
     :rtype: DataFrame (with floats), string
     """
     
-    zuweisungen = pd.read_csv(os.path.join('../auxiliary/occupancy_schedules/occupancy_schedules_zuweisungen.csv'), sep = ';', encoding = 'latin')
+    """ -------------------------------------------------------------------------------------------------------------------------------
+    This code below replaces the pandas library
+
+    readData: ReadCsvAndConvertToJSON = ReadCsvAndConvertToJSON('../auxiliary/occupancy_schedules/occupancy_schedules_zuweisungen.csv')
+    data = readData.read_file()
+    mapp_file_to_classes = readData.create_dynamic_class(data)
+
+    for zuweisung in mapp_file_to_classes:
+        if hk_geb in zuweisung.hk_geb:
+            if uk_geb in zuweisung.uk_geb:
+                schedule_name = zuweisung.schedule_name
+                logging.info(schedule_name)
+                build_path = os.path.join('../auxiliary/occupancy_schedules/')+schedule_name+'.csv'
+                initialize_file_reader = ReadCsvAndConvertToJSON(build_path)
+                data = initialize_file_reader.read_file()
+                build_schedule_name_classes = initialize_file_reader.create_dynamic_class(data)
+
+                return build_schedule_name_classes, schedule_name
+            else:
+                return print('uk_geb unbekannt')
+        else:
+            return print('hk_geb unbekannt')
+    ---------------------------------------------------------------------------------------------------------------------------------"""
+
+    # readData: ReadCsvAndConvertToJSON = ReadCsvAndConvertToJSON('../auxiliary/occupancy_schedules/occupancy_schedules_zuweisungen.csv')
+    # data = readData.read_file()
+    # logging.info(readData.file_name)
+    # mapp_file_to_classes = readData.create_dynamic_class(data)
+
+            
+
+    zuweisungen = pd.read_csv(os.path.join('../auxiliary/occupancy_schedules/occupancy_schedules_zuweisungen.csv'), sep = ';', encoding = 'latin')    
     
     if hk_geb in zuweisungen['hk_geb'].values:
         

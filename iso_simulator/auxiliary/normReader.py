@@ -14,6 +14,8 @@ __license__ = "MIT"
 
 import os
 import pandas as pd
+from .readData import ReadCsvAndConvertToJSON
+import logging
 
 
 def getGains(hk_geb, uk_geb, profile_from_norm, gains_from_group_values):
@@ -36,6 +38,8 @@ def getGains(hk_geb, uk_geb, profile_from_norm, gains_from_group_values):
     :rtype: tuple (float, float, string)
     """
     
+    readData: ReadCsvAndConvertToJSON = ReadCsvAndConvertToJSON('../auxiliary/norm_profiles/profiles_zuweisungen.csv');
+
     gains_zuweisungen = pd.read_csv(os.path.join('../auxiliary/norm_profiles/profiles_zuweisungen.csv'), sep = ';', encoding = 'latin')
     
     if hk_geb in gains_zuweisungen['hk_geb'].values:

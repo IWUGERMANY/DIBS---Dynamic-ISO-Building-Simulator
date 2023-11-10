@@ -10,6 +10,8 @@ import os
 import sys
 import pandas as pd
 import numpy as np
+from .readData import ReadCsvAndConvertToJSON
+import logging
 
   
 
@@ -30,7 +32,35 @@ def getTEK(hk_geb, uk_geb):
     :return: df_TEK, TEK_name
     :rtype: DataFrame (with floats), string
     """
+    """ -------------------------------------------------------------------------------------------------------------------------------
+    This code below replaces the pandas library
+
+    readData: ReadCsvAndConvertToJSON = ReadCsvAndConvertToJSON('../auxiliary/TEKs/TEK_NWG_Vergleichswerte_zuweisung.csv')
+    data = readData.read_file()
+    logging.info(readData.class_name)
+    mapp_file_to_classes = readData.create_dynamic_class(data)
+
+    readData_2: ReadCsvAndConvertToJSON = ReadCsvAndConvertToJSON('../auxiliary/TEKs/TEK_NWG_Vergleichswerte.csv')
+    DB_TEKs = readData_2.read_file()
+    logging.info(readData_2.class_name)
+    mapp_file_to_classes = readData_2.create_dynamic_class(DB_TEKs)
+
+    filtered_objects = [obj for obj in mapp_file_to_classes if obj.TEK_Category == TEK_name]
     
+    for zuweisung in mapp_file_to_classes:
+        if hk_geb in zuweisung.hk_geb:
+            if uk_geb in zuweisung.uk_geb:
+                TEK_name = str(zuweisung.schedule_name)
+                if filtered_objects:
+                    first_object = filtered_objects[0]
+                    TEK_dhw = float(first_object.TEK_Warmwasser)
+                return TEK_dhw, TEK_name
+            else:
+                return print('uk_geb unbekannt')
+        else:
+        return print('hk_geb unbekannt')
+    ---------------------------------------------------------------------------------------------------------------------"""
+
     zuweisungen = pd.read_csv(os.path.join('../auxiliary/TEKs/TEK_NWG_Vergleichswerte_zuweisung.csv'), sep = ';', decimal=',', encoding = 'cp1250')
     
     DB_TEKs = pd.read_csv(os.path.join('../auxiliary/TEKs/TEK_NWG_Vergleichswerte.csv'), sep = ';', decimal=',', index_col = False, encoding = 'cp1250')
