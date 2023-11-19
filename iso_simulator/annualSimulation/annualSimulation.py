@@ -26,18 +26,21 @@ __license__ = "MIT"
 # Import packages
 import sys
 import os
+import logging
+logging.basicConfig(level=logging.INFO, filename='sample.log', filemode='w')
 
 # Set root folder one level up
 mainPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # add mainPath to sys.path, at the beginning of the the list of directory paths that Python searches when trying to import a module
 sys.path.insert(0, mainPath)
-
+print(sys.path)
 # Import more packages
 import numpy as np
 import pandas as pd
 
 # Import modules
-from namedlist import namedlist
+#from namedlist import namedlist
+from collections import namedtuple
 from building_physics import Building  
 import supply_system
 import emission_system
@@ -53,11 +56,26 @@ import time
 # Create dictionary to store final DataFrames of the buildings
 dict_of_results = {}
 list_of_summary = []
+
+# ---------------------------------------------------------------
+# Set root folder one level up
+mainPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+model_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../model'))
+datasource_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../data_source'))
+# add mainPath to sys.path, at the beginning of the the list of directory paths that Python searches when trying to import a module
+sys.path.insert(0, mainPath)
+sys.path.insert(0, model_path)
+sys.path.insert(0, datasource_path)
+
+# Import modules Datasource
+from data_source.datasource_csv import DataSourceCSV
+# ---------------------------------------------------------------
   
 # WhatToSimulate
 # Read data with all the buildings from csv file    
 # building_data = pd.read_csv('SimulationData_Tiefenerhebung.csv', sep = ';', index_col = False, encoding = 'utf8') 
 building_data = pd.read_csv('SimulationData_Breitenerhebung.csv', sep = ';', index_col = False, encoding = 'utf8') 
+building_data_object = DataSourceCSV().getBuildingData()
 
 #What weather data periode to use for simulation
 weather_period = "2004-2018"
@@ -65,7 +83,7 @@ weather_period = "2004-2018"
 
 # Create namedlist of building_data for further iterations
 def iterate_namedlist(building_data):
-    Row = namedlist('Gebaeude', building_data.columns)
+    Row = namedtuple('Gebaeude', building_data.columns)
     for row in building_data.itertuples():
         yield Row(*row[1:])
 
@@ -166,21 +184,33 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     else: 
         pass
     
-
     # Initialize the buildings location with a weather file from the nearest weather station depending on the plz
-    getEPWFile_list = Location.getEPWFile(BuildingInstance.plz, weather_period)
-    epw_filename = getEPWFile_list[0]      
+    # getEPWFile_list = Location.getEPWFile(BuildingInstance.plz, weather_period)
+    # getEPWFile_object = Location.getEPWFile(BuildingInstance.plz, weather_period)
+    getEPWFile_object = DataSourceCSV().getEPWFile(BuildingInstance.plz, weather_period)
+    # epw_filename = getEPWFile_object[0]     
+    #  
+    epw_filename = getEPWFile_object.file_name      
+    # logging.info(f'filename is: {getEPWFile_object.file_name}, coordinates station: {getEPWFile_object.coordinates_station}, distance: {getEPWFile_object.distance}')
+
+    # datasource_epwfile = DataSourceCSV().getEPWFile(building_data_object.plz, weather_period)
+    # logging.info(f"my value: {datasource_epwfile[0]}, other value: {getEPWFile_list}")
+
     if (weather_period == "2007-2021"):
         building_location = Location(epwfile_path = os.path.join(mainPath, 'auxiliary/weather_data/weather_data_TMYx_2007_2021', epw_filename))
     else:      
         building_location = Location(epwfile_path = os.path.join(mainPath, 'auxiliary/weather_data', epw_filename))
 
     # Distance from weather station to the building
-    distance = getEPWFile_list[2] 
+    # distance = getEPWFile_object[2] 
+
+    distance = getEPWFile_object.distance
 
     # Extract coordinates of that weather station. Necessary for calc_sun_position()
-    latitude_station = getEPWFile_list[1][0]      
-    longitude_station = getEPWFile_list[1][1]     
+    # latitude_station = getEPWFile_object[1][0]      
+    # longitude_station = getEPWFile_object[1][1]    
+    #  
+    latitude_station, longitude_station = getEPWFile_object.coordinates_station   
                                                  
     # Define windows for each compass direction
     SouthWindow = Window(azimuth_tilt = 0, alititude_tilt = 90, 
