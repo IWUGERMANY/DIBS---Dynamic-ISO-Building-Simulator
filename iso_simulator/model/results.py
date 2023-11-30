@@ -28,7 +28,12 @@ class Result:
         solar_gains_east_window (List[float]): 
         solar_gains_west_window (List[float]): 
         solar_gains_north_window (List[float]): 
-
+        solar_gains_total (List[float]):
+        day_time: 
+        hotwaterdemand:
+        hotwaterenergy: 
+        hot)water_sys_electricity:
+        hot_water_sys_fossils:
 
     """
 

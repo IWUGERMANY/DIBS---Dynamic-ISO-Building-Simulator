@@ -8,6 +8,7 @@ class WeatherData:
                  ceiling_hgt_m, presweathobs, presweathcodes, precip_wtr_mm, aerosol_opt_thousandths,
                  snowdepth_cm, days_last_snow, Albedo, liq_precip_depth_mm, liq_precip_rate_Hour,
                  ):
+
         self.year = year
         self.month = month
         self.day = day
@@ -43,4 +44,3 @@ class WeatherData:
         self.Albedo = Albedo
         self.liq_precip_depth_mm = liq_precip_depth_mm
         self.liq_precip_rate_Hour = liq_precip_rate_Hour
-        

@@ -1,5 +1,4 @@
 from .utils.location_utils import *
-from .utils.utils_building import *
 from .utils.utils_epwfile import *
 from .utils.utils_hkgeb import *
 from .utils.utils_methods import *
