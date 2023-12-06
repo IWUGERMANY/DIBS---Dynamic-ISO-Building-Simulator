@@ -1,8 +1,4 @@
-from data_source.datasource_csv import DataSourceCSV
-from iso_simulator.model.epw_file import EPWFile
-from utils.location_utils import *
-import sys
-import os
+from iso_simulator.data_source.datasource_csv import DataSourceCSV
 import math
 import datetime
 
@@ -11,11 +7,6 @@ class Location:
     def __init__(self):
         self.datasourcecsv = DataSourceCSV()
 
-    # def getWeatherDataObjects(self, weather_period, file_name):
-    #     return self.datasourcecsv.chooseAndGetTheRightWeatherDataFromPath(weather_period, file_name)
-
-    # def getEPWFile(self, plz, weather_period) -> EPWFile:
-    #     return self.datasourcecsv.getEPWFile(plz, weather_period)
 
     def calc_sun_position(self, latitude_deg, longitude_deg, year, hoy):
         """

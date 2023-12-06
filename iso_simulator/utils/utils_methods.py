@@ -1,6 +1,6 @@
 from typing import List, Union
 
-from model.plz_data import PLZData
+from iso_simulator.model.plz_data import PLZData
 
 def get_coordinates_by_plz(plzData: List[PLZData], target_plz: str) -> Union[List, ValueError]:
 

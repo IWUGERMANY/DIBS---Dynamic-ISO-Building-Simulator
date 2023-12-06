@@ -1,5 +1,5 @@
 import unittest
-from iso_simulator.building_simulator.building_simulator import BuildingSimulator
+from iso_simulator.building_simulator.simulator import BuildingSimulator
 
 from iso_simulator.data_source.datasource_csv import DataSourceCSV
 

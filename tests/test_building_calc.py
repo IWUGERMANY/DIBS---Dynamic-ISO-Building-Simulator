@@ -1,6 +1,6 @@
 from iso_simulator.data_source.datasource_csv import DataSourceCSV
-from iso_simulator.building_simulator import BuildingSimulator
 import unittest
+from iso_simulator.building_simulator.simulator import BuildingSimulator
 
 
 class TestBuildingCalculations(unittest.TestCase):
@@ -11,6 +11,7 @@ class TestBuildingCalculations(unittest.TestCase):
 
     def test_mass_area(self):
         self.assertEqual(self.building.mass_area, 529.0120000000001,
+
                          'Mass area should be 529.0120000000001')
 
     def test_window_area(self):
@@ -89,17 +90,17 @@ class TestBuildingCalculations(unittest.TestCase):
     def test_altitude_and_azimuth_hour0(self):
         building_simulator = BuildingSimulator(
             DataSourceCSV(), "2004-2018", 'din18599', 'mid')
-        self.assertEqual(building_simulator.get_altitude_and_zimuth(
+        self.assertEqual(building_simulator.calc_altitude_and_zimuth(
             0), (-60.95945850498123, 160.65950615649393))
 
     def test_altitude_and_azimuth_hour6(self):
         building_simulator = BuildingSimulator(
             DataSourceCSV(), "2004-2018", 'din18599', 'mid')
-        self.assertEqual(building_simulator.get_altitude_and_zimuth(
+        self.assertEqual(building_simulator.calc_altitude_and_zimuth(
             6), (-11.68415334313391, 67.73680832995645))
-        
+
     def test_altitude_and_azimuth_hour12(self):
         building_simulator = BuildingSimulator(
             DataSourceCSV(), "2004-2018", 'din18599', 'mid')
-        self.assertEqual(building_simulator.get_altitude_and_zimuth(
+        self.assertEqual(building_simulator.calc_altitude_and_zimuth(
             12), (15.475326045849297, -9.602544290526064))

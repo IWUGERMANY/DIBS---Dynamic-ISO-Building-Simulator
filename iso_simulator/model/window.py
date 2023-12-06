@@ -16,7 +16,8 @@ class Window:
         self.area = area
         self.glass_solar_shading_transmittance = glass_solar_shading_transmittance
 
-    def calc_solar_gains(self, sun_altitude: float, sun_azimuth: float, normal_direct_radiation: int, horizontal_diffuse_radiation: int, t_air: int, hour: int) -> None:
+    def calc_solar_gains(self, sun_altitude: float, sun_azimuth: float, normal_direct_radiation: int,
+                         horizontal_diffuse_radiation: int, t_air: float, hour: int) -> None:
         """
         Calculates the solar gains in the building zone through the set window
 
@@ -51,19 +52,20 @@ class Window:
             horizontal_diffuse_radiation,
         )
         if (
-            t_air > 24
-            and cooling_season
-            and self.glass_solar_shading_transmittance > 0
-        ):      # Check if the building has sunshading
+                t_air > 24
+                and cooling_season
+                and self.glass_solar_shading_transmittance > 0
+        ):  # Check if the building has sunshading
 
             self.solar_gains = self.glass_solar_shading_transmittance * self.incident_solar
 
         else:
             self.solar_gains = self.glass_solar_transmittance * self.incident_solar
 
-    def set_variable_for_calc_sun(self, sun_altitude: float, sun_azimuth: float, normal_direct_radiation: int, horizontal_diffuse_radiation: int) -> None:
+    def set_variable_for_calc_sun(self, sun_altitude: float, sun_azimuth: float, normal_direct_radiation: int,
+                                  horizontal_diffuse_radiation: int) -> None:
         direct_factor = self.calc_direct_solar_factor(
-            sun_altitude, sun_azimuth,)
+            sun_altitude, sun_azimuth, )
         diffuse_factor = self.calc_diffuse_solar_factor()
 
         direct_solar = direct_factor * normal_direct_radiation
@@ -77,7 +79,8 @@ class Window:
         # Proportion of incident light on the window surface
         return (1 + math.cos(self.alititude_tilt_rad)) / 2
 
-    def calc_illuminance(self, sun_altitude: float, sun_azimuth: float, normal_direct_illuminance: int, horizontal_diffuse_illuminance: int) -> None:
+    def calc_illuminance(self, sun_altitude: float, sun_azimuth: float, normal_direct_illuminance: int,
+                         horizontal_diffuse_illuminance: int) -> None:
         """
         Calculates the illuminance in the building zone through the set window
 
@@ -95,16 +98,16 @@ class Window:
         """
 
         direct_factor = self.calc_direct_solar_factor(
-            sun_altitude, sun_azimuth,)
+            sun_altitude, sun_azimuth, )
         diffuse_factor = self.calc_diffuse_solar_factor()
 
         direct_illuminance = direct_factor * normal_direct_illuminance
         diffuse_illuminance = diffuse_factor * horizontal_diffuse_illuminance
 
         self.incident_illuminance = (
-            direct_illuminance + diffuse_illuminance) * self.area
+                                            direct_illuminance + diffuse_illuminance) * self.area
         self.transmitted_illuminance = self.incident_illuminance * \
-            self.glass_light_transmittance
+                                       self.glass_light_transmittance
 
     def calc_direct_solar_factor(self, sun_altitude: float, sun_azimuth: float) -> float:
         """
@@ -116,8 +119,9 @@ class Window:
         # Proportion of the radiation incident on the window (cos of the
         # incident ray)
         # ref:Quaschning, Volker, and Rolf Hanitsch. "Shade calculations in photovoltaic systems." ISES Solar World Conference, Harare. 1995.
-        direct_factor = math.cos(sun_altitude_rad) * math.sin(self.alititude_tilt_rad) * math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) + \
-            math.sin(sun_altitude_rad) * math.cos(self.alititude_tilt_rad)
+        direct_factor = math.cos(sun_altitude_rad) * math.sin(self.alititude_tilt_rad) * math.cos(
+            sun_azimuth_rad - self.azimuth_tilt_rad) + \
+                        math.sin(sun_altitude_rad) * math.cos(self.alititude_tilt_rad)
 
         # If the sun is in front of the window surface
         if (math.degrees(math.acos(direct_factor)) > 90):

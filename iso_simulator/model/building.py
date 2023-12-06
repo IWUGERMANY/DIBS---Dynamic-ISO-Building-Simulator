@@ -1,3 +1,7 @@
+import supply_system
+import emission_system
+import os
+import sys
 """
 Physics required to calculate sensible space heating and space cooling loads, and space lighting loads (DIN EN ISO 13970:2008)
 
@@ -16,26 +20,21 @@ __author__ = "Wail Samjouni, Julian Bischof"
 __copyright__ = "Copyright 2023, Institut Wohnen und Umwelt"
 __license__ = "MIT"
 
-import os
-import sys
+
 mainPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, mainPath)
-
-import supply_system
-import emission_system
-from utils.utils_building import *
 
 class Building:
 
     """
     Sets the parameters of the building.
 
-    INPUT PARAMETER DEFINITION 
+    INPUT PARAMETER DEFINITION
     scr_gebaeude_id: Building Screening-ID
     plz: Zipcode of building location
     hk_geb: Usage type (main category)
     uk_geb: Usage type (subcategory)
-    max_occupancy: Max. number of persons 
+    max_occupancy: Max. number of persons
     wall_area_og: Area of all walls above ground in contact with the outside [m2]
     wall_area_ug: Area of all walls below ground in contact with soil [m2]
     window_area_north: Area of the glazed surface in contact with the outside facing north [m2]
@@ -45,10 +44,10 @@ class Building:
     roof_area: Area of the roof in contact with the outside [m2]
     net_room_area: Area of all floor areas from usable rooms including all floor plan levels of the building (Refers to "Netto-Raumfläche", DIN 277-1:2016-01)
     base_area: Area for the calculation of transmission heat losses to the soil. Also used to calculate the building's volume.
-    gross_base_area 
-    energy_ref_area: Energy reference area of the building   
-    building_height: Mean height of the building [m] 
-    lighting_load: Lighting Load [W/m2] 
+    gross_base_area
+    energy_ref_area: Energy reference area of the building
+    building_height: Mean height of the building [m]
+    lighting_load: Lighting Load [W/m2]
     lighting_control: Lux threshold at which the lights turn on [Lx]
     lighting_utilisation_factor: A factor that determines how much natural solar lumminace is effectively utilised in the space
     lighting_maintenance_factor: A factor based on how dirty the windows area
@@ -59,9 +58,9 @@ class Building:
     u_walls: U value of external walls  [W/m2K]
     u_roof: U value of the roof [W/m2K]
     u_base: U value of the floor [W/m2K]
-    temp_adj_base: Temperature adjustment factor for the floor 
+    temp_adj_base: Temperature adjustment factor for the floor
     temp_adj_walls_ug: Temperature adjustment factor for walls below ground
-    ach_inf: Air changes per hour through infiltration [Air Changes Per Hour] 
+    ach_inf: Air changes per hour through infiltration [Air Changes Per Hour]
     ach_win: Air changes per hour through opened windows [Air Changes Per Hour]
     ach_vent: Air changes per hour through ventilation [Air Changes Per Hour]
     heat_recovery_efficiency
@@ -82,12 +81,12 @@ class Building:
     internal_gains: Internal Heat Gains [W]
     solar_gains: Solar Heat Gains after transmitting through the window [W]
     t_out: Outdoor air temperature [C]
-    t_m_prev: Thermal mass temperature from the previous time step 
+    t_m_prev: Thermal mass temperature from the previous time step
     ill: Illuminance transmitting through the window [lumen]
     occupancy: Occupancy [people]
 
     t_m_next: Medium temperature of the next time step [C]
-    t_m: Average between the previous and current time-step of the bulk temperature [C] 
+    t_m: Average between the previous and current time-step of the bulk temperature [C]
 
     Inputs to the 5R1C model:
     c_m: Thermal Capacitance of the medium [J/K]
@@ -212,14 +211,10 @@ class Building:
         self.night_flushing_flow = night_flushing_flow
         self.max_heating_energy_per_floor_area = max_heating_energy_per_floor_area
         self.max_cooling_energy_per_floor_area = max_cooling_energy_per_floor_area
-        self.heating_supply_system = getattr(
-            supply_system, heating_supply_system)
-        self.cooling_supply_system = getattr(
-            supply_system, cooling_supply_system)
-        self.heating_emission_system = getattr(
-            emission_system, heating_emission_system)
-        self.cooling_emission_system = getattr(
-            emission_system, cooling_emission_system)
+        self.heating_supply_system = heating_supply_system
+        self.cooling_supply_system = cooling_supply_system
+        self.heating_emission_system = heating_emission_system
+        self.cooling_emission_system = cooling_emission_system
         self.dhw_system = dhw_system
         self.intializing_variables_calculations()
 
@@ -248,7 +243,7 @@ class Building:
 
     def calc_total_internal_area(self):
         """
-            Calculate internal area (See 7.2.2.2, p. 35/36) 
+            Calculate internal area (See 7.2.2.2, p. 35/36)
         """
         self.total_internal_area = self.energy_ref_area * 4.5
 
@@ -296,7 +291,7 @@ class Building:
         """
             Conductance through ventilation [W/M]
             transmittance from the internal air to the thermal mass of the building
-            p. 79, Eq. 64 
+            p. 79, Eq. 64
         """
         self.h_tr_ms = 9.1 * self.mass_area
 
@@ -376,7 +371,7 @@ class Building:
     @property
     def t_opperative(self):
         """
-        The opperative temperature is a weighted average of the air and mean radiant temperatures. 
+        The opperative temperature is a weighted average of the air and mean radiant temperatures.
         It is not used in any further calculation at this stage
         # (C.12) in [C.3 ISO 13790]
         """
@@ -502,7 +497,7 @@ class Building:
         """
         Calculates the lighting demand for a set timestep
 
-        Daylighting is based on methods in 
+        Daylighting is based on methods in
         Szokolay, S.V. (1980): Environmental Science Handbook vor architects and builders. Unknown Edition, The Construction Press, Lancaster/London/New York, ISBN: 0-86095-813-2, p. 105ff.
         respectively
         Szokolay, S.V. (2008): Introduction to Architectural Science. The Basis of Sustainable Design. 2nd Edition, Elsevier/Architectural Press, Oxford, ISBN: 978-0-7506-8704-1, p. 154ff.
@@ -550,13 +545,13 @@ class Building:
 
         :return: self.heating_demand, space heating demand of the building
         :return: self.heating_sys_electricity, heating electricity consumption
-        :return: self.heating_sys_fossils, heating fossil fuel consumption 
+        :return: self.heating_sys_fossils, heating fossil fuel consumption
         :return: self.cooling_demand, space cooling demand of the building
         :return: self.cooling_sys_electricity, electricity consumption from cooling
         :return: self.cooling_sys_fossils, fossil fuel consumption from cooling
         :return: self.electricity_out, electricity produced from combined heat pump systems
         :return: self.sys_total_energy, total exergy consumed (electricity + fossils) for heating and cooling
-        :return: self.heating_energy, total exergy consumed (electricity + fossils) for heating 
+        :return: self.heating_energy, total exergy consumed (electricity + fossils) for heating
         :return: self.cooling_energy, total exergy consumed (electricity + fossils) for cooling
         :return: self.cop, Coefficient of Performance of the heating or cooling system
         :rtype: float
@@ -670,7 +665,7 @@ class Building:
         step 1 in section C.4.2 in [C.3 ISO 13790]
 
         FUNCTIONALITY:
-            - set energy demand to 0 and see if temperatures are within the comfort range 
+            - set energy demand to 0 and see if temperatures are within the comfort range
             - Solve for the internal temperature t_Air
             - If the air temperature is less or greater than the set temperature, there is a heating/cooling load
         """
@@ -694,9 +689,9 @@ class Building:
         Used in: has_demand(), solve_building_energy(), calc_energy_demand()
         section C.3 in [C.3 ISO 13790]
 
-        :calc_heat_flow: Eq. C.1 - C.3 
+        :calc_heat_flow: Eq. C.1 - C.3
         :calc_phi_m_tot:Eq. C.5
-        :calc_t_m_next: # Calculates the new bulk temperature point from the old one #Eq. C.4   
+        :calc_t_m_next: # Calculates the new bulk temperature point from the old one #Eq. C.4
         :calc_t_m: Calculates the average bulk temperature used for the remaining calculation # Eq. C.9
         :calc_t_s: Eq. C.10
         :calc_t_air: Eq. C.11
@@ -718,10 +713,10 @@ class Building:
         # Step 1 - Step 4 in Section C.4.2 in [C.3 ISO 13790]
 
         FUNCTIONALITY:
-            - Step 1: Check if heating or cooling is needed 
+            - Step 1: Check if heating or cooling is needed
                 - (Not needed, but doing so for readability when comparing with the standard)
                 - Set heating/cooling to 0
-                - Calculate the air temperature with no heating/cooling 
+                - Calculate the air temperature with no heating/cooling
 
             - Step 2: Calculate the unrestricted heating/cooling required
                 -  determine if we need heating or cooling based on the condition that no heating or cooling is required
@@ -785,9 +780,9 @@ class Building:
         # (C.13) in [C.3 ISO 13790]
 
 
-        Based on the Thales Intercept Theorem. 
-        Where we set a heating case that is 10x the floor area and determine the temperature as a result 
-        Assuming that the relation is linear, one can draw a right angle triangle. 
+        Based on the Thales Intercept Theorem.
+        Where we set a heating case that is 10x the floor area and determine the temperature as a result
+        Assuming that the relation is linear, one can draw a right angle triangle.
         From this we can determine the heating level required to achieve the set point temperature
         This assumes a perfect HVAC control system
         """
@@ -803,7 +798,7 @@ class Building:
 
         #C.1 - C.3 in [C.3 ISO 13790]
 
-        Note that this equation has diverged slightly from the standard 
+        Note that this equation has diverged slightly from the standard
         as the heating/cooling node can enter any node depending on the
         emission system selected
         """
@@ -873,7 +868,7 @@ class Building:
 
     def calc_t_s(self, t_out):
         """
-        Calculate the temperature of the inside room surfaces. 
+        Calculate the temperature of the inside room surfaces.
         Consists of the air temperature and the average radiation temperature
         # (C.10) in [C.3 ISO 13790]
         # h_ve = h_ve_adj and t_supply = t_out [9.3.2 ISO 13790]

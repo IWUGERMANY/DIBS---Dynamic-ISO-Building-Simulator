@@ -1,7 +1,3 @@
-from .schedule_name import ScheduleName
-from typing import List
-
-
 class OccupancySchedulesAssignment:
 
     def __init__(self,

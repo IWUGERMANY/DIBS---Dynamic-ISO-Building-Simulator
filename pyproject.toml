@@ -1,0 +1,28 @@
+[project]
+name = "iso_simulator"
+license = "MIT"
+authors = [
+    {name = "Julian Bischof", email = "j.bischof@iwu.de"},
+    {name = "André Müller", email = "a.mueller@iwu.de"},
+    {name = "Jens Calisti", email = "j.calisti@iwu.de"},
+]
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest"
+]
+
+[tool.pytest.ini_options]
+pythonpath = [
+    ".",
+]
+testpaths = [
+    "tests",
+]
+addopts = [
+    "--import-mode=importlib",
+]
