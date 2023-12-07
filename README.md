@@ -5,8 +5,8 @@ Dynamic ISO Building Simulator (DIBS) is a simulation program for calculating th
 You can install DIBS via downloading the zip file or either clone this repository. Unfortunately there's no pip install at this stage. 
 
 Python packages you need to use DIBS:  
-- [Pandas](https://pypi.org/project/pandas/)
-- [Numpy](https://pypi.org/project/numpy/)
+- [Pandas 1.5.3](https://pypi.org/project/pandas/)
+- [Numpy 1.22.4](https://pypi.org/project/numpy/)
 - [Namedlist](https://pypi.org/project/namedlist/)
 - [Geopy](https://pypi.org/project/geopy/)
 
