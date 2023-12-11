@@ -10,25 +10,26 @@ copyright: "Copyright 2022, Institut Wohnen und Umwelt"
 license: "MIT"
 
 """
+from geopy.distance import geodesic
+import datetime
+import math
+import pandas as pd
 __author__ = "Simon Knoll, Julian Bischof, Michael Hörner "
 __copyright__ = "Copyright 2022, Institut Wohnen und Umwelt"
 __license__ = "MIT"
 
-
-import numpy as np
-import pandas as pd
 import os
 import sys
-import math
-import datetime
-from geopy.distance import geodesic
+mainPath = os.path.abspath(os.path.join(
+    os.path.dirname(__file__), './data_source'))
+# add mainPath to sys.path, at the beginning of the the list of directory paths that Python searches when trying to import a module
+sys.path.insert(0, mainPath)
 
-       
 
 class Location(object):
     """
     Set the Location of the Simulation with an Energy Plus Weather File
-    
+
     Methods:
         getEPWFile: Function finds the epw file depending on building location
         calc_sun_position: Calculates the sun position for a specific hour and location
@@ -47,56 +48,58 @@ class Location(object):
         # Import EPW file
         self.weather_data = pd.read_csv(
             epwfile_path, skiprows=8, header=None, names=epw_labels).drop('datasource', axis=1)
-        
-    def getEPWFile(plz, weather_period):  
+
+    def getEPWFile(self, plz, weather_period):
         """
         Function finds the epw file depending on building location
-        
+
 
         :external input data: File with german zip codes [../auxiliary/weather_data/plzcodes.csv]
                               File with metadata of weather stations (e.g. longitude, latitude) [../auxiliary/weather_data/weatherfiles_stations_93.csv]
-        
+
         :return epw_filename: filename of the epw
         :rtype: tuple (string)
         :return coordinates_station: latitude and longitute of the selected station
         :rtype: tuple (float)
         """
-        
+
         # Read data
         # plz_data = pd.read_csv(os.path.join('../auxiliary/weather_data/plzcodes.csv'), encoding = 'latin')
-        plz_data = pd.read_csv(os.path.join('../auxiliary/weather_data/plzcodes.csv'), encoding = 'latin', dtype={'zipcode': int})
-        
+        plz_data = pd.read_csv(os.path.join(
+            '../auxiliary/weather_data/plzcodes.csv'), encoding='latin', dtype={'zipcode': int})
         if (weather_period == "2007-2021"):
-            weatherfiles_stations = pd.read_csv(os.path.join('../auxiliary/weather_data/weather_data_TMYx_2007_2021/weatherfiles_stations_109.csv'), sep = ';')
-        else:      
-            weatherfiles_stations = pd.read_csv(os.path.join('../auxiliary/weather_data/weatherfiles_stations_93.csv'), sep = ';')
-        
-        
+            weatherfiles_stations = pd.read_csv(os.path.join(
+                '../auxiliary/weather_data/weather_data_TMYx_2007_2021/weatherfiles_stations_109.csv'), sep=';')
+        else:
+            weatherfiles_stations = pd.read_csv(os.path.join(
+                '../auxiliary/weather_data/weatherfiles_stations_93.csv'), sep=';')
+
         # Pick latitude and longitude from plz_data and put values into a list
-        coordinates_plz = plz_data.loc[plz_data['zipcode'] == plz, ['latitude', 'longitude']].iloc[0].tolist()
-        
+        coordinates_plz = plz_data.loc[plz_data['zipcode'] == plz, [
+            'latitude', 'longitude']].iloc[0].tolist()
+
         # Append plz to weatherfiles_stations
         weatherfiles_stations['latitude_building'] = coordinates_plz[0]
         weatherfiles_stations['longitude_building'] = coordinates_plz[1]
-        
+
         # Calculate minimum distance to next weather station
         weatherfiles_stations['distance'] = weatherfiles_stations.apply(lambda x: geodesic((x['latitude'], x['longitude']),
-                                                   (x['latitude_building'], x['longitude_building'])).km, axis = 1)
-        
+                                                                                           (x['latitude_building'], x['longitude_building'])).km, axis=1)
+
         # Pick filename of minimum distance
-        epw_filename = weatherfiles_stations.loc[weatherfiles_stations['distance'].idxmin(), 'filename']    
-        
+        epw_filename = weatherfiles_stations.loc[weatherfiles_stations['distance'].idxmin(
+        ), 'filename']
+
         # Pick latitude and longitude from station as arguments in calc_sun_position(), See annualSimulation.py
-        coordinates_station = weatherfiles_stations.loc[weatherfiles_stations['distance'].idxmin(), ['latitude', 'longitude']].tolist() 
-        
-        # Distance 
-        distance = distance = weatherfiles_stations.loc[weatherfiles_stations['distance'].idxmin(), 'distance']
-        
-                
+        coordinates_station = weatherfiles_stations.loc[weatherfiles_stations['distance'].idxmin(), [
+            'latitude', 'longitude']].tolist()
+
+        # Distance
+        distance = distance = weatherfiles_stations.loc[weatherfiles_stations['distance'].idxmin(
+        ), 'distance']
+
         return epw_filename, coordinates_station, distance
-    
-                 
-    
+
     def calc_sun_position(self, latitude_deg, longitude_deg, year, hoy):
         """
         Calculates the sun position for a specific hour and location
@@ -156,7 +159,7 @@ class Location(object):
 
         # I don't really know what this code does, it has been imported from
         # PySolar
-        if(math.cos(hour_angle_rad) >= (math.tan(declination_rad) / math.tan(latitude_rad))):
+        if (math.cos(hour_angle_rad) >= (math.tan(declination_rad) / math.tan(latitude_rad))):
             return math.degrees(altitude_rad), math.degrees(azimuth_rad)
         else:
             return math.degrees(altitude_rad), (180 - math.degrees(azimuth_rad))
@@ -171,18 +174,18 @@ class Window(object):
         calc_diffuse_solar_factor: Calculates the proportion of diffuse radiation
     """
 
-    def __init__(self, azimuth_tilt, alititude_tilt = 90, 
-                 glass_solar_transmittance = 0.7,
-                 glass_solar_shading_transmittance = 0.2,
-                 glass_light_transmittance = 0.8, 
-                 area = 1):
+    def __init__(self, azimuth_tilt,
+                 glass_solar_transmittance,
+                 glass_solar_shading_transmittance,
+                 glass_light_transmittance,
+                 area):
 
-        self.alititude_tilt_rad = math.radians(alititude_tilt)
         self.azimuth_tilt_rad = math.radians(azimuth_tilt)
+        self.alititude_tilt_rad = math.radians(90)
         self.glass_solar_transmittance = glass_solar_transmittance
+        self.glass_solar_shading_transmittance = glass_solar_shading_transmittance
         self.glass_light_transmittance = glass_light_transmittance
         self.area = area
-        self.glass_solar_shading_transmittance = glass_solar_shading_transmittance
 
     def calc_solar_gains(self, sun_altitude, sun_azimuth, normal_direct_radiation, horizontal_diffuse_radiation, t_air, hour):
         """
@@ -196,48 +199,56 @@ class Window(object):
         :type normal_direct_radiation: float
         :param horizontal_diffuse_radiation: Horizontal Diffuse Radiation from weather file
         :type horizontal_diffuse_radiation: float
-        
+
         # Added:
         #param t_out: Outdoor temperature from weather file
         :type t_out: float
-        
+
         :return: self.incident_solar, Incident Solar Radiation on window
         :return: self.solar_gains - Solar gains in building after transmitting through the window
         :rtype: float
         """
-        
+
         # Check conditions cooling seasons == True and outdoor temperature > 24 (requiered indoor temperature in the cooling case for 85% of usage zones according to DIN V 18599-10):
         # If condition is true, use reduced glass_solar_transmittance (called glass_solar_shading_transmittance) due to the use
-        # of activated sunshadings 
-        cooling_season = (2169 < hour < 6561)           # Assume cooling season from 01/04 9am - 01/10 9am
-        
-        if t_air > 24 and (cooling_season == True):
+        # of activated sunshadings
+        # Assume cooling season from 01/04 9am - 01/10 9am
+        cooling_season = (2169 < hour < 6561)
 
-            direct_factor = self.calc_direct_solar_factor(sun_altitude, sun_azimuth,)
-            diffuse_factor = self.calc_diffuse_solar_factor()
+        if t_air > 24 and cooling_season:
 
-            direct_solar = direct_factor * normal_direct_radiation
-            diffuse_solar = horizontal_diffuse_radiation * diffuse_factor
-            self.incident_solar = (direct_solar + diffuse_solar) * self.area
-        
+            self.setVariableForCalcSun(
+                sun_altitude,
+                sun_azimuth,
+                normal_direct_radiation,
+                horizontal_diffuse_radiation,
+            )
             if self.glass_solar_shading_transmittance > 0:      # Check if the building has sunshading
-                
-                self.solar_gains = self.glass_solar_shading_transmittance * self.incident_solar
-            
-            else: 
-                self.solar_gains = self.glass_solar_transmittance * self.incident_solar
-        
-        else: 
-            
-            direct_factor = self.calc_direct_solar_factor(sun_altitude, sun_azimuth,)
-            diffuse_factor = self.calc_diffuse_solar_factor()
 
-            direct_solar = direct_factor * normal_direct_radiation
-            diffuse_solar = horizontal_diffuse_radiation * diffuse_factor
-            self.incident_solar = (direct_solar + diffuse_solar) * self.area
-        
+                self.solar_gains = self.glass_solar_shading_transmittance * self.incident_solar
+
+            else:
+                self.solar_gains = self.glass_solar_transmittance * self.incident_solar
+
+        else:
+
+            self.setVariableForCalcSun(
+                sun_altitude,
+                sun_azimuth,
+                normal_direct_radiation,
+                horizontal_diffuse_radiation,
+            )
             self.solar_gains = self.glass_solar_transmittance * self.incident_solar
-            
+
+    # TODO Rename this here and in `calc_solar_gains`
+    def setVariableForCalcSun(self, sun_altitude, sun_azimuth, normal_direct_radiation, horizontal_diffuse_radiation):
+        direct_factor = self.calc_direct_solar_factor(
+            sun_altitude, sun_azimuth,)
+        diffuse_factor = self.calc_diffuse_solar_factor()
+
+        direct_solar = direct_factor * normal_direct_radiation
+        diffuse_solar = horizontal_diffuse_radiation * diffuse_factor
+        self.incident_solar = (direct_solar + diffuse_solar) * self.area
 
     def calc_illuminance(self, sun_altitude, sun_azimuth, normal_direct_illuminance, horizontal_diffuse_illuminance):
         """
@@ -256,7 +267,8 @@ class Window(object):
         :rtype: float
         """
 
-        direct_factor = self.calc_direct_solar_factor(sun_altitude, sun_azimuth,)
+        direct_factor = self.calc_direct_solar_factor(
+            sun_altitude, sun_azimuth,)
         diffuse_factor = self.calc_diffuse_solar_factor()
 
         direct_illuminance = direct_factor * normal_direct_illuminance
@@ -276,14 +288,13 @@ class Window(object):
 
         # Proportion of the radiation incident on the window (cos of the
         # incident ray)
-        #ref:Quaschning, Volker, and Rolf Hanitsch. "Shade calculations in photovoltaic systems." ISES Solar World Conference, Harare. 1995.
+        # ref:Quaschning, Volker, and Rolf Hanitsch. "Shade calculations in photovoltaic systems." ISES Solar World Conference, Harare. 1995.
         direct_factor = math.cos(sun_altitude_rad) * math.sin(self.alititude_tilt_rad) * math.cos(sun_azimuth_rad - self.azimuth_tilt_rad) + \
             math.sin(sun_altitude_rad) * math.cos(self.alititude_tilt_rad)
 
-
         # If the sun is in front of the window surface
-        if(math.degrees(math.acos(direct_factor)) > 90):
-            direct_factor=0
+        if (math.degrees(math.acos(direct_factor)) > 90):
+            direct_factor = 0
 
         else:
             pass

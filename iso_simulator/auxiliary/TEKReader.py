@@ -6,12 +6,10 @@ __author__ = "Julian Bischof"
 __copyright__ = "Copyright 2022, Institut Wohnen und Umwelt"
 __credits__ = ""
 __license__ = "MIT"
-import os
-import sys
-import pandas as pd
-import numpy as np
 
-  
+import os
+import pandas as pd
+
 
 def getTEK(hk_geb, uk_geb):
     """
@@ -30,30 +28,31 @@ def getTEK(hk_geb, uk_geb):
     :return: df_TEK, TEK_name
     :rtype: DataFrame (with floats), string
     """
-    
-    zuweisungen = pd.read_csv(os.path.join('../auxiliary/TEKs/TEK_NWG_Vergleichswerte_zuweisung.csv'), sep = ';', decimal=',', encoding = 'cp1250')
-    
-    DB_TEKs = pd.read_csv(os.path.join('../auxiliary/TEKs/TEK_NWG_Vergleichswerte.csv'), sep = ';', decimal=',', index_col = False, encoding = 'cp1250')
-    #DB_TEKs.set_index("Gebäudekategorie", inplace=True) # Asigne Row indexes
-    #DB_TEKs.set_index("TEK_Category", inplace=True) # Asigne Row indexes
-    
+
+    zuweisungen = pd.read_csv(os.path.join('../auxiliary/TEKs/TEK_NWG_Vergleichswerte_zuweisung.csv'), sep=';',
+                              decimal=',', encoding='cp1250')
+
+    DB_TEKs = pd.read_csv(os.path.join('../auxiliary/TEKs/TEK_NWG_Vergleichswerte.csv'), sep=';', decimal=',',
+                          index_col=False, encoding='cp1250')
+    # DB_TEKs.set_index("Gebäudekategorie", inplace=True) # Asigne Row indexes
+    # DB_TEKs.set_index("TEK_Category", inplace=True) # Asigne Row indexes
+
     if hk_geb in zuweisungen['hk_geb'].values:
-        
+
         if uk_geb in zuweisungen['uk_geb'].values:
             row = zuweisungen[zuweisungen['uk_geb'] == uk_geb]
             TEK_name = row['TEK'].astype(str)
             TEK_name = TEK_name.iloc[0]
-            #print(TEK_name)
+            # print(TEK_name)
             df_TEK = DB_TEKs[DB_TEKs['TEK_Category'] == TEK_name]
             TEK_dhw = df_TEK.iloc[0]['TEK Warmwasser']
             TEK_dhw = TEK_dhw.astype(float)
-            #print(ABC)
-            
-            return TEK_dhw, TEK_name # df_TEK
-        
-        else: 
-            return print('uk_geb unbekannt')
-        
-    else:
-        return print('hk_geb unbekannt')    
+            # print(ABC)
 
+            return TEK_dhw, TEK_name  # df_TEK
+
+        else:
+            return print('uk_geb unbekannt')
+
+    else:
+        return print('hk_geb unbekannt')

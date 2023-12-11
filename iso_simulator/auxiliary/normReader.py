@@ -72,7 +72,6 @@ def getGains(hk_geb, uk_geb, profile_from_norm, gains_from_group_values):
         return gain_per_person, appliance_gains, typ_norm
     
     
-    
 def getUsagetime(hk_geb, uk_geb, usage_from_norm):
     """
     Find building's usage time DIN 18599-10 or SIA2024
@@ -92,22 +91,59 @@ def getUsagetime(hk_geb, uk_geb, usage_from_norm):
     """
     
     gains_zuweisungen = pd.read_csv(os.path.join('../auxiliary/norm_profiles/profiles_zuweisungen.csv'), sep = ';', encoding = 'latin')
-    
+
     if hk_geb in gains_zuweisungen['hk_geb'].values:
         
-        if uk_geb in gains_zuweisungen['uk_geb'].values:
-            row = gains_zuweisungen[gains_zuweisungen['uk_geb'] == uk_geb]
-            
-            if usage_from_norm == 'sia2024':    
-                usage_start = int(row['usage_start_sia2024'].to_string(index = False).strip())    
-                usage_end = int(row['usage_end_sia2024'].to_string(index = False).strip())    
-                
-            elif usage_from_norm == 'din18599': 
-                usage_start = int(row['usage_start_18599'].to_string(index = False).strip())  
-                usage_end = int(row['usage_end_18599'].to_string(index = False).strip())  
-                
-        else: 
+        if uk_geb not in gains_zuweisungen['uk_geb'].values:
             raise ValueError('Something went wrong with the function getUsagetime()')      
-            
+
+        row = gains_zuweisungen[gains_zuweisungen['uk_geb'] == uk_geb]
+
+        if usage_from_norm == 'sia2024':    
+            usage_start = int(row['usage_start_sia2024'].to_string(index = False).strip())    
+            usage_end = int(row['usage_end_sia2024'].to_string(index = False).strip())    
+
+        elif usage_from_norm == 'din18599': 
+            usage_start = int(row['usage_start_18599'].to_string(index = False).strip())  
+            usage_end = int(row['usage_end_18599'].to_string(index = False).strip())  
+
         return usage_start, usage_end
                 
+
+# def getUsagetime(hk_geb, uk_geb, usage_from_norm):
+#     """
+#     Find building's usage time DIN 18599-10 or SIA2024
+
+    
+#     :external input data: Assignments [../auxiliary/norm_profiles/profiles_zuweisungen.csv]
+        
+#     :param hk_geb: usage type (main category)
+#     :type hk_geb: string
+#     :param uk_geb: usage type (subcategory)
+#     :type uk_geb: string
+#     :param usage_from_norm: data source either 18599-10 or SIA2024 [specified in annualSimulation.py]
+#     :type usage_from_norm: string
+
+#     :return: usage_start, usage_end
+#     :rtype: tuple (float, float)
+#     """
+    
+#     gains_zuweisungen = pd.read_csv(os.path.join('../auxiliary/norm_profiles/profiles_zuweisungen.csv'), sep = ';', encoding = 'latin')
+    
+#     if hk_geb in gains_zuweisungen['hk_geb'].values:
+        
+#         if uk_geb in gains_zuweisungen['uk_geb'].values:
+#             row = gains_zuweisungen[gains_zuweisungen['uk_geb'] == uk_geb]
+            
+#             if usage_from_norm == 'sia2024':    
+#                 usage_start = int(row['usage_start_sia2024'].to_string(index = False).strip())    
+#                 usage_end = int(row['usage_end_sia2024'].to_string(index = False).strip())    
+                
+#             elif usage_from_norm == 'din18599': 
+#                 usage_start = int(row['usage_start_18599'].to_string(index = False).strip())  
+#                 usage_end = int(row['usage_end_18599'].to_string(index = False).strip())  
+                
+#         else: 
+#             raise ValueError('Something went wrong with the function getUsagetime()')      
+            
+#         return usage_start, usage_end

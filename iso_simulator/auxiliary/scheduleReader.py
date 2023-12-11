@@ -31,19 +31,16 @@ def getSchedule(hk_geb, uk_geb):
     """
     
     zuweisungen = pd.read_csv(os.path.join('../auxiliary/occupancy_schedules/occupancy_schedules_zuweisungen.csv'), sep = ';', encoding = 'latin')
-    
-    if hk_geb in zuweisungen['hk_geb'].values:
-        
-        if uk_geb in zuweisungen['uk_geb'].values:
-            row = zuweisungen[zuweisungen['uk_geb'] == uk_geb]
-            schedule_name = row['schedule_name'].to_string(index = False).strip()
-            df_schedule = pd.read_csv(os.path.join('../auxiliary/occupancy_schedules/')+schedule_name+'.csv', sep = ';')
-            
-            return df_schedule, schedule_name
-        
-        else: 
-            return print('uk_geb unbekannt')
-        
-    else:
-        return print('hk_geb unbekannt')    
+
+    if hk_geb not in zuweisungen['hk_geb'].values:
+        return print('hk_geb unbekannt')
+    if uk_geb in zuweisungen['uk_geb'].values:
+        row = zuweisungen[zuweisungen['uk_geb'] == uk_geb]
+        schedule_name = row['schedule_name'].to_string(index = False).strip()
+        df_schedule = pd.read_csv(os.path.join('../auxiliary/occupancy_schedules/')+schedule_name+'.csv', sep = ';')
+
+        return df_schedule, schedule_name
+
+    else: 
+        return print('uk_geb unbekannt')    
 

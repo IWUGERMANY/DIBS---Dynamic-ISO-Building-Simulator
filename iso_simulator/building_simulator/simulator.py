@@ -117,7 +117,7 @@ class BuildingSimulator:
     def extract_year(self, weather_data: List[WeatherData], hour: int) -> int:
         return weather_data[hour].year
 
-    def calc_altitude_and_zimuth(self, hour: int) -> Tuple[float, float]:
+    def calc_altitude_and_azimuth(self, hour: int) -> Tuple[float, float]:
         """
         Call calc_sun_position(). Depending on latitude, longitude, year and hour - Independent from epw weather_data
         """
@@ -202,8 +202,7 @@ class BuildingSimulator:
         Appliance_gains equal the electric energy that appliances use, except for negative appliance_gains of refrigerated counters in trade buildings for food!
         The assumption is: negative appliance_gains come from referigerated counters with heat pumps for which we assume a COP = 2.
         """
-        appliance_gains_elt = -1 * appliance_gains / \
-                              2 if appliance_gains < 0 else appliance_gains
+        appliance_gains_elt = -1 * appliance_gains / 2 if appliance_gains < 0 else appliance_gains
         return appliance_gains_elt * occupancy_schedule[hour].Appliances * self.building_object.energy_ref_area
 
     def calc_sum_solar_gains_all_windows(self) -> float:
@@ -220,8 +219,8 @@ class BuildingSimulator:
         central = ['CentralHeating', 'CentralDHW']
         return self.building_object.dhw_system in central
 
-    def check_if_heat_pump_air_source_or_heat_pump_ground_source(self):
-        heat_source = ['HeatPumpAirSource', 'HeatPumpGroundSource']
+    def check_if_heat_pump_air_or_ground_source(self):
+        heat_source = ['HeatPumpAirSource', 'HeatPumpGroundSource', 'ElectricHeating']
         return self.building_object.heating_supply_system in heat_source
 
     def calc_hot_water_usage(self, occupancy_schedule: List[ScheduleName], tek_dhw_per_occupancy_full_usage_hour: float,
@@ -231,79 +230,75 @@ class BuildingSimulator:
         represents the Efficiency of the heat generation in the building
         :hotwaterdemand: in W
         """
-
         if self.building_object.dhw_system not in ['NoDHW', ' -']:
-            hot_water_demand = occupancy_schedule[hour].People * \
-                             tek_dhw_per_occupancy_full_usage_hour * \
-                             1000 * self.building_object.energy_ref_area
+            hot_water_demand = occupancy_schedule[
+                                   hour].People * tek_dhw_per_occupancy_full_usage_hour * 1000 * self.building_object.energy_ref_area
 
-            if self.building_object.heating_demand > 0:  # catch devision by zero error
-                hot_water_energy = hot_water_demand * \
-                                 (self.building_object.heating_energy /
-                                  self.building_object.heating_demand)
+            if self.building_object.heating_demand > 0:
+                hot_water_energy = hot_water_demand * (
+                        self.building_object.heating_energy / self.building_object.heating_demand)
             else:
                 hot_water_energy = hot_water_demand
 
             if self.building_object.dhw_system == 'DecentralElectricDHW' or (
-                    self.check_if_central_heating_or_central_dhw() and (
-                    self.check_if_heat_pump_air_source_or_heat_pump_ground_source() | self.building_object.heating_supply_system == 'ElectricHeating')):
-                self.result.HotWaterSysElectricity = hot_water_energy
-                self.result.HotWaterSysFossils = 0
+                    self.check_if_central_heating_or_central_dhw() and self.check_if_heat_pump_air_or_ground_source()):
+                hot_water_sys_electricity = hot_water_energy
+                hot_water_sys_fossils = 0
             else:
-                self.result.HotWaterSysFossils = hot_water_energy
-                self.resultHotWaterSysElectricity = 0
+                hot_water_sys_fossils = hot_water_energy
+                hot_water_sys_electricity = 0
         else:
-            self.result.hot_water_demand = 0
-            self.result.hot_water_energy = 0
-            self.result.HotWaterSysElectricity = 0
-            self.result.HotWaterSysFossils = 0
+            hot_water_demand = 0
+            hot_water_energy = 0
+            hot_water_sys_electricity = 0
+            hot_water_sys_fossils = 0
 
-        return self.result
+        return hot_water_demand, hot_water_energy, hot_water_sys_electricity, hot_water_sys_fossils
 
-    # -------------------------------------Extracted methods from append_results() --------------------------------------------------
-    def heating_demand_and_energy_result(self) -> None:
-        self.result.HeatingDemand.append(self.building_object.heating_demand)
-        self.result.HeatingEnergy.append(self.building_object.heating_energy)
+    # ---------------------------Extracted methods from append_results() -------------------
+    def heating_demand_and_energy_results(self) -> None:
+        self.result.heating_demand.append(self.building_object.heating_demand)
+        self.result.heating_energy.append(self.building_object.heating_energy)
 
     def heating_electricity_fossils_sys_results(self) -> None:
-        self.result.Heating_Sys_Electricity.append(
+        self.result.heating_sys_electricity.append(
             self.building_object.heating_sys_electricity)
-        self.result.Heating_Sys_Fossils.append(
+        self.result.heating_sys_fossils.append(
             self.building_object.heating_sys_fossils)
 
     def cooling_electricity_fossils_sys_results(self) -> None:
-        self.result.Cooling_Sys_Electricity.append(
+        self.result.cooling_sys_electricity.append(
             self.building_object.cooling_sys_electricity)
-        self.result.Cooling_Sys_Fossils.append(
+        self.result.cooling_sys_fossils.append(
             self.building_object.cooling_sys_fossils)
 
-    def cooling_demand_and_energy_result(self) -> None:
-        self.result.CoolingDemand.append(self.building_object.cooling_demand)
-        self.result.CoolingEnergy.append(self.building_object.cooling_energy)
+    def cooling_demand_and_energy_results(self) -> None:
+        self.result.cooling_demand.append(self.building_object.cooling_demand)
+        self.result.cooling_energy.append(self.building_object.cooling_energy)
 
-    def hot_demand_and_energy_result(self) -> None:
-        self.result.HotWaterDemand.append(self.result.hotwaterdemand)
-        self.result.HotWaterEnergy.append(self.result.hotwaterenergy)
+    def hot_demand_and_energy_results(self) -> None:
+        self.result.hot_water_demand.append(self.result.hot_water_demand)
+        self.result.hot_water_energy.append(self.result.hot_water_energy)
 
     def hotwater_electricity_fossils_sys_results(self) -> None:
-        self.result.HotWater_Sys_Electricity.append(
+        self.result.hot_water_sys_electricity.append(
             self.result.HotWaterSysElectricity)
-        self.result.HotWater_Sys_Fossils.append(self.result.HotWaterSysFossils)
+        self.result.hot_water_sys_fossils.append(self.result.HotWaterSysFossils)
 
     def air_temperature_results(self, t_out: float) -> None:
-        self.result.TempAir.append(self.building_object.t_air)
-        self.result.OutsideTemp.append(t_out)
+        self.result.temp_air.append(self.building_object.t_air)
+        self.result.outside_temp.append(t_out)
 
     def south_east_windows_results(self) -> None:
-        self.result.SolarGainsSouthWindow.append(
+        self.result.solar_gains_south_window.append(
             self.all_windows[0].solar_gains)
-        self.result.SolarGainsEastWindow.append(
+        self.result.solar_gains_east_window.append(
             self.all_windows[1].solar_gains)
 
     def west_north_windows_results(self) -> None:
-        self.result.SolarGainsWestWindow.append(
+        self.result.solar_gains_west_window.append(
             self.all_windows[2].solar_gains)
-        self.result.SolarGainsNorthWindow.append(
+        self.result.solar_gains_north_window.append(
             self.all_windows[3].solar_gains)
 
     def all_windows_results(self) -> None:
@@ -311,7 +306,7 @@ class BuildingSimulator:
         self.west_north_windows_results()
 
     def solar_gains_daytime_results(self, hour: int) -> None:
-        self.result.SolarGainsTotal.append(
+        self.result.solar_gains_total.append(
             self.calc_sum_solar_gains_all_windows())
         self.result.DayTime.append(hour % 24)
 
@@ -322,49 +317,19 @@ class BuildingSimulator:
 
         self.result.scr_gebaeude_id = self.building_object.scr_gebaeude_id
 
-        self.heating_demand_and_energy_result()
+        self.heating_demand_and_energy_results()
         self.heating_electricity_fossils_sys_results()
-        self.cooling_demand_and_energy_result()
+        self.cooling_demand_and_energy_results()
         self.cooling_electricity_fossils_sys_results()
-        self.hot_demand_and_energy_result()
+        self.hot_demand_and_energy_results()
         self.hotwater_electricity_fossils_sys_results()
-        self.air_temperature_results()
+        self.air_temperature_results(t_out)
 
-        self.result.LightingDemand.append(self.building_object.lighting_demand)
-        self.result.InternalGains.append(internal_gains)
+        self.result.lighting_demand.append(self.building_object.lighting_demand)
+        self.result.internal_gains.append(internal_gains)
 
         self.all_windows_results()
         self.solar_gains_daytime_results(hour)
-
-    # -----------------------------------------------------------------------------------------------------
-
-    def calcs_for_console_prints(self, resuls: Result):
-        """
-        These are helpful calculations for the console prints
-        """
-        return CalculationOfSum(sum(resuls.HeatingDemand) / 1000, sum(resuls.HeatingEnergy) / 1000,
-                                sum(resuls.Heating_Sys_Electricity) /
-                                1000, sum(resuls.Heating_Sys_Fossils) / 1000,
-                                sum(resuls.CoolingDemand) /
-                                1000, sum(resuls.CoolingEnergy) / 1000,
-                                sum(resuls.Cooling_Sys_Electricity) /
-                                1000, sum(resuls.Cooling_Sys_Electricity) / 1000,
-                                sum(resuls.Cooling_Sys_Fossils) /
-                                1000, sum(resuls.HotWaterDemand) / 1000,
-                                sum(resuls.HotWaterEnergy) /
-                                1000, sum(
-                resuls.HotWater_Sys_Electricity) / 1000,
-                                sum(resuls.HotWater_Sys_Fossils) /
-                                1000, sum(resuls.InternalGains) / 1000,
-                                sum(resuls.Appliance_gains_demand) /
-                                1000, sum(resuls.Appliance_gains_demand) / 1000,
-                                sum(resuls.Appliance_gains_elt_demand) /
-                                1000, sum(resuls.LightingDemand) / 1000,
-                                sum(resuls.SolarGainsSouthWindow) /
-                                1000, sum(resuls.SolarGainsEastWindow) / 1000,
-                                sum(resuls.SolarGainsWestWindow) /
-                                1000, sum(resuls.SolarGainsNorthWindow) / 1000,
-                                sum(resuls.SolarGainsTotal) / 1000)
 
     # ----------------------------Extracted methods from choose the fuel type------------------------------------
 
@@ -389,7 +354,7 @@ class BuildingSimulator:
     def lgas_boiler_temp(self) -> bool:
         lgas_boiler_temp = ['LGasBoilerLowTempBefore95', 'LGasBoilerLowTempFrom95', 'LGasBoilerCondensingBefore95',
                             'LGasBoilerCondensingFrom95', 'LGasBoilerCondensingImproved', 'LGasBoilerLowTempBefore87']
-        self.building_object.heating_supply_system in lgas_boiler_temp
+        return self.building_object.heating_supply_system in lgas_boiler_temp
 
     def gas_boiler_standard(self) -> bool:
         gas_boiler_standard = ['GasBoilerStandardBefore86', 'GasBoilerStandardBefore95', 'GasBoilerStandardFrom95',
@@ -506,8 +471,8 @@ class BuildingSimulator:
         return self.get_ghg_factor_heating(fuel_type), self.get_pe_factor_heating(
             fuel_type), self.get_conversion_factor_heating(fuel_type), fuel_type
 
-    def check_heating_sys_electricity_sum(self, calculation_of_sum: CalculationOfSum, f_Hs_Hi: float, f_GHG: int,
-                                          f_PE: float) -> Tuple[int, float, float, float]:
+    def check_heating_sys_electricity_sum(self, calculation_of_sum: CalculationOfSum, f_hs_hi: float, f_ghg: int,
+                                          f_pe: float) -> Tuple[int, float, float, float]:
         """
         :Heating_Sys_Electricity_Hi_sum: for kWhHi Final Energy Demand
         :Heating_Sys_Carbon_sum: for kg CO2eq
@@ -518,35 +483,35 @@ class BuildingSimulator:
         """
 
         if calculation_of_sum.Heating_Sys_Electricity_sum > 0:
-            Heating_Sys_Electricity_Hi_sum = calculation_of_sum.Heating_Sys_Electricity_sum / f_Hs_Hi
-            Heating_Sys_Carbon_sum = (
-                                             Heating_Sys_Electricity_Hi_sum * f_GHG) / 1000
-            Heating_Sys_PE_sum = Heating_Sys_Electricity_Hi_sum * f_PE
+            heating_sys_electricity_hi_sum = calculation_of_sum.Heating_Sys_Electricity_sum / f_hs_hi
+            heating_sys_carbon_sum = (
+                                             heating_sys_electricity_hi_sum * f_ghg) / 1000
+            heating_sys_pe_sum = heating_sys_electricity_hi_sum * f_pe
         else:
-            Heating_Sys_Fossils_Hi_sum = calculation_of_sum.Heating_Sys_Fossils_sum / f_Hs_Hi
-            Heating_Sys_Carbon_sum = (
-                                             Heating_Sys_Fossils_Hi_sum * f_GHG) / 1000
-            Heating_Sys_PE_sum = Heating_Sys_Fossils_Hi_sum * f_PE
+            heating_sys_fossils_hi_sum = calculation_of_sum.Heating_Sys_Fossils_sum / f_hs_hi
+            heating_sys_carbon_sum = (
+                                             heating_sys_fossils_hi_sum * f_ghg) / 1000
+            heating_sys_pe_sum = heating_sys_fossils_hi_sum * f_pe
 
-        return Heating_Sys_Electricity_Hi_sum, Heating_Sys_Carbon_sum, Heating_Sys_PE_sum, Heating_Sys_Fossils_Hi_sum
+        return heating_sys_electricity_hi_sum, heating_sys_carbon_sum, heating_sys_pe_sum, heating_sys_fossils_hi_sum
 
-    def check_hotwater_sys_electricity_sum(self, calculation_of_sum: CalculationOfSum, f_Hs_Hi: float, f_GHG: int,
-                                           f_PE: float) -> Tuple[int, float, float, float]:
+    def check_hotwater_sys_electricity_sum(self, calculation_of_sum: CalculationOfSum, f_hs_hi: float, f_ghg: int,
+                                           f_pe: float) -> Tuple[int, float, float, float]:
 
         if calculation_of_sum.HotWater_Sys_Electricity_sum > 0:
-            HotWater_Sys_Electricity_Hi_sum = calculation_of_sum.HotWater_Sys_Electricity_sum / f_Hs_Hi
-            HotWater_Sys_PE_sum = HotWater_Sys_Electricity_Hi_sum * f_PE
-            HotWater_Sys_Carbon_sum = (
-                                              HotWater_Sys_Electricity_Hi_sum * f_GHG) / 1000
+            hot_water_sys_electricity_hi_sum = calculation_of_sum.HotWater_Sys_Electricity_sum / f_hs_hi
+            hot_water_sys_pe_sum = hot_water_sys_electricity_hi_sum * f_pe
+            hot_water_sys_carbon_sum = (
+                                               hot_water_sys_electricity_hi_sum * f_ghg) / 1000
         else:
-            HotWater_Sys_Fossils_Hi_sum = calculation_of_sum.HotWater_Sys_Fossils_sum / f_Hs_Hi
-            HotWater_Sys_PE_sum = HotWater_Sys_Fossils_Hi_sum * f_PE
-            HotWater_Sys_Carbon_sum = (
-                                              HotWater_Sys_Fossils_Hi_sum * f_GHG) / 1000
-        return HotWater_Sys_Electricity_Hi_sum, HotWater_Sys_PE_sum, HotWater_Sys_Carbon_sum, HotWater_Sys_Fossils_Hi_sum
+            hot_water_sys_fossils_hi_sum = calculation_of_sum.HotWater_Sys_Fossils_sum / f_hs_hi
+            hot_water_sys_pe_sum = hot_water_sys_fossils_hi_sum * f_pe
+            hot_water_sys_carbon_sum = (
+                                               hot_water_sys_fossils_hi_sum * f_ghg) / 1000
+        return hot_water_sys_electricity_hi_sum, hot_water_sys_pe_sum, hot_water_sys_carbon_sum, hot_water_sys_fossils_hi_sum
 
-    def check_cooling_system_elctricity_sum(self, calculation_of_sum: CalculationOfSum, f_Hs_Hi: float, f_GHG: int,
-                                            f_PE: float) -> Tuple[int, float, float, float]:
+    def check_cooling_system_elctricity_sum(self, calculation_of_sum: CalculationOfSum, f_hs_hi: float, f_ghg: int,
+                                            f_pe: float) -> Tuple[int, float, float, float]:
         """
         :Cooling_Sys_Electricity_Hi_sum: for kWhHi Final Energy Demand
         :Cooling_Sys_Carbon_sum: for kg CO2eq
@@ -556,16 +521,16 @@ class BuildingSimulator:
         :Cooling_Sys_PE_sum: for kWh Primary Energy Demand
         """
         if calculation_of_sum.Cooling_Sys_Electricity_sum > 0:
-            Cooling_Sys_Electricity_Hi_sum = calculation_of_sum.Cooling_Sys_Electricity_sum / f_Hs_Hi
-            Cooling_Sys_Carbon_sum = (
-                                             Cooling_Sys_Electricity_Hi_sum * f_GHG) / 1000
-            Cooling_Sys_PE_sum = Cooling_Sys_Electricity_Hi_sum * f_PE
+            cooling_sys_electricity_hi_sum = calculation_of_sum.Cooling_Sys_Electricity_sum / f_hs_hi
+            cooling_sys_carbon_sum = (
+                                             cooling_sys_electricity_hi_sum * f_ghg) / 1000
+            cooling_sys_pe_sum = cooling_sys_electricity_hi_sum * f_pe
         else:
-            Cooling_Sys_Fossils_Hi_sum = calculation_of_sum.Cooling_Sys_Fossils_sum / f_Hs_Hi
-            Cooling_Sys_Carbon_sum = (
-                                             Cooling_Sys_Fossils_Hi_sum * f_GHG) / 1000
-            Cooling_Sys_PE_sum = Cooling_Sys_Fossils_Hi_sum * f_PE
-        return Cooling_Sys_Electricity_Hi_sum, Cooling_Sys_Carbon_sum, Cooling_Sys_PE_sum, Cooling_Sys_Fossils_Hi_sum
+            cooling_sys_fossils_hi_sum = calculation_of_sum.Cooling_Sys_Fossils_sum / f_hs_hi
+            cooling_sys_carbon_sum = (
+                                             cooling_sys_fossils_hi_sum * f_ghg) / 1000
+            cooling_sys_pe_sum = cooling_sys_fossils_hi_sum * f_pe
+        return cooling_sys_electricity_hi_sum, cooling_sys_carbon_sum, cooling_sys_pe_sum, cooling_sys_fossils_hi_sum
 
     # -----------------------------------Sum Electricity Fossil, Hot Energy and Cooling System--------------------------------------------------
     def sys_electricity_folssils_sum(self, heating_sys_electricity_hi_sum: int,
@@ -573,8 +538,8 @@ class BuildingSimulator:
         return heating_sys_electricity_hi_sum + heating_sys_fossils_hi_sum
 
     def hot_energy_hi_sum(self, hotWater_sys_electricity_hi_sum: int,
-                          hotWater_sys_fossils_hi_sum: float):
-        return hotWater_sys_electricity_hi_sum + hotWater_sys_fossils_hi_sum
+                          hot_water_sys_fossils_hi_sum: float):
+        return hotWater_sys_electricity_hi_sum + hot_water_sys_fossils_hi_sum
 
     def cooling_sys_hi_sum(self, cooling_sys_electricity_hi_sum: int, cooling_sys_fossils_hi_sum:
     float) -> float:
