@@ -1,3 +1,5 @@
+import math
+
 from iso_simulator.model.calculations_sum import CalculationOfSum
 from iso_simulator.model.location import Location
 from iso_simulator.model.schedule_name import ScheduleName
@@ -25,7 +27,8 @@ class BuildingSimulator:
                  datasourcecsv: DataSourceCSV,
                  weather_period: str,
                  profile_from_norm: str,
-                 gains_from_group_values: str
+                 gains_from_group_values: str,
+                 usage_from_norm: str
                  ):
         self.datasourcecsv = datasourcecsv
         self.weather_period = weather_period
@@ -36,7 +39,10 @@ class BuildingSimulator:
         self.result = Result()
         self.profile_from_norm = profile_from_norm
         self.gains_from_group_values = gains_from_group_values
+        self.usage_from_norm = usage_from_norm
         self.all_windows = self.build_windows_objects()
+        self.weather_data = self.get_weather_data()
+        self.gwp_PE_Factors[29].energy_carrier = 'None'
 
     def initialize_building_time(self) -> float:
         return time.time()
@@ -89,7 +95,7 @@ class BuildingSimulator:
 
     def get_usage_start_and_end(self) -> Tuple[int, int]:
         usage_start, usage_end = self.datasourcecsv.get_usage_time(
-            self.building_object.hk_geb, self.building_object.uk_geb, self.profile_from_norm)
+            self.building_object.hk_geb, self.building_object.uk_geb, self.usage_from_norm)
         return usage_start, usage_end
 
     def get_schedule(self) -> Union[Tuple[List[ScheduleName], str], ValueError]:
@@ -103,31 +109,26 @@ class BuildingSimulator:
         return self.datasourcecsv.get_schedule_sum(self.building_object.hk_geb, self.building_object.uk_geb)
 
     def get_weather_data(self) -> List[WeatherData]:
-        epw_object = self.datasourcecsv.get_epw_file(
-            self.building_object.plz, self.weather_period)
         return self.datasourcecsv.choose_and_get_the_right_weather_data_from_path(self.weather_period,
-                                                                                  epw_object.file_name)
+                                                                                  self.epw_object.file_name)
 
-    def extract_outdoor_temperature(self, weather_data: List[WeatherData], hour: int) -> float:
+    def extract_outdoor_temperature(self, hour: int) -> float:
         """
         Extract the outdoor temperature in building_location for that hour from weather_data
         """
-        return weather_data[hour].drybulb_C
+        return self.weather_data[hour].drybulb_C
 
-    def extract_year(self, weather_data: List[WeatherData], hour: int) -> int:
-        return weather_data[hour].year
+    def extract_year(self, hour: int) -> int:
+        return self.weather_data[hour].year
 
     def calc_altitude_and_azimuth(self, hour: int) -> Tuple[float, float]:
         """
         Call calc_sun_position(). Depending on latitude, longitude, year and hour - Independent from epw weather_data
         """
         location = Location()
-        epw_file = self.datasourcecsv.get_epw_file(
-            self.building_object.plz, self.weather_period)
-        weather_data = self.datasourcecsv.choose_and_get_the_right_weather_data_from_path(
-            self.weather_period, epw_file.file_name)
         return location.calc_sun_position(
-            epw_file.coordinates_station[0], epw_file.coordinates_station[1], self.extract_year(weather_data, hour),
+            self.epw_object.coordinates_station[0], self.epw_object.coordinates_station[1],
+            self.extract_year(hour),
             hour)
 
     def calc_building_h_ve_adj(self, hour: int, t_out: float, usage_start: int, usage_end: int) -> float:
@@ -136,14 +137,14 @@ class BuildingSimulator:
         """
         return self.building_object.calc_h_ve_adj(hour, t_out, usage_start, usage_end)
 
-    def set_t_air_based_on_hour(self, hour) -> float:
+    def set_t_air_based_on_hour(self, hour: int) -> float:
         """
         Define t_air for calc_solar_gains(). Starting condition (hour==0) necessary for first time step 
         """
         t_air = self.building_object.t_set_heating if hour == 0 else self.building_object.t_air
         return t_air
 
-    def calc_solar_gains_for_all_windows(self, weather_data: List[WeatherData], sun_altitude: float, sun_azimuth: float,
+    def calc_solar_gains_for_all_windows(self, sun_altitude: float, sun_azimuth: float,
                                          t_air: float, hour: int) -> None:
         """
         Calculate solar gains through each window 
@@ -151,10 +152,11 @@ class BuildingSimulator:
 
         for element in self.all_windows:
             element.calc_solar_gains(
-                sun_altitude, sun_azimuth, weather_data[hour].dirnorrad_Whm2, weather_data[hour].difhorrad_Whm2, t_air,
+                sun_altitude, sun_azimuth, self.weather_data[hour].dirnorrad_Whm2,
+                self.weather_data[hour].difhorrad_Whm2, t_air,
                 hour)
 
-    def calc_illuminance_for_all_windows(self, weather_data: List[WeatherData], sun_altitude: float, sun_azimuth: float,
+    def calc_illuminance_for_all_windows(self, sun_altitude: float, sun_azimuth: float,
                                          hour: int) -> None:
         """
         Calculate solar illuminance through each window 
@@ -162,7 +164,8 @@ class BuildingSimulator:
 
         for element in self.all_windows:
             element.calc_illuminance(
-                sun_altitude, sun_azimuth, weather_data[hour].dirnorillum_lux, weather_data[hour].difhorillum_lux)
+                sun_altitude, sun_azimuth, self.weather_data[hour].dirnorillum_lux,
+                self.weather_data[hour].difhorillum_lux)
 
     def calc_occupancy(self, occupancy_schedule: List[ScheduleName], hour: int) -> float:
         """
@@ -208,7 +211,7 @@ class BuildingSimulator:
     def calc_sum_solar_gains_all_windows(self) -> float:
         return sum(element.solar_gains for element in self.all_windows)
 
-    def calc_energy_demand_for_time_step(self, internal_gains: float, t_out: float, t_m_prev: int) -> None:
+    def calc_energy_demand_for_time_step(self, internal_gains: float, t_out: float, t_m_prev: float) -> None:
         """
         Calculate energy demand for the time step 
         """
@@ -219,12 +222,12 @@ class BuildingSimulator:
         central = ['CentralHeating', 'CentralDHW']
         return self.building_object.dhw_system in central
 
-    def check_if_heat_pump_air_or_ground_source(self):
+    def check_if_heat_pump_air_or_ground_source(self) -> bool:
         heat_source = ['HeatPumpAirSource', 'HeatPumpGroundSource', 'ElectricHeating']
         return self.building_object.heating_supply_system in heat_source
 
     def calc_hot_water_usage(self, occupancy_schedule: List[ScheduleName], tek_dhw_per_occupancy_full_usage_hour: float,
-                             hour: int):
+                             hour: int) -> Tuple[float, float, float, float]:
         """
         Calculate hot water usage of the building for the time step with (BuildingInstance.heating_energy / BuildingInstance.heating_demand)
         represents the Efficiency of the heat generation in the building
@@ -254,82 +257,6 @@ class BuildingSimulator:
             hot_water_sys_fossils = 0
 
         return hot_water_demand, hot_water_energy, hot_water_sys_electricity, hot_water_sys_fossils
-
-    # ---------------------------Extracted methods from append_results() -------------------
-    def heating_demand_and_energy_results(self) -> None:
-        self.result.heating_demand.append(self.building_object.heating_demand)
-        self.result.heating_energy.append(self.building_object.heating_energy)
-
-    def heating_electricity_fossils_sys_results(self) -> None:
-        self.result.heating_sys_electricity.append(
-            self.building_object.heating_sys_electricity)
-        self.result.heating_sys_fossils.append(
-            self.building_object.heating_sys_fossils)
-
-    def cooling_electricity_fossils_sys_results(self) -> None:
-        self.result.cooling_sys_electricity.append(
-            self.building_object.cooling_sys_electricity)
-        self.result.cooling_sys_fossils.append(
-            self.building_object.cooling_sys_fossils)
-
-    def cooling_demand_and_energy_results(self) -> None:
-        self.result.cooling_demand.append(self.building_object.cooling_demand)
-        self.result.cooling_energy.append(self.building_object.cooling_energy)
-
-    def hot_demand_and_energy_results(self) -> None:
-        self.result.hot_water_demand.append(self.result.hot_water_demand)
-        self.result.hot_water_energy.append(self.result.hot_water_energy)
-
-    def hotwater_electricity_fossils_sys_results(self) -> None:
-        self.result.hot_water_sys_electricity.append(
-            self.result.HotWaterSysElectricity)
-        self.result.hot_water_sys_fossils.append(self.result.HotWaterSysFossils)
-
-    def air_temperature_results(self, t_out: float) -> None:
-        self.result.temp_air.append(self.building_object.t_air)
-        self.result.outside_temp.append(t_out)
-
-    def south_east_windows_results(self) -> None:
-        self.result.solar_gains_south_window.append(
-            self.all_windows[0].solar_gains)
-        self.result.solar_gains_east_window.append(
-            self.all_windows[1].solar_gains)
-
-    def west_north_windows_results(self) -> None:
-        self.result.solar_gains_west_window.append(
-            self.all_windows[2].solar_gains)
-        self.result.solar_gains_north_window.append(
-            self.all_windows[3].solar_gains)
-
-    def all_windows_results(self) -> None:
-        self.south_east_windows_results()
-        self.west_north_windows_results()
-
-    def solar_gains_daytime_results(self, hour: int) -> None:
-        self.result.solar_gains_total.append(
-            self.calc_sum_solar_gains_all_windows())
-        self.result.DayTime.append(hour % 24)
-
-    def append_results(self, internal_gains: float, t_out: float, hour: int) -> None:
-        """
-        Append results to the result object
-        """
-
-        self.result.scr_gebaeude_id = self.building_object.scr_gebaeude_id
-
-        self.heating_demand_and_energy_results()
-        self.heating_electricity_fossils_sys_results()
-        self.cooling_demand_and_energy_results()
-        self.cooling_electricity_fossils_sys_results()
-        self.hot_demand_and_energy_results()
-        self.hotwater_electricity_fossils_sys_results()
-        self.air_temperature_results(t_out)
-
-        self.result.lighting_demand.append(self.building_object.lighting_demand)
-        self.result.internal_gains.append(internal_gains)
-
-        self.all_windows_results()
-        self.solar_gains_daytime_results(hour)
 
     # ----------------------------Extracted methods from choose the fuel type------------------------------------
 
@@ -401,7 +328,7 @@ class BuildingSimulator:
         return self.heat_pump() | self.electric_heating()
 
     def hard_coal(self) -> bool:
-        return self.coal_solid_fuel_boiler() | self.solid_fuel_liquid_fuel_furnace()
+        return self.coal_solid_fuel_boiler() or self.solid_fuel_liquid_fuel_furnace()
 
     def choose_the_fuel_type(self) -> Union[str, None]:
 
@@ -481,6 +408,8 @@ class BuildingSimulator:
         :Heating_Sys_Carbon_sum: for kg CO2eq
         :Heating_Sys_PE_sum: for kWh Primary Energy Demand
         """
+        heating_sys_electricity_hi_sum = 0
+        heating_sys_fossils_hi_sum = 0
 
         if calculation_of_sum.Heating_Sys_Electricity_sum > 0:
             heating_sys_electricity_hi_sum = calculation_of_sum.Heating_Sys_Electricity_sum / f_hs_hi
@@ -497,6 +426,9 @@ class BuildingSimulator:
 
     def check_hotwater_sys_electricity_sum(self, calculation_of_sum: CalculationOfSum, f_hs_hi: float, f_ghg: int,
                                            f_pe: float) -> Tuple[int, float, float, float]:
+
+        hot_water_sys_electricity_hi_sum = 0
+        hot_water_sys_fossils_hi_sum = 0
 
         if calculation_of_sum.HotWater_Sys_Electricity_sum > 0:
             hot_water_sys_electricity_hi_sum = calculation_of_sum.HotWater_Sys_Electricity_sum / f_hs_hi
@@ -520,6 +452,9 @@ class BuildingSimulator:
         :Cooling_Sys_Carbon_sum: for kg CO2eq
         :Cooling_Sys_PE_sum: for kWh Primary Energy Demand
         """
+        cooling_sys_electricity_hi_sum = 0
+        cooling_sys_fossils_hi_sum = 0
+
         if calculation_of_sum.Cooling_Sys_Electricity_sum > 0:
             cooling_sys_electricity_hi_sum = calculation_of_sum.Cooling_Sys_Electricity_sum / f_hs_hi
             cooling_sys_carbon_sum = (
@@ -527,8 +462,7 @@ class BuildingSimulator:
             cooling_sys_pe_sum = cooling_sys_electricity_hi_sum * f_pe
         else:
             cooling_sys_fossils_hi_sum = calculation_of_sum.Cooling_Sys_Fossils_sum / f_hs_hi
-            cooling_sys_carbon_sum = (
-                                             cooling_sys_fossils_hi_sum * f_ghg) / 1000
+            cooling_sys_carbon_sum = (cooling_sys_fossils_hi_sum * f_ghg) / 1000
             cooling_sys_pe_sum = cooling_sys_fossils_hi_sum * f_pe
         return cooling_sys_electricity_hi_sum, cooling_sys_carbon_sum, cooling_sys_pe_sum, cooling_sys_fossils_hi_sum
 

@@ -164,7 +164,7 @@ class DataSourceCSV(DataSource):
 
             return get_usage_start_end(usage_from_norm, row)
 
-    def get_gains(self, hk_geb: str, uk_geb: str, profile_from_norm, gains_from_group_values) -> Tuple[
+    def get_gains(self, hk_geb: str, uk_geb: str, profile_from_norm: str, gains_from_group_values) -> Tuple[
         Tuple[float, str], float]:
         """
         Find data from DIN V 18599-10 or SIA2024
@@ -202,6 +202,45 @@ class DataSourceCSV(DataSource):
                     row, gains_from_group_values)
 
         return gain_person_and_typ_norm, appliance_gains
+
+    # def get_g(self, hk_geb, uk_geb, profile_from_norm, gains_from_group_values):
+    #
+    #     gains_zuweisungen: pd.DataFrame = read_profiles_zuweisungen_data()
+    #
+    #     if hk_geb in gains_zuweisungen['hk_geb'].values:
+    #         if uk_geb in gains_zuweisungen['uk_geb'].values:
+    #             row = find_row(gains_zuweisungen, uk_geb)
+    #
+    #             if profile_from_norm == 'sia2024':
+    #                 typ_norm = row['typ_sia2024'].to_string(index=False).strip()
+    #                 gain_per_person = float(row['gain_per_person_sia2024'].to_string(index=False).strip())
+    #                 if gains_from_group_values == 'low':
+    #                     appliance_gains = float(
+    #                         row['appliance_gains_ziel_sia2024'].to_string(index=False).strip())
+    #                     print(appliance_gains)
+    #                 elif gains_from_group_values == 'mid':
+    #                     appliance_gains = float(
+    #                         row['appliance_gains_standard_sia2024'].to_string(index=False).strip())
+    #                     print(appliance_gains)
+    #                 elif gains_from_group_values == 'max':
+    #                     appliance_gains = float(
+    #                         row['appliance_gains_bestand_sia2024'].to_string(index=False).strip())
+    #                     print(appliance_gains)
+    #             else:
+    #                 typ_norm = row['typ_18599'].to_string(index=False).strip()
+    #                 gain_per_person = float(row['gain_per_person_18599'].to_string(index=False).strip())
+    #                 if gains_from_group_values == 'low':
+    #                     appliance_gains = float(row['appliance_gains_tief_18599'].to_string(index=False).strip())
+    #                     print(appliance_gains)
+    #
+    #                 elif gains_from_group_values == 'mid':
+    #                     appliance_gains = float(row['appliance_gains_mittel_18599'].to_string(index=False).strip())
+    #                     print(appliance_gains)
+    #
+    #                 elif gains_from_group_values == 'max':
+    #                     appliance_gains = float(row['appliance_gains_hoch_18599'].to_string(index=False).strip())
+    #                     print(appliance_gains)
+    #         return gain_per_person, appliance_gains, typ_norm
 
     def result_to_pandas_dataframe(self, result: ResultOutput) -> pd.DataFrame:
 
@@ -265,7 +304,7 @@ class DataSourceCSV(DataSource):
             'HotWater_Sys_GWP [kg/m2]': result.calc_hot_water_sys_gwp(),
             'HotWater_Sys_PE [kWh]': result.hot_water_sys_pe_sum,
             'HotWater_Sys_PE [kWh/m2]': result.calc_hot_water_sys_pe(),
-            'ElectricityDemandTotal [kWh]':  result.calc_electricity_demand_total(),
+            'ElectricityDemandTotal [kWh]': result.calc_electricity_demand_total(),
             'ElectricityDemandTotal [kwh/m2]': result.calc_electricity_demand_total_ref(),
             'FossilsDemandTotal [kWh]': result.calc_fossils_demand_total(),
             'FossilsDemandTotal [kwh/m2]': result.calc_fossils_demand_total_ref(),
@@ -299,4 +338,4 @@ class DataSourceCSV(DataSource):
         })
 
     def results_pandas_dataframe_to_excel(self, dataframe: pd.DataFrame) -> None:
-        dataframe.to_excel(r'./results/annualResults_summary.xlsx', index = False)
+        dataframe.to_excel(r'./results/annualResults_summary.xlsx', index=False)

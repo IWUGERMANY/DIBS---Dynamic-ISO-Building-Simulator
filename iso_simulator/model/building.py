@@ -1,7 +1,23 @@
 import supply_system
 import emission_system
+from iso_simulator.emission_system import SurfaceHeatingCooling, AirConditioning, ThermallyActivated, NoCooling, \
+    NoHeating
+from iso_simulator.supply_system import OilBoilerStandardBefore86, OilBoilerStandardFrom95, OilBoilerLowTempBefore87, \
+    OilBoilerLowTempBefore95, OilBoilerLowTempFrom95, OilBoilerCondensingBefore95, OilBoilerCondensingFrom95, \
+    OilBoilerCondensingImproved, GasBoilerStandardBefore86, GasBoilerStandardBefore95, GasBoilerStandardFrom95, \
+    GasBoilerLowTempBefore87, LGasBoilerLowTempBefore87, GasBoilerLowTempBefore95, LGasBoilerLowTempBefore95, \
+    GasBoilerLowTempFrom95, LGasBoilerLowTempFrom95, BiogasOilBoilerLowTempBefore95, GasBoilerLowTempSpecialFrom78, \
+    GasBoilerLowTempSpecialFrom95, GasBoilerCondensingBefore95, LGasBoilerCondensingBefore95, \
+    BiogasBoilerCondensingBefore95, BiogasBoilerCondensingFrom95, GasBoilerCondensingFrom95, LGasBoilerCondensingFrom95, \
+    BiogasOilBoilerCondensingFrom95, GasBoilerCondensingImproved, LGasBoilerCondensingImproved, \
+    BiogasOilBoilerCondensingImproved, WoodChipSolidFuelBoiler, WoodPelletSolidFuelBoiler, WoodSolidFuelBoilerCentral, \
+    CoalSolidFuelBoiler, SolidFuelLiquidFuelFurnace, HeatPumpAirSource, HeatPumpGroundSource, GasCHP, DistrictHeating, \
+    ElectricHeating, DirectHeater, AirCooledPistonScroll, AirCooledPistonScrollMulti, WaterCooledPistonScroll, \
+    AbsorptionRefrigerationSystem, DistrictCooling, GasEnginePistonScroll, DirectCooler, NoHeating, NoCooling
+
 import os
 import sys
+
 """
 Physics required to calculate sensible space heating and space cooling loads, and space lighting loads (DIN EN ISO 13970:2008)
 
@@ -20,12 +36,11 @@ __author__ = "Wail Samjouni, Julian Bischof"
 __copyright__ = "Copyright 2023, Institut Wohnen und Umwelt"
 __license__ = "MIT"
 
-
 mainPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, mainPath)
 
-class Building:
 
+class Building:
     """
     Sets the parameters of the building.
 
@@ -218,6 +233,54 @@ class Building:
         self.dhw_system = dhw_system
         self.intializing_variables_calculations()
 
+        self.class_mapping = {'AirConditioning': AirConditioning, 'SurfaceHeatingCooling': SurfaceHeatingCooling,
+                              'ThermallyActivated': ThermallyActivated, 'NoCooling': NoCooling, 'NoHeating': NoHeating}
+
+        self.supply_mapping = {'OilBoilerStandardBefore86': OilBoilerStandardBefore86,
+                               'OilBoilerStandardFrom95': OilBoilerStandardFrom95,
+                               'OilBoilerLowTempBefore87': OilBoilerLowTempBefore87,
+                               'OilBoilerLowTempBefore95': OilBoilerLowTempBefore95,
+                               'OilBoilerLowTempFrom95': OilBoilerLowTempFrom95,
+                               'OilBoilerCondensingBefore95': OilBoilerCondensingBefore95,
+                               'OilBoilerCondensingFrom95': OilBoilerCondensingFrom95,
+                               'OilBoilerCondensingImproved': OilBoilerCondensingImproved,
+                               'GasBoilerStandardBefore86': GasBoilerStandardBefore86,
+                               'GasBoilerStandardBefore95': GasBoilerStandardBefore95,
+                               'GasBoilerStandardFrom95': GasBoilerStandardFrom95,
+                               'GasBoilerLowTempBefore87': GasBoilerLowTempBefore87,
+                               'LGasBoilerLowTempBefore87': LGasBoilerLowTempBefore87,
+                               'GasBoilerLowTempBefore95': GasBoilerLowTempBefore95,
+                               'LGasBoilerLowTempBefore95': LGasBoilerLowTempBefore95,
+                               'GasBoilerLowTempFrom95': GasBoilerLowTempFrom95,
+                               'LGasBoilerLowTempFrom95': LGasBoilerLowTempFrom95,
+                               'BiogasOilBoilerLowTempBefore95': BiogasOilBoilerLowTempBefore95,
+                               'GasBoilerLowTempSpecialFrom78': GasBoilerLowTempSpecialFrom78,
+                               'GasBoilerLowTempSpecialFrom95': GasBoilerLowTempSpecialFrom95,
+                               'GasBoilerCondensingBefore95': GasBoilerCondensingBefore95,
+                               'LGasBoilerCondensingBefore95': LGasBoilerCondensingBefore95,
+                               'BiogasBoilerCondensingBefore95': BiogasBoilerCondensingBefore95,
+                               'BiogasBoilerCondensingFrom95': BiogasBoilerCondensingFrom95,
+                               'GasBoilerCondensingFrom95': GasBoilerCondensingFrom95,
+                               'LGasBoilerCondensingFrom95': LGasBoilerCondensingFrom95,
+                               'BiogasOilBoilerCondensingFrom95': BiogasOilBoilerCondensingFrom95,
+                               'GasBoilerCondensingImproved': GasBoilerCondensingImproved,
+                               'LGasBoilerCondensingImproved': LGasBoilerCondensingImproved,
+                               'BiogasOilBoilerCondensingImproved': BiogasOilBoilerCondensingImproved,
+                               'WoodChipSolidFuelBoiler': WoodChipSolidFuelBoiler,
+                               'WoodPelletSolidFuelBoiler': WoodPelletSolidFuelBoiler,
+                               'WoodSolidFuelBoilerCentral': WoodSolidFuelBoilerCentral,
+                               'CoalSolidFuelBoiler': CoalSolidFuelBoiler,
+                               'SolidFuelLiquidFuelFurnace': SolidFuelLiquidFuelFurnace,
+                               'HeatPumpAirSource': HeatPumpAirSource,
+                               'HeatPumpGroundSource': HeatPumpGroundSource, 'GasCHP': GasCHP,
+                               'DistrictHeating': DistrictHeating, 'ElectricHeating': ElectricHeating,
+                               'DirectHeater': DirectHeater, 'AirCooledPistonScroll': AirCooledPistonScroll,
+                               'AirCooledPistonScrollMulti': AirCooledPistonScrollMulti,
+                               'WaterCooledPistonScroll': WaterCooledPistonScroll,
+                               'AbsorptionRefrigerationSystem': AbsorptionRefrigerationSystem,
+                               'DistrictCooling': DistrictCooling, 'GasEnginePistonScroll': GasEnginePistonScroll,
+                               'DirectCooler': DirectCooler, 'NoHeating': NoHeating, 'NoCooling': NoCooling}
+
     def calc_mass_area(self):
         """
             [m2] Effective mass area (See p. 81, Table 12)
@@ -233,7 +296,7 @@ class Building:
 
     def calc_window_area(self):
         self.window_area = self.window_area_north + self.window_area_east + \
-            self.window_area_south + self.window_area_west
+                           self.window_area_south + self.window_area_west
 
     def calc_building_volume(self):
         """
@@ -265,8 +328,8 @@ class Building:
         """
 
         self.h_tr_op = (self.u_walls * self.wall_area_og) + (self.u_roof * self.roof_area) + \
-            (self.base_area * self.u_base * self.temp_adj_base) + \
-            (self.wall_area_ug * self.u_walls * self.temp_adj_walls_ug)
+                       (self.base_area * self.u_base * self.temp_adj_base) + \
+                       (self.wall_area_ug * self.u_walls * self.temp_adj_walls_ug)
 
     def calch_tr_w(self):
         """
@@ -303,7 +366,7 @@ class Building:
         self.h_tr_is = self.total_internal_area * 3.45
 
     def calch_tr_em(self):
-        self.h_tr_em = max(0, (1 / ((1/self.h_tr_op) - (1/self.h_tr_ms))))
+        self.h_tr_em = max(0, (1 / ((1 / self.h_tr_op) - (1 / self.h_tr_ms))))
 
     def set_heating_and_cooling_demand(self):
         """
@@ -377,7 +440,7 @@ class Building:
         """
         return 0.3 * self.t_air + 0.7 * self.t_s
 
-    def calc_h_ve_adj(self, hour, t_out, usage_start, usage_end) -> float:
+    def calc_h_ve_adj(self, hour: int, t_out: float, usage_start: int, usage_end: int) -> float:
         """
         Calculates h_ve_adj depending on the building's usage time
 
@@ -404,51 +467,51 @@ class Building:
         if self.ach_vent == 0 and self.ach_win == 0:
 
             self.h_ve_adj = 1200 * 1 * \
-                self.building_vol * (self.ach_inf / 3600)
+                            self.building_vol * (self.ach_inf / 3600)
 
         elif usage_start < usage_end:
             if (
-                usage_start <= daytime < usage_end
-                and self.night_flushing_on
-                or not usage_start <= daytime < usage_end
-                and self.night_flushing_on
+                    usage_start <= daytime < usage_end
+                    and self.night_flushing_on
+                    or not usage_start <= daytime < usage_end
+                    and self.night_flushing_on
             ):
                 self.h_ve_adj = 1200 * 1 * self.building_vol * \
-                    (self.night_flushing_flow / 3600)
+                                (self.night_flushing_flow / 3600)
 
                 # Set t_set_heating = 0 for the time step, otherwise the heating system heats up during night flushing is on
                 self.t_set_heating = 0
 
             elif usage_start <= daytime < usage_end:
                 self.h_ve_adj = 1200 * ((self.b_ek * self.building_vol * (
-                    self.ach_vent / 3600)) + (1 * self.building_vol * (self.ach_win / 3600)))
+                        self.ach_vent / 3600)) + (1 * self.building_vol * (self.ach_win / 3600)))
 
             else:
                 # Only infiltration
                 self.h_ve_adj = 1200 * 1 * \
-                    self.building_vol * (self.ach_inf / 3600)
+                                self.building_vol * (self.ach_inf / 3600)
 
         elif (
-            not usage_end <= daytime < usage_start
-            and self.night_flushing_on
-            or usage_end <= daytime < usage_start
-            and self.night_flushing_on
+                not usage_end <= daytime < usage_start
+                and self.night_flushing_on
+                or usage_end <= daytime < usage_start
+                and self.night_flushing_on
         ):
 
             self.h_ve_adj = 1200 * 1 * self.building_vol * \
-                (self.night_flushing_flow / 3600)
+                            (self.night_flushing_flow / 3600)
 
             # Set t_set_heating = 0 for the time step, otherwise the heating system heats up during night flushing is on
             self.t_set_heating = 0
 
         elif not usage_end <= daytime < usage_start:
             self.h_ve_adj = 1200 * ((self.b_ek * self.building_vol * (
-                self.ach_vent / 3600)) + (1 * self.building_vol * (self.ach_win / 3600)))
+                    self.ach_vent / 3600)) + (1 * self.building_vol * (self.ach_win / 3600)))
 
         else:
             # Only infiltration
             self.h_ve_adj = 1200 * 1 * \
-                self.building_vol * (self.ach_inf / 3600)
+                            self.building_vol * (self.ach_inf / 3600)
 
         return self.h_ve_adj
 
@@ -487,11 +550,11 @@ class Building:
 
     def set_night_flushing_on(self, cooling_season, is_night_time, t_out):
         return (
-            self.night_flushing_flow > 0
-            and cooling_season
-            and is_night_time
-            and self.t_air > 21
-            and self.t_air > (t_out + 2))
+                self.night_flushing_flow > 0
+                and cooling_season
+                and is_night_time
+                and self.t_air > 21
+                and self.t_air > (t_out + 2))
 
     def solve_building_lighting(self, illuminance, occupancy):
         """
@@ -577,7 +640,7 @@ class Building:
             self.initialize_variables_if_no_heating_or_cooling_demand()
 
         self.sys_total_energy = self.heating_sys_electricity + self.heating_sys_fossils + \
-            self.cooling_sys_electricity + self.cooling_sys_fossils
+                                self.cooling_sys_electricity + self.cooling_sys_fossils
         self.heating_energy = self.heating_sys_electricity + self.heating_sys_fossils
         self.cooling_energy = self.cooling_sys_electricity + self.cooling_sys_fossils
 
@@ -602,12 +665,19 @@ class Building:
         supply_director = supply_system.SupplyDirector()
 
         if self.has_heating_demand:
-            supply_director.set_builder(self.heating_supply_system(load=self.energy_demand,
-                                                                   t_out=t_out,
-                                                                   heating_supply_temperature=self.heating_supply_temperature,
-                                                                   cooling_supply_temperature=self.cooling_supply_temperature,
-                                                                   has_heating_demand=self.has_heating_demand,
-                                                                   has_cooling_demand=self.has_cooling_demand))
+            if self.heating_supply_system in self.supply_mapping:
+                my_system = self.supply_mapping[self.heating_supply_system](load=self.energy_demand, t_out=t_out,
+                                                                            heating_supply_temperature=self.heating_supply_temperature,
+                                                                            cooling_supply_temperature=self.cooling_supply_temperature,
+                                                                            has_heating_demand=self.has_heating_demand,
+                                                                            has_cooling_demand=self.has_cooling_demand)
+                supply_director.set_builder(my_system)
+            # supply_director.set_builder(self.heating_supply_system(load=self.energy_demand,
+            #                                                        t_out=t_out,
+            #                                                        heating_supply_temperature=self.heating_supply_temperature,
+            #                                                        cooling_supply_temperature=self.cooling_supply_temperature,
+            #                                                        has_heating_demand=self.has_heating_demand,
+            #                                                        has_cooling_demand=self.has_cooling_demand))
             supplyOut = supply_director.calc_system()
             # All Variables explained underneath line 467
             self.heating_demand = self.energy_demand
@@ -619,12 +689,20 @@ class Building:
             self.electricity_out = supplyOut.electricity_out
 
         elif self.has_cooling_demand:
-            supply_director.set_builder(self.cooling_supply_system(load=self.energy_demand * (-1),
-                                                                   t_out=t_out,
-                                                                   heating_supply_temperature=self.heating_supply_temperature,
-                                                                   cooling_supply_temperature=self.cooling_supply_temperature,
-                                                                   has_heating_demand=self.has_heating_demand,
-                                                                   has_cooling_demand=self.has_cooling_demand))
+            if self.cooling_supply_system in self.supply_mapping:
+                my_system = self.supply_mapping[self.cooling_supply_system](load=self.energy_demand * (-1),
+                                                                            t_out=t_out,
+                                                                            heating_supply_temperature=self.heating_supply_temperature,
+                                                                            cooling_supply_temperature=self.cooling_supply_temperature,
+                                                                            has_heating_demand=self.has_heating_demand,
+                                                                            has_cooling_demand=self.has_cooling_demand)
+                supply_director.set_builder(my_system)
+            # supply_director.set_builder(self.cooling_supply_system(load=self.energy_demand * (-1),
+            #                                                        t_out=t_out,
+            #                                                        heating_supply_temperature=self.heating_supply_temperature,
+            #                                                        cooling_supply_temperature=self.cooling_supply_temperature,
+            #                                                        has_heating_demand=self.has_heating_demand,
+            #                                                        has_cooling_demand=self.has_cooling_demand))
             supplyOut = supply_director.calc_system()
             self.heating_demand = 0
             self.heating_sys_electricity = 0
@@ -787,7 +865,7 @@ class Building:
         This assumes a perfect HVAC control system
         """
         self.energy_demand_unrestricted = energy_floorAx10 * \
-            (t_air_set - t_air_0) / (t_air_10 - t_air_0)
+                                          (t_air_set - t_air_0) / (t_air_10 - t_air_0)
 
     def calc_heat_flow(self, t_out, internal_gains, solar_gains, energy_demand):
         """
@@ -811,7 +889,7 @@ class Building:
                                                           (9.1 * self.A_t))) * (0.5 * internal_gains + solar_gains)
         # Heatflow to the thermal mass node
         self.phi_m = (self.mass_area / self.A_t) * \
-            (0.5 * internal_gains + solar_gains)
+                     (0.5 * internal_gains + solar_gains)
 
         # We call the EmissionDirector to modify these flows depending on the
         # system and the energy demand
@@ -819,11 +897,17 @@ class Building:
 
         # Set the emission system to the type specified by the user
         if energy_demand > 0:
-            emDirector.set_builder(self.heating_emission_system(
-                energy_demand=energy_demand))
+            if self.heating_emission_system in self.class_mapping:
+                my_system = self.class_mapping[self.heating_emission_system](energy_demand)
+                emDirector.set_builder(my_system)
+            # emDirector.set_builder(self.heating_emission_system(
+            #     energy_demand=energy_demand))
         else:
-            emDirector.set_builder(self.cooling_emission_system(
-                energy_demand=energy_demand))
+            if self.heating_emission_system in self.class_mapping:
+                my_system = self.class_mapping[self.heating_emission_system](energy_demand)
+                emDirector.set_builder(my_system)
+            # emDirector.set_builder(self.cooling_emission_system(
+            #     energy_demand=energy_demand))
         # Calculate the new flows to each node based on the heating/cooling system
         flows = emDirector.calc_flows()
 
@@ -856,8 +940,8 @@ class Building:
         t_supply = t_out  # ASSUMPTION: Supply air comes straight from the outside air
 
         self.phi_m_tot = self.phi_m + self.h_tr_em * t_out + \
-            self.h_tr_3 * (self.phi_st + self.h_tr_w * t_out + self.h_tr_1 *
-                           ((self.phi_ia / self.h_ve_adj) + t_supply)) / self.h_tr_2
+                         self.h_tr_3 * (self.phi_st + self.h_tr_w * t_out + self.h_tr_1 *
+                                        ((self.phi_ia / self.h_ve_adj) + t_supply)) / self.h_tr_2
 
     def calc_t_m(self, t_m_prev):
         """
@@ -878,7 +962,7 @@ class Building:
 
         self.t_s = (self.h_tr_ms * self.t_m + self.phi_st + self.h_tr_w * t_out + self.h_tr_1 *
                     (t_supply + self.phi_ia / self.h_ve_adj)) / \
-            (self.h_tr_ms + self.h_tr_w + self.h_tr_1)
+                   (self.h_tr_ms + self.h_tr_w + self.h_tr_1)
 
     def calc_t_air(self, t_out):
         """
@@ -890,5 +974,7 @@ class Building:
         t_supply = t_out
 
         # Calculate the temperature of the inside air
-        self.t_air = (self.h_tr_is * self.t_s + self.h_ve_adj *
-                      t_supply + self.phi_ia) / (self.h_tr_is + self.h_ve_adj)
+        # self.t_air = (self.h_tr_is * self.t_s + self.h_ve_adj *
+        #               t_supply + self.phi_ia) / (self.h_tr_is + self.h_ve_adj)
+        self.t_air = round(
+            (self.h_tr_is * self.t_s + self.h_ve_adj * t_supply + self.phi_ia) / (self.h_tr_is + self.h_ve_adj), 3)

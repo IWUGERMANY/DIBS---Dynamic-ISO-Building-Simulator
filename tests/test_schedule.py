@@ -9,7 +9,7 @@ class TestScheduleCalculations(unittest.TestCase):
     def __init__(self, methodName: str = "runTest") -> None:
         super().__init__(methodName)
         self.building_simulator = BuildingSimulator(
-            DataSourceCSV(), "2004-2018", 'din18599', 'mid')
+            DataSourceCSV(), "2004-2018", 'din18599', 'mid', 'sia2024')
         self.building = self.building_simulator.datasourcecsv.get_building_data()
 
     def test_get_schedule(self):
@@ -19,5 +19,5 @@ class TestScheduleCalculations(unittest.TestCase):
 
     def test_occupancy_full_usage_hours(self):
         self.assertEqual(self.building_simulator.get_occupancy_full_usage_hours(), 1503.3600000000001)
-    
+
 

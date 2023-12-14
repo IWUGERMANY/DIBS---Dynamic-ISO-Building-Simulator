@@ -2,11 +2,6 @@ from iso_simulator.data_source.datasource import DataSource
 from iso_simulator.data_source.datasource_csv import DataSourceCSV
 from iso_simulator.building_simulator.simulator import BuildingSimulator
 from typing import Tuple, List
-from iso_simulator.model.building import Building
-from iso_simulator.model.primary_energy_and_emission_factors import PrimaryEnergyAndEmissionFactor
-from iso_simulator.model.epw_file import EPWFile
-from iso_simulator.model.weather_data import WeatherData
-from iso_simulator.model.window import Window
 from iso_simulator.model.schedule_name import ScheduleName
 from iso_simulator.model.results import Result
 from iso_simulator.model.ResultOutput import ResultOutput
@@ -19,48 +14,10 @@ class DIBS:
     def set_data_source(self, datasource: DataSource):
         self.datasource = datasource
 
-    def read_data_objects(self, simulator: BuildingSimulator) -> Tuple[
-        Building, list[PrimaryEnergyAndEmissionFactor], EPWFile, list[WeatherData], list[Window]]:
-        building_data = simulator.datasourcecsv.get_building_data()
-        gwp_pe_factors = simulator.datasourcecsv.get_epw_pe_factors()
-        epw_file_object = simulator.datasourcecsv.get_epw_file(building_data.plz, simulator.weather_period)
-        weather_data = simulator.get_weather_data()
-        windows = simulator.build_windows_objects()
-        return building_data, gwp_pe_factors, epw_file_object, weather_data, windows
-
-    def get_usage_occupancy_and_schedule_name(self, simulator: BuildingSimulator) -> Tuple[
-        int, int, List[ScheduleName] | ValueError, str | ValueError]:
-        usage_start, usage_end = simulator.get_usage_start_and_end()
-        occupancy_schedule, schedule_name = simulator.get_schedule()
-        return usage_start, usage_end, occupancy_schedule, schedule_name
-
-    # def initialize_data(self, simulator: BuildingSimulator):
-    #     simulator.initialize_building_time()
-    #     building_data, gwp_pe_factors, epw_file_object, weather_data, windows = self.read_data_objects(simulator)
-    #     simulator.check_energy_area_and_heating()
-    #
-    #     gain_person_and_typ_norm, appliance_gains = simulator.datasourcecsv.get_gains(
-    #         building_data.hk_geb, building_data.uk_geb, simulator.profile_from_norm,
-    #         simulator.gains_from_group_values)
-    #
-    #     usage_start, usage_end, occupancy_schedule, schedule_name = self.get_usage_occupancy_and_schedule_name(
-    #         simulator)
-    #
-    #     tek_dhw, tek_name = simulator.get_tek()
-    #
-    #     occupancy_full_usage_hours = simulator.get_occupancy_full_usage_hours()
-    #
-    #     tek_dhw_per_occupancy_full_usage_hour = tek_dhw / occupancy_full_usage_hours
-    #     t_m_prev = building_data.t_start
-    #
-    #     return (
-    #         building_data, gwp_pe_factors, epw_file_object, weather_data, windows, gain_person_and_typ_norm,
-    #         appliance_gains, usage_start, usage_end, occupancy_schedule, schedule_name,
-    #         tek_dhw, tek_name, occupancy_full_usage_hours, tek_dhw_per_occupancy_full_usage_hour, t_m_prev)
-
-    def calculate_building_result(self, weather_period: str, profile_from_norm: str, gains_from_group_values: str):
-        simulator = BuildingSimulator(self.datasource, weather_period, profile_from_norm, gains_from_group_values)
-        gwp_pe_factors = simulator.datasourcecsv.get_epw_pe_factors()
+    def calculate_building_result(self, weather_period: str, profile_from_norm: str, gains_from_group_values: str,
+                                  usage_from_norm: str):
+        simulator = BuildingSimulator(self.datasource, weather_period, profile_from_norm, gains_from_group_values,
+                                      usage_from_norm)
 
         simulator.initialize_building_time()
 
@@ -70,20 +27,18 @@ class DIBS:
 
         simulator.check_energy_area_and_heating()
 
-        epw_file_object = simulator.datasourcecsv.get_epw_file(building_data.plz, simulator.weather_period)
-        weather_data = simulator.get_weather_data()
-        windows = simulator.build_windows_objects()
+        epw_file_object = simulator.datasourcecsv.get_epw_file(simulator.building_object.plz, simulator.weather_period)
 
-        gain_person_and_typ_norm, appliance_gains = simulator.datasourcecsv.get_gains(building_data.hk_geb,
-                                                                                      building_data.uk_geb,
+        gain_person_and_typ_norm, appliance_gains = simulator.datasourcecsv.get_gains(simulator.building_object.hk_geb,
+                                                                                      simulator.building_object.uk_geb,
                                                                                       simulator.profile_from_norm,
                                                                                       simulator.gains_from_group_values)
-        print(gain_person_and_typ_norm, appliance_gains)
 
         gain_per_person, typ_norm = gain_person_and_typ_norm
 
-        usage_start, usage_end, occupancy_schedule, schedule_name = self.get_usage_occupancy_and_schedule_name(
-            simulator)
+        usage_start, usage_end = simulator.get_usage_start_and_end()
+
+        occupancy_schedule, schedule_name = simulator.get_schedule()
 
         tek_dhw, tek_name = simulator.get_tek()
 
@@ -91,19 +46,20 @@ class DIBS:
 
         tek_dhw_per_occupancy_full_usage_hour = tek_dhw / occupancy_full_usage_hours
 
-        t_m_prev = building_data.t_start
+        t_m_prev = simulator.building_object.t_start
 
         for hour in range(8760):
-            t_out = simulator.extract_outdoor_temperature(weather_data, hour)
+            t_out = simulator.extract_outdoor_temperature(hour)
 
             altitude, azimuth = simulator.calc_altitude_and_azimuth(hour)
 
-            building_data.h_ve_adj = simulator.building_object.calc_h_ve_adj(hour, t_out, usage_start, usage_end)
+            simulator.building_object.h_ve_adj = simulator.building_object.calc_h_ve_adj(hour, t_out, usage_start,
+                                                                                         usage_end)
 
             t_air = simulator.set_t_air_based_on_hour(hour)
 
-            simulator.calc_solar_gains_for_all_windows(weather_data, altitude, azimuth, t_air, hour)
-            simulator.calc_illuminance_for_all_windows(weather_data, altitude, azimuth, hour)
+            simulator.calc_solar_gains_for_all_windows(altitude, azimuth, t_air, hour)
+            simulator.calc_illuminance_for_all_windows(altitude, azimuth, hour)
 
             occupancy_percent = occupancy_schedule[hour].People
             occupancy = simulator.calc_occupancy(occupancy_schedule, hour)
@@ -111,12 +67,13 @@ class DIBS:
             simulator.building_object.solve_building_lighting(simulator.calc_sum_illuminance_all_windows(),
                                                               occupancy_percent)
 
-            internal_gains = simulator.calc_gains_from_occupancy_and_appliances(occupancy_schedule, occupancy, gain_per_person, appliance_gains, hour)
+            internal_gains = simulator.calc_gains_from_occupancy_and_appliances(occupancy_schedule, occupancy,
+                                                                                gain_per_person, appliance_gains, hour)
+
             """
             Calculate appliance_gains as part of the internal_gains
             """
             appliance_gains_demand = simulator.calc_appliance_gains_demand(occupancy_schedule, appliance_gains, hour)
-
             """
             Appliance_gains equal the electric energy that appliances use, except for negative appliance_gains of refrigerated counters in trade buildings for food!
             The assumption is: negative appliance_gains come from referigerated counters with heat pumps for which we assume a COP = 2.
@@ -128,19 +85,21 @@ class DIBS:
             Calculate energy demand for the time step
             """
             simulator.calc_energy_demand_for_time_step(internal_gains, t_out, t_m_prev)
+            print(f'hour: {hour}, heating_demand: {simulator.building_object.heating_demand}')
 
             """
             Calculate hot water usage of the building for the time step with (BuildingInstance.heating_energy
              / BuildingInstance.heating_demand) represents the Efficiency of the heat generation in the building
             """
+
             hot_water_demand, hot_water_energy, hot_water_sys_electricity, hot_water_sys_fossils = simulator.calc_hot_water_usage(
                 occupancy_schedule, tek_dhw_per_occupancy_full_usage_hour, hour)
 
             """
             Set the previous temperature for the next time step
             """
-            t_m_prev = building_data.t_m_next
-
+            t_m_prev = simulator.building_object.t_m_next
+            print(t_m_prev)
             """
             Append results to the created lists 
             """
@@ -148,12 +107,23 @@ class DIBS:
                                   hot_water_sys_electricity, hot_water_sys_fossils, t_out, internal_gains,
                                   appliance_gains_demand, appliance_gains_demand_elt,
                                   simulator.calc_sum_solar_gains_all_windows(), hour)
-
         """
         Some calculations used for the console prints
         """
-        sum_of_all_results = result.calc_sum_of_results()
 
+        sum_of_all_results = result.calc_sum_of_results()
+        # print(f' heating_demand : {sum(result.heating_demand)}')
+        # print(f' heating_energy : {sum(result.heating_energy)}')
+        # print(f'heating_sys_electricity : {sum(result.heating_sys_electricity)}')
+        # print(f'heating_sys_fossils : {sum(result.heating_sys_fossils)}')
+        # print(f'heating_sys_fossils : {sum(result.cooling_demand)}')
+        # print(f'heating_sys_fossils : {sum(result.cooling_energy)}')
+        # print(f'heating_sys_fossils : {sum(result.cooling_sys_electricity)}')
+        # print(f'heating_sys_fossils : {sum(result.cooling_sys_fossils)}')
+        # print(f'heating_sys_fossils : {sum(result.all_hot_water_demand)}')
+        # print(f'heating_sys_fossils : {sum(result.all_hot_water_energy)}')
+        # print(f'heating_sys_fossils : {sum(result.hot_water_sys_electricity)}')
+        # print(f'heating_sys_fossils : {sum(result.hot_water_sys_fossils)}')
         """
         the fuel-related final energy sums, f.i. HeatingEnergy_sum, are calculated based upon the superior heating value
         Hs since the corresponding expenditure factors from TEK 9.24 represent the ration of Hs-related final energy to 
@@ -168,8 +138,7 @@ class DIBS:
             - PE-Factor Heating
             - Umrechnungsfaktor von Brennwert (Hs) zu Heizwert (Hi) einlesen
         """
-        f_ghg, f_pe, f_hs_hi = simulator.get_ghg_pe_conversion_factors(fuel_type)
-        heating_properties = [f_ghg, f_pe, f_hs_hi, fuel_type]
+        f_ghg, f_pe, f_hs_hi, fuel_type = simulator.get_ghg_pe_conversion_factors(fuel_type)
 
         heating_sys_electricity_hi_sum, heating_sys_carbon_sum, heating_sys_pe_sum, heating_sys_fossils_hi_sum = simulator.check_heating_sys_electricity_sum(
             sum_of_all_results, f_hs_hi, f_ghg, f_pe)
@@ -189,7 +158,7 @@ class DIBS:
         """
         fuel_type = simulator.check_if_central_dhw_use_same_fuel_type_as_heating_system(heating_fuel_type)
 
-        f_ghg, f_pe, f_hs_hi = simulator.get_ghg_pe_conversion_factors(fuel_type)
+        f_ghg, f_pe, f_hs_hi, fuel_type = simulator.get_ghg_pe_conversion_factors(fuel_type)
 
         hot_water_sys_electricity_hi_sum, hot_water_sys_pe_sum, hot_water_sys_carbon_sum, hot_water_sys_fossils_hi_sum = simulator.check_hotwater_sys_electricity_sum(
             sum_of_all_results, f_hs_hi, f_ghg, f_pe)
@@ -207,7 +176,7 @@ class DIBS:
         """
         fuel_type = simulator.choose_cooling_energy_fuel_type()
 
-        f_ghg, f_pe, f_hs_hi = simulator.get_ghg_pe_conversion_factors(fuel_type)
+        f_ghg, f_pe, f_hs_hi, fuel_type = simulator.get_ghg_pe_conversion_factors(fuel_type)
 
         cooling_sys_electricity_hi_sum, cooling_sys_carbon_sum, cooling_sys_pe_sum, cooling_sys_fossils_hi_sum = simulator.check_cooling_system_elctricity_sum(
             sum_of_all_results, f_hs_hi, f_ghg, f_pe)
@@ -225,7 +194,7 @@ class DIBS:
         electrical energy for lighting
         """
         fuel_type = 'Electricity grid mix'
-        f_ghg, f_pe, f_hs_hi = simulator.get_ghg_pe_conversion_factors(fuel_type)
+        f_ghg, f_pe, f_hs_hi, fuel_type = simulator.get_ghg_pe_conversion_factors(fuel_type)
 
         lighting_demand_hi_sum = sum_of_all_results.LightingDemand_sum / f_hs_hi  # for kWhHi Final Energy Demand
         lighting_demand_carbon_sum = (lighting_demand_hi_sum * f_ghg) / 1000  # for kg CO2eq
@@ -272,7 +241,4 @@ class DIBS:
                                      appliance_gains_demand_pe_sum, carbon_sum, pe_sum, fe_hi_sum, schedule_name,
                                      typ_norm, epw_file_object.file_name)
 
-        print(result_output.building.energy_ref_area)
-
-    def calculate_result_of_one_hour(self):
-        pass
+        # print(result_output.fe_hi_sum)

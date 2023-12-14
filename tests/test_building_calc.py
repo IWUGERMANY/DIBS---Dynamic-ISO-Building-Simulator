@@ -66,10 +66,9 @@ class TestBuildingCalculations(unittest.TestCase):
 
     def test_t_out(self):
         building_simulator = BuildingSimulator(
-            DataSourceCSV(), "2004-2018", 'din', 'low')
+            DataSourceCSV(), "2004-2018", 'din', 'low', 'sia2024')
         weather_data = building_simulator.get_weather_data()
-        self.assertEqual(building_simulator.extract_outdoor_temperature(
-            weather_data, 2), -2.00)
+        self.assertEqual(building_simulator.extract_outdoor_temperature(2), -2.00)
 
     def test_h_ve_adj(self):
         self.assertEqual(self.building.calc_h_ve_adj(
@@ -89,18 +88,18 @@ class TestBuildingCalculations(unittest.TestCase):
 
     def test_altitude_and_azimuth_hour0(self):
         building_simulator = BuildingSimulator(
-            DataSourceCSV(), "2004-2018", 'din18599', 'mid')
-        self.assertEqual(building_simulator.calc_altitude_and_zimuth(
+            DataSourceCSV(), "2004-2018", 'din18599', 'mid', 'sia2024')
+        self.assertEqual(building_simulator.calc_altitude_and_azimuth(
             0), (-60.95945850498123, 160.65950615649393))
 
     def test_altitude_and_azimuth_hour6(self):
         building_simulator = BuildingSimulator(
-            DataSourceCSV(), "2004-2018", 'din18599', 'mid')
-        self.assertEqual(building_simulator.calc_altitude_and_zimuth(
+            DataSourceCSV(), "2004-2018", 'din18599', 'mid', 'sia2024')
+        self.assertEqual(building_simulator.calc_altitude_and_azimuth(
             6), (-11.68415334313391, 67.73680832995645))
 
     def test_altitude_and_azimuth_hour12(self):
         building_simulator = BuildingSimulator(
-            DataSourceCSV(), "2004-2018", 'din18599', 'mid')
-        self.assertEqual(building_simulator.calc_altitude_and_zimuth(
+            DataSourceCSV(), "2004-2018", 'din18599', 'mid', 'sia2024')
+        self.assertEqual(building_simulator.calc_altitude_and_azimuth(
             12), (15.475326045849297, -9.602544290526064))

@@ -63,15 +63,16 @@ class Result:
         self.solar_gains_north_window = []
         self.solar_gains_total = []
         self.DayTime = []
-        self.hot_water_demand = 0
-        self.hot_water_energy = 0
-        self.HotWaterSysElectricity = 0
-        self.HotWaterSysFossils = 0
+        # self.hot_water_demand = 0
+        # self.hot_water_energy = 0
+        # self.HotWaterSysElectricity = 0
+        # self.HotWaterSysFossils = 0
         self.appliance_gains_demand = []
         self.appliance_gains_elt_demand = []
 
-    def append_results(self, building: Building, all_windows: List[Window], hot_water_demand: int,
-                       hot_water_energy: int, hot_water_sys_electricity: int, hot_water_sys_fossils: int, t_out: float,
+    def append_results(self, building: Building, all_windows: List[Window], hot_water_demand: float,
+                       hot_water_energy: float, hot_water_sys_electricity: float, hot_water_sys_fossils: float,
+                       t_out: float,
                        internal_gains: float, appliance_gains_demand: float,
                        appliance_gains_elt_demand: float, solar_gains_all_windows: float, hour: int) -> None:
         self.heating_demand.append(building.heating_demand)

@@ -1,6 +1,8 @@
 import pandas as pd
+import os
 
 from typing import Tuple
+from iso_simulator.utils.utils_readcsv import read_profiles_zuweisungen_data
 
 
 def get_value_error() -> ValueError:
@@ -19,18 +21,16 @@ def get_usage_start_end(usage_from_norm: str, row: pd.DataFrame) -> Tuple[int, i
 def get_appliance_gains_sia2024(gains_from_group_values: str, row: pd.DataFrame) -> float:
     match gains_from_group_values:
         case 'low':
-            appliance_gains = float(
+            return float(
                 row['appliance_gains_ziel_sia2024'].to_string(index=False).strip())
 
         case 'mid':
-            appliance_gains = float(
+            return float(
                 row['appliance_gains_standard_sia2024'].to_string(index=False).strip())
 
         case 'max':
-            appliance_gains = float(
+            return float(
                 row['appliance_gains_bestand_sia2024'].to_string(index=False).strip())
-
-    return appliance_gains
 
 
 def get_appliance_gains_18599(gains_from_group_values: str, row: pd.DataFrame) -> float:

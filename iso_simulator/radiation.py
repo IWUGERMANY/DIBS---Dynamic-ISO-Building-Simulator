@@ -118,7 +118,7 @@ class Location(object):
 
         # Convert to Radians
         latitude_rad = math.radians(latitude_deg)
-        longitude_rad = math.radians(longitude_deg)
+        # longitude_rad = math.radians(longitude_deg)
 
         # Set the date in UTC based off the hour of year and the year itself
         start_of_year = datetime.datetime(year, 1, 1, 0, 0, 0, 0)
