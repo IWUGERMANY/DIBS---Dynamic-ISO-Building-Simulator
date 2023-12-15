@@ -100,6 +100,8 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     OutsideTemp = []
     LightingDemand = []
     InternalGains = []
+    Appliance_gains_demands = []
+    Appliance_gains_elt_demands = []
     SolarGainsSouthWindow = []
     SolarGainsEastWindow = []
     SolarGainsWestWindow = []
@@ -399,6 +401,8 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
         OutsideTemp.append(t_out)
         LightingDemand.append(BuildingInstance.lighting_demand)
         InternalGains.append(internal_gains)
+        Appliance_gains_demands.append(Appliance_gains_demand)
+        Appliance_gains_elt_demands.append(Appliance_gains_elt_demand)
         SolarGainsSouthWindow.append(SouthWindow.solar_gains)
         SolarGainsEastWindow.append(EastWindow.solar_gains)
         SolarGainsWestWindow.append(WestWindow.solar_gains)
@@ -426,8 +430,8 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
         'OutsideTemperature':  OutsideTemp,
         'LightingDemand': LightingDemand,
         'InternalGains': InternalGains,
-        'Appliance_gains_demand': Appliance_gains_demand,
-        'Appliance_gains_elt_demand': Appliance_gains_elt_demand,
+        'Appliance_gains_demands': Appliance_gains_demands,
+        'Appliance_gains_elt_demands': Appliance_gains_elt_demands,
         'SolarGainsSouthWindow': SolarGainsSouthWindow,
         'SolarGainsEastWindow': SolarGainsEastWindow,
         'SolarGainsWestWindow': SolarGainsWestWindow,
@@ -457,8 +461,8 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
     HotWater_Sys_Electricity_sum = hourlyResults.HotWater_Sys_Electricity.sum()/1000 
     HotWater_Sys_Fossils_sum = hourlyResults.HotWater_Sys_Fossils.sum()/1000 
     InternalGains_sum = hourlyResults.InternalGains.sum()/1000
-    Appliance_gains_demand_sum = hourlyResults.Appliance_gains_demand.sum()/1000
-    Appliance_gains_elt_demand_sum = hourlyResults.Appliance_gains_elt_demand.sum()/1000
+    Appliance_gains_demand_sum = hourlyResults.Appliance_gains_demands.sum()/1000
+    Appliance_gains_elt_demand_sum = hourlyResults.Appliance_gains_elt_demands.sum()/1000
     LightingDemand_sum = hourlyResults.LightingDemand.sum()/1000
     SolarGainsSouthWindow_sum = hourlyResults.SolarGainsSouthWindow.sum()/1000
     SolarGainsEastWindow_sum = hourlyResults.SolarGainsEastWindow.sum()/1000
