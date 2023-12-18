@@ -5,7 +5,7 @@ from iso_simulator.dibs.dibs import DIBS
 def main():
     datasource = DataSourceCSV()
     dibs = DIBS(datasource)
-
+    
     dibs.calculate_building_result("2004-2018", 'din18599', 'mid', 'sia2024')
 
 

@@ -8,17 +8,17 @@ import os
 
 def get_weather_files_stations(weather_period: str) -> pd.DataFrame:
 
-    if (weather_period == "2007-2021"):
-        weatherfiles_stations = pd.read_csv(os.path.join(
+    if weather_period == "2007-2021":
+        weather_files_stations = pd.read_csv(os.path.join(
             'iso_simulator/auxiliary/weather_data/weather_data_TMYx_2007_2021/weatherfiles_stations_109.csv'), sep=';')
-        weatherfiles_stations_objects: List[WeatherStation109] = [
-            WeatherStation109(*row.values) for _, row in weatherfiles_stations.iterrows()]
+        weather_files_stations_objects: List[WeatherStation109] = [
+            WeatherStation109(*row.values) for _, row in weather_files_stations.iterrows()]
     else:
-        weatherfiles_stations = pd.read_csv(os.path.join(
+        weather_files_stations = pd.read_csv(os.path.join(
             'iso_simulator/auxiliary/weather_data/weatherfiles_stations_93.csv'), sep=';')
-        weatherfiles_stations_objects: List[WeatherStation93] = [
-            WeatherStation93(*row.values) for _, row in weatherfiles_stations.iterrows()]
-    return weatherfiles_stations
+        weather_files_stations_objects: List[WeatherStation93] = [
+            WeatherStation93(*row.values) for _, row in weather_files_stations.iterrows()]
+    return weather_files_stations
 
 
 def get_coordinates_plz(plz_data: pd.DataFrame, plz: str) -> List:

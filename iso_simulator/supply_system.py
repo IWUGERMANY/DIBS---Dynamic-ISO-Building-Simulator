@@ -20,9 +20,7 @@ __copyright__ = "Copyright 2022, Institut Wohnen und Umwelt"
 __license__ = "MIT"
 
 
-
 class SupplyDirector:
-
     """
     The director sets what Supply system is being used, and runs that set Supply system
     """
@@ -35,7 +33,6 @@ class SupplyDirector:
 
     # Calcs the energy load of that system. This is the main() function
     def calc_system(self):
-
         # Director asks the builder to produce the system body. self.builder
         # is an instance of the class
 
@@ -45,12 +42,12 @@ class SupplyDirector:
 
 
 class SupplySystemBase:
-
     """
      The base class in which Supply systems are built from 
     """
 
-    def __init__(self, load, t_out, heating_supply_temperature, cooling_supply_temperature, has_heating_demand, has_cooling_demand):
+    def __init__(self, load, t_out, heating_supply_temperature, cooling_supply_temperature, has_heating_demand,
+                 has_cooling_demand):
         self.load = load  # Energy Demand of the building at that time step
         self.t_out = t_out  # Outdoor Air Temperature
         # Temperature required by the emission system
@@ -60,12 +57,13 @@ class SupplySystemBase:
         self.has_cooling_demand = has_cooling_demand
 
     def calc_loads(self): pass
+
     """
     Caculates the electricty / fossil fuel consumption of the set supply system
     If the system also generates electricity, then this is stored as electricity_out
     """
-    
-    
+
+
 ##############################################################################
 # Oil Boilers 
 ##############################################################################    
@@ -82,6 +80,7 @@ class OilBoilerStandardBefore86(SupplySystemBase):
         system.electricity_out = 0
         return system
 
+
 class OilBoilerStandardFrom95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -95,6 +94,7 @@ class OilBoilerStandardFrom95(SupplySystemBase):
         system.electricity_out = 0
         return system
 
+
 class OilBoilerLowTempBefore87(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -106,7 +106,8 @@ class OilBoilerLowTempBefore87(SupplySystemBase):
         system.fossils_in = self.load * 1.112
         system.electricity_in = 0
         system.electricity_out = 0
-        return system    
+        return system
+
 
 class OilBoilerLowTempBefore95(SupplySystemBase):
     """
@@ -120,7 +121,8 @@ class OilBoilerLowTempBefore95(SupplySystemBase):
         system.electricity_in = 0
         system.electricity_out = 0
         return system
-    
+
+
 class OilBoilerLowTempFrom95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -133,7 +135,8 @@ class OilBoilerLowTempFrom95(SupplySystemBase):
         system.electricity_in = 0
         system.electricity_out = 0
         return system
-    
+
+
 class OilBoilerCondensingBefore95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -146,7 +149,8 @@ class OilBoilerCondensingBefore95(SupplySystemBase):
         system.electricity_in = 0
         system.electricity_out = 0
         return system
-    
+
+
 class OilBoilerCondensingFrom95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -159,6 +163,7 @@ class OilBoilerCondensingFrom95(SupplySystemBase):
         system.electricity_in = 0
         system.electricity_out = 0
         return system
+
 
 class OilBoilerCondensingImproved(SupplySystemBase):
     """
@@ -189,7 +194,8 @@ class GasBoilerStandardBefore86(SupplySystemBase):
         system.electricity_in = 0
         system.electricity_out = 0
         return system
-    
+
+
 class GasBoilerStandardBefore95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -201,8 +207,9 @@ class GasBoilerStandardBefore95(SupplySystemBase):
         system.fossils_in = self.load * 1.124
         system.electricity_in = 0
         system.electricity_out = 0
-        return system 
-    
+        return system
+
+
 class GasBoilerStandardFrom95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -214,7 +221,8 @@ class GasBoilerStandardFrom95(SupplySystemBase):
         system.fossils_in = self.load * 1.114
         system.electricity_in = 0
         system.electricity_out = 0
-        return system    
+        return system
+
 
 class GasBoilerLowTempBefore87(SupplySystemBase):
     """
@@ -228,7 +236,8 @@ class GasBoilerLowTempBefore87(SupplySystemBase):
         system.electricity_in = 0
         system.electricity_out = 0
         return system
-    
+
+
 class LGasBoilerLowTempBefore87(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -241,7 +250,8 @@ class LGasBoilerLowTempBefore87(SupplySystemBase):
         system.electricity_in = 0
         system.electricity_out = 0
         return system
-    
+
+
 class GasBoilerLowTempBefore95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -254,7 +264,8 @@ class GasBoilerLowTempBefore95(SupplySystemBase):
         system.electricity_in = 0
         system.electricity_out = 0
         return system
-    
+
+
 class LGasBoilerLowTempBefore95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -266,7 +277,8 @@ class LGasBoilerLowTempBefore95(SupplySystemBase):
         system.fossils_in = self.load * 1.102
         system.electricity_in = 0
         system.electricity_out = 0
-        return system 
+        return system
+
 
 class GasBoilerLowTempFrom95(SupplySystemBase):
     """
@@ -280,7 +292,8 @@ class GasBoilerLowTempFrom95(SupplySystemBase):
         system.electricity_in = 0
         system.electricity_out = 0
         return system
-    
+
+
 class LGasBoilerLowTempFrom95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -292,7 +305,8 @@ class LGasBoilerLowTempFrom95(SupplySystemBase):
         system.fossils_in = self.load * 1.083
         system.electricity_in = 0
         system.electricity_out = 0
-        return system  
+        return system
+
 
 class BiogasOilBoilerLowTempBefore95(SupplySystemBase):
     """
@@ -305,9 +319,9 @@ class BiogasOilBoilerLowTempBefore95(SupplySystemBase):
         system.fossils_in = self.load * 1.0995
         system.electricity_in = 0
         system.electricity_out = 0
-        return system  
-    
-    
+        return system
+
+
 class GasBoilerLowTempSpecialFrom78(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -319,8 +333,9 @@ class GasBoilerLowTempSpecialFrom78(SupplySystemBase):
         system.fossils_in = self.load * 1.113
         system.electricity_in = 0
         system.electricity_out = 0
-        return system   
-    
+        return system
+
+
 class GasBoilerLowTempSpecialFrom95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -332,7 +347,8 @@ class GasBoilerLowTempSpecialFrom95(SupplySystemBase):
         system.fossils_in = self.load * 1.093
         system.electricity_in = 0
         system.electricity_out = 0
-        return system         
+        return system
+
 
 class GasBoilerCondensingBefore95(SupplySystemBase):
     """
@@ -345,8 +361,9 @@ class GasBoilerCondensingBefore95(SupplySystemBase):
         system.fossils_in = self.load * 1.057
         system.electricity_in = 0
         system.electricity_out = 0
-        return system    
-    
+        return system
+
+
 class LGasBoilerCondensingBefore95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -358,8 +375,9 @@ class LGasBoilerCondensingBefore95(SupplySystemBase):
         system.fossils_in = self.load * 1.047
         system.electricity_in = 0
         system.electricity_out = 0
-        return system       
-    
+        return system
+
+
 class BiogasBoilerCondensingBefore95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -371,7 +389,8 @@ class BiogasBoilerCondensingBefore95(SupplySystemBase):
         system.fossils_in = self.load * 1.057
         system.electricity_in = 0
         system.electricity_out = 0
-        return system  
+        return system
+
 
 class BiogasBoilerCondensingFrom95(SupplySystemBase):
     """
@@ -384,9 +403,9 @@ class BiogasBoilerCondensingFrom95(SupplySystemBase):
         system.fossils_in = self.load * 1.054
         system.electricity_in = 0
         system.electricity_out = 0
-        return system 
-        
-    
+        return system
+
+
 class GasBoilerCondensingFrom95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -398,8 +417,9 @@ class GasBoilerCondensingFrom95(SupplySystemBase):
         system.fossils_in = self.load * 1.054
         system.electricity_in = 0
         system.electricity_out = 0
-        return system    
-    
+        return system
+
+
 class LGasBoilerCondensingFrom95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -411,9 +431,11 @@ class LGasBoilerCondensingFrom95(SupplySystemBase):
         system.fossils_in = self.load * 1.044
         system.electricity_in = 0
         system.electricity_out = 0
-        return system     
+        return system
 
-# Double of above BiogasBoilerCondensingFrom95    
+    # Double of above BiogasBoilerCondensingFrom95
+
+
 # class BioGasBoilerCondensingFrom95(SupplySystemBase):
 #     """
 #     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -426,7 +448,7 @@ class LGasBoilerCondensingFrom95(SupplySystemBase):
 #         system.electricity_in = 0
 #         system.electricity_out = 0
 #         return system      
-    
+
 class BiogasOilBoilerCondensingFrom95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -438,8 +460,9 @@ class BiogasOilBoilerCondensingFrom95(SupplySystemBase):
         system.fossils_in = self.load * 1.041
         system.electricity_in = 0
         system.electricity_out = 0
-        return system 
-    
+        return system
+
+
 class GasBoilerCondensingImproved(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -451,7 +474,8 @@ class GasBoilerCondensingImproved(SupplySystemBase):
         system.fossils_in = self.load * 1.028
         system.electricity_in = 0
         system.electricity_out = 0
-        return system    
+        return system
+
 
 class LGasBoilerCondensingImproved(SupplySystemBase):
     """
@@ -464,8 +488,9 @@ class LGasBoilerCondensingImproved(SupplySystemBase):
         system.fossils_in = self.load * 1.019
         system.electricity_in = 0
         system.electricity_out = 0
-        return system   
-    
+        return system
+
+
 class BiogasOilBoilerCondensingImproved(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -477,11 +502,12 @@ class BiogasOilBoilerCondensingImproved(SupplySystemBase):
         system.fossils_in = self.load * 1.016
         system.electricity_in = 0
         system.electricity_out = 0
-        return system       
-    
-    
-##############################################################################
-# Solid Fuel Boilers 
+        return system
+
+    ##############################################################################
+
+
+# Solid Fuel Boilers
 ##############################################################################
 class WoodChipSolidFuelBoiler(SupplySystemBase):
     """
@@ -494,7 +520,8 @@ class WoodChipSolidFuelBoiler(SupplySystemBase):
         system.fossils_in = self.load * 1.056
         system.electricity_in = 0
         system.electricity_out = 0
-        return system        
+        return system
+
 
 class WoodPelletSolidFuelBoiler(SupplySystemBase):
     """
@@ -507,7 +534,8 @@ class WoodPelletSolidFuelBoiler(SupplySystemBase):
         system.fossils_in = self.load * 1.054
         system.electricity_in = 0
         system.electricity_out = 0
-        return system  
+        return system
+
 
 class WoodSolidFuelBoilerCentral(SupplySystemBase):
     """
@@ -520,7 +548,8 @@ class WoodSolidFuelBoilerCentral(SupplySystemBase):
         system.fossils_in = self.load * 1.123
         system.electricity_in = 0
         system.electricity_out = 0
-        return system    
+        return system
+
 
 class CoalSolidFuelBoiler(SupplySystemBase):
     """
@@ -534,9 +563,11 @@ class CoalSolidFuelBoiler(SupplySystemBase):
         system.fossils_in = self.load * 1.123
         system.electricity_in = 0
         system.electricity_out = 0
-        return system      
-    
-##############################################################################
+        return system
+
+    ##############################################################################
+
+
 # Furnaces
 ##############################################################################    
 class SolidFuelLiquidFuelFurnace(SupplySystemBase):
@@ -549,9 +580,11 @@ class SolidFuelLiquidFuelFurnace(SupplySystemBase):
         system.fossils_in = self.load / 0.7
         system.electricity_in = 0
         system.electricity_out = 0
-        return system   
-  
-##############################################################################
+        return system
+
+    ##############################################################################
+
+
 # Heat Pumps
 ##############################################################################
 class HeatPumpAirSource(SupplySystemBase):
@@ -568,14 +601,14 @@ class HeatPumpAirSource(SupplySystemBase):
             # determine the temperature difference, if negative, set to 0
             deltaT = max(0, self.heating_supply_temperature - self.t_out)
             # Eq (4) in Staggell et al.
-            system.cop = 6.81 - 0.121 * deltaT + 0.000630 * deltaT**2
+            system.cop = 6.81 - 0.121 * deltaT + 0.000630 * deltaT ** 2
             system.electricity_in = self.load / system.cop
 
         elif self.has_cooling_demand:
             # determine the temperature difference, if negative, set to 0
             deltaT = max(0, self.t_out - self.cooling_supply_temperature)
             # Eq (4) in Staggell et al.
-            system.cop = 6.81 - 0.121 * deltaT + 0.000630 * deltaT**2
+            system.cop = 6.81 - 0.121 * deltaT + 0.000630 * deltaT ** 2
             system.electricity_in = self.load / system.cop
 
         else:
@@ -585,6 +618,7 @@ class HeatPumpAirSource(SupplySystemBase):
         system.fossils_in = 0
         system.electricity_out = 0
         return system
+
 
 class HeatPumpGroundSource(SupplySystemBase):
     """"
@@ -599,26 +633,25 @@ class HeatPumpGroundSource(SupplySystemBase):
     Source: Staffell et al. (2012): A review of domestic heat pumps, In: Energy & Environmental Science, 2012, 5, p. 9291-9306
     """
 
-
     def calc_loads(self):
         system = SupplyOut()
         if self.has_heating_demand:
             deltaT = max(0, self.heating_supply_temperature - 7.0)
             # Eq (4) in Staggell et al.
-            system.cop = 8.77 - 0.150 * deltaT + 0.000734 * deltaT**2
+            system.cop = 8.77 - 0.150 * deltaT + 0.000734 * deltaT ** 2
             system.electricity_in = self.load / system.cop
 
         elif self.has_cooling_demand:
             deltaT = max(0, 13.0 - self.cooling_supply_temperature)
             # Eq (4) in Staggell et al.
-            system.cop = 8.77 - 0.150 * deltaT + 0.000734 * deltaT**2
+            system.cop = 8.77 - 0.150 * deltaT + 0.000734 * deltaT ** 2
             system.electricity_in = self.load / system.cop
 
         system.fossils_in = 0
         system.electricity_out = 0
         return system
-    
-    
+
+
 ##############################################################################
 # Combined heat and power plant
 ##############################################################################
@@ -634,8 +667,8 @@ class GasCHP(SupplySystemBase):
         system.electricity_in = 0
         system.electricity_out = system.fossils_in * 0.38
         return system
-    
-    
+
+
 ##############################################################################
 # District Heating
 # Assumption: Indirect system with two water circuits          
@@ -645,17 +678,18 @@ class DistrictHeating(SupplySystemBase):
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
     District Heating with expenditure factor = 1.002
     """
-    
+
     def calc_loads(self):
         system = SupplyOut()
         system.fossils_in = self.load * 1.002
         system.electricity_in = 0
         system.electricity_out = 0
-        return system       
-  
+        return system
 
-##############################################################################
-# Electric Heating   
+    ##############################################################################
+
+
+# Electric Heating
 ##############################################################################
 class ElectricHeating(SupplySystemBase):
     """
@@ -668,8 +702,8 @@ class ElectricHeating(SupplySystemBase):
         system.fossils_in = 0
         system.electricity_out = 0
         return system
-    
-    
+
+
 ##############################################################################
 # Direct Heater for testing purposes
 ##############################################################################  
@@ -684,8 +718,8 @@ class DirectHeater(SupplySystemBase):
         system.fossils_in = 0
         system.electricity_out = 0
         return system
-    
-    
+
+
 ##############################################################################
 # AirCooledPistonScroll
 ##############################################################################
@@ -704,10 +738,11 @@ class AirCooledPistonScroll(SupplySystemBase):
         system.electricity_in = self.load / 3.1
         system.fossils_in = 0
         system.electricity_out = 0
-        return system    
-    
+        return system
 
-##############################################################################
+    ##############################################################################
+
+
 # AirCooledPistonScrollMulti
 ##############################################################################
 class AirCooledPistonScrollMulti(SupplySystemBase):
@@ -725,10 +760,11 @@ class AirCooledPistonScrollMulti(SupplySystemBase):
         system.electricity_in = self.load / 3.1
         system.fossils_in = 0
         system.electricity_out = 0
-        return system 
-    
-  
-##############################################################################
+        return system
+
+    ##############################################################################
+
+
 # WaterCooledPistonScroll
 ##############################################################################
 class WaterCooledPistonScroll(SupplySystemBase):
@@ -748,7 +784,7 @@ class WaterCooledPistonScroll(SupplySystemBase):
         system.electricity_out = 0
         return system
 
-    
+
 ##############################################################################
 # AbsorptionRefrigerationSystem
 ##############################################################################
@@ -770,8 +806,8 @@ class AbsorptionRefrigerationSystem(SupplySystemBase):
         system.fossils_in = 0
         system.electricity_out = 0
         return system
-   
-    
+
+
 ##############################################################################
 # DistrictCooling
 ##############################################################################
@@ -785,11 +821,12 @@ class DistrictCooling(SupplySystemBase):
         system.electricity_in = 0
         system.fossils_in = self.load
         system.electricity_out = 0
-        return system   
-    
+        return system
 
-##############################################################################
-# GasEnginePistonScroll #https://d-nb.info/1047203537/34 
+    ##############################################################################
+
+
+# GasEnginePistonScroll #https://d-nb.info/1047203537/34
 ##############################################################################
 class GasEnginePistonScroll(SupplySystemBase):
     """
@@ -802,9 +839,10 @@ class GasEnginePistonScroll(SupplySystemBase):
     def calc_loads(self):
         system = SupplyOut()
         system.electricity_in = 0
-        system.fossils_in = self.load / 1.16 
+        system.fossils_in = self.load / 1.16
         system.electricity_out = 0
         return system
+
 
 ##############################################################################
 # Direct Cooler for testing purposes
@@ -820,11 +858,12 @@ class DirectCooler(SupplySystemBase):
         system.fossils_in = 0
         system.electricity_out = 0
         return system
-    
+
+
 ##############################################################################
 # NoHeating
 ##############################################################################
-class NoHeating(SupplySystemBase):
+class NoHeater(SupplySystemBase):
     """
     Dummyclass used for buildings with no heating supply system
     """
@@ -834,13 +873,14 @@ class NoHeating(SupplySystemBase):
         system.electricity_in = 0
         system.fossils_in = 0
         system.electricity_out = 0
-        return system  
+        return system
 
-    
-##############################################################################
+    ##############################################################################
+
+
 # NoCooling
 ##############################################################################
-class NoCooling(SupplySystemBase):
+class NoCooler(SupplySystemBase):
     """
     Dummyclass used for buildings with no cooling supply system
     """
@@ -850,10 +890,11 @@ class NoCooling(SupplySystemBase):
         system.electricity_in = 0
         system.fossils_in = 0
         system.electricity_out = 0
-        return system    
-    
-    
-##############################################################################
+        return system
+
+    ##############################################################################
+
+
 ##############################################################################
 
 class SupplyOut:

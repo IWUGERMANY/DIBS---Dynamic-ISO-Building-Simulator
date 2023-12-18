@@ -42,7 +42,8 @@ class BuildingSimulator:
         self.usage_from_norm = usage_from_norm
         self.all_windows = self.build_windows_objects()
         self.weather_data = self.get_weather_data()
-        self.gwp_PE_Factors[29].energy_carrier = 'None'
+        # self.gwp_PE_Factors[29].energy_carrier = 'None'
+
 
     def initialize_building_time(self) -> float:
         return time.time()

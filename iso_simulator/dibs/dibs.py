@@ -1,10 +1,9 @@
 from iso_simulator.data_source.datasource import DataSource
 from iso_simulator.data_source.datasource_csv import DataSourceCSV
 from iso_simulator.building_simulator.simulator import BuildingSimulator
-from typing import Tuple, List
-from iso_simulator.model.schedule_name import ScheduleName
 from iso_simulator.model.results import Result
 from iso_simulator.model.ResultOutput import ResultOutput
+import pandas as pd
 
 
 class DIBS:
@@ -47,6 +46,9 @@ class DIBS:
         tek_dhw_per_occupancy_full_usage_hour = tek_dhw / occupancy_full_usage_hours
 
         t_m_prev = simulator.building_object.t_start
+        internal_list = []
+        elt_list = []
+        appliance_gains_demand_list = []
 
         for hour in range(8760):
             t_out = simulator.extract_outdoor_temperature(hour)
@@ -66,7 +68,9 @@ class DIBS:
 
             simulator.building_object.solve_building_lighting(simulator.calc_sum_illuminance_all_windows(),
                                                               occupancy_percent)
-
+            xxx = occupancy_schedule[hour].Appliances
+            b = simulator.building_object.lighting_demand
+            area = simulator.building_object.energy_ref_area
             internal_gains = simulator.calc_gains_from_occupancy_and_appliances(occupancy_schedule, occupancy,
                                                                                 gain_per_person, appliance_gains, hour)
 
@@ -78,15 +82,45 @@ class DIBS:
             Appliance_gains equal the electric energy that appliances use, except for negative appliance_gains of refrigerated counters in trade buildings for food!
             The assumption is: negative appliance_gains come from referigerated counters with heat pumps for which we assume a COP = 2.
             """
-            appliance_gains_demand_elt = simulator.get_appliance_gains_elt_demand(occupancy_schedule, appliance_gains,
-                                                                                  hour)
+            # appliance_gains_demand_elt = simulator.get_appliance_gains_elt_demand(occupancy_schedule, appliance_gains,
+            #                                                                       hour)
+            appliance_gains_elt = -1 * appliance_gains / 2 if appliance_gains < 0 else appliance_gains
+            appliance_gains_demand_elt = appliance_gains_elt * occupancy_schedule[
+                hour].Appliances * simulator.building_object.energy_ref_area
 
             """
             Calculate energy demand for the time step
             """
             simulator.calc_energy_demand_for_time_step(internal_gains, t_out, t_m_prev)
-            print(f'hour: {hour}, heating_demand: {simulator.building_object.heating_demand}')
+            ####################################################################################
+            #calc phi_m_tot
+            phi_m = simulator.building_object.phi_m
+            h_tr_em = simulator.building_object.h_tr_em
+            h_tr_3 = simulator.building_object.h_tr_3
+            phi_st = simulator.building_object.phi_st
+            h_tr_w = simulator.building_object.h_tr_w
+            h_tr_1 = simulator.building_object.h_tr_1
+            phi_ia = simulator.building_object.phi_ia
+            h_ve_adj = simulator.building_object.h_ve_adj
+            h_tr_2 = simulator.building_object.h_tr_2
+            phi_m_tot = simulator.building_object.phi_m_tot
+            ###############################################################
+            internal_gains_1 = internal_gains
+            t_out_1 = t_out
+            t_m_prev_1 = t_m_prev
+            building_heating_demand = simulator.building_object.heating_demand
+            building_cooling_demand = simulator.building_object.cooling_demand
+            building_heating_sys_electricity = simulator.building_object.heating_sys_electricity
+            building_heating_sys_fossils = simulator.building_object.heating_sys_fossils
+            building_cooling_sys_electricity = simulator.building_object.cooling_sys_electricity
+            building_cooling_sys_fossils = simulator.building_object.cooling_sys_fossils
+            building_electricity_out = simulator.building_object.electricity_out
 
+            phi_st = simulator.building_object.phi_st
+            t_air_1 = t_air
+            t_m_next_1 = simulator.building_object.t_m_next
+            total_en = simulator.building_object.sys_total_energy
+            ####################################################################################
             """
             Calculate hot water usage of the building for the time step with (BuildingInstance.heating_energy
              / BuildingInstance.heating_demand) represents the Efficiency of the heat generation in the building
@@ -94,12 +128,12 @@ class DIBS:
 
             hot_water_demand, hot_water_energy, hot_water_sys_electricity, hot_water_sys_fossils = simulator.calc_hot_water_usage(
                 occupancy_schedule, tek_dhw_per_occupancy_full_usage_hour, hour)
+            print(hot_water_demand)
 
             """
             Set the previous temperature for the next time step
             """
             t_m_prev = simulator.building_object.t_m_next
-            print(t_m_prev)
             """
             Append results to the created lists 
             """
@@ -107,6 +141,42 @@ class DIBS:
                                   hot_water_sys_electricity, hot_water_sys_fossils, t_out, internal_gains,
                                   appliance_gains_demand, appliance_gains_demand_elt,
                                   simulator.calc_sum_solar_gains_all_windows(), hour)
+
+        # hourlyResults = pd.DataFrame({
+        #     'HeatingDemand': result.heating_demand,
+        #     'HeatingEnergy': result.heating_energy,
+        #     'Heating_Sys_Electricity': result.heating_sys_electricity,
+        #     'Heating_Sys_Fossils': result.heating_sys_fossils,
+        #     'CoolingDemand': result.cooling_demand,
+        #     'CoolingEnergy': result.cooling_energy,
+        #     'Cooling_Sys_Electricity': result.cooling_sys_electricity,
+        #     'Cooling_Sys_Fossils': result.cooling_sys_fossils,
+        #     'HotWaterDemand': result.all_hot_water_demand,
+        #     'HotWaterEnergy': result.all_hot_water_energy,
+        #     'HotWater_Sys_Electricity': result.hot_water_sys_electricity,
+        #     'HotWater_Sys_Fossils': result.hot_water_sys_fossils,
+        #     'IndoorAirTemperature': result.temp_air,
+        #     'OutsideTemperature': result.outside_temp,
+        #     'LightingDemand': result.lighting_demand,
+        #     'InternalGains': result.internal_gains,
+        #     'Appliance_gains_demand': result.appliance_gains_demand,
+        #     'Appliance_gains_elt_demand': result.appliance_gains_elt_demand,
+        #     'SolarGainsSouthWindow': result.solar_gains_south_window,
+        #     'SolarGainsEastWindow': result.solar_gains_east_window,
+        #     'SolarGainsWestWindow': result.solar_gains_west_window,
+        #     'SolarGainsNorthWindow': result.solar_gains_north_window,
+        #     'SolarGainsTotal': result.solar_gains_total,
+        #     'Daytime': result.DayTime,
+        # })
+        # hourlyResults.to_excel('first_building.xlsx')
+
+        appliance_demand_result = pd.DataFrame({
+            'internal_gains': internal_list,
+            'appliance_gains_demand': appliance_gains_demand_list,
+            'appliance_gains_elt_demand': elt_list
+        })
+
+        appliance_demand_result.to_excel('appliances10.xlsx')
         """
         Some calculations used for the console prints
         """
@@ -241,4 +311,5 @@ class DIBS:
                                      appliance_gains_demand_pe_sum, carbon_sum, pe_sum, fe_hi_sum, schedule_name,
                                      typ_norm, epw_file_object.file_name)
 
-        # print(result_output.fe_hi_sum)
+        result_data_frame = simulator.datasourcecsv.result_to_pandas_dataframe(result_output)
+        result_data_frame.to_excel("result_output.xlsx")

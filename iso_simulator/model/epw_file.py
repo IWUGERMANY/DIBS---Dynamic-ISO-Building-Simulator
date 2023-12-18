@@ -1,3 +1,5 @@
+from typing import List
+
 __author__ = "Wail Samjouni"
 __copyright__ = "Copyright 2023, Institut Wohnen und Umwelt"
 __license__ = "MIT"
@@ -17,7 +19,7 @@ class EPWFile:
 
     def __init__(self,
                  file_name: str,
-                 coordinates_station: Tuple[float, float],
+                 coordinates_station: List,
                  distance: float
                  ):
         

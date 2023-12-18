@@ -1,6 +1,5 @@
-import os
+import os, pandas as pd
 from typing import List, Tuple, Union
-import pandas as pd
 
 from iso_simulator.data_source.datasource import DataSource
 
@@ -40,10 +39,10 @@ class DataSourceCSV(DataSource):
         ]
 
     def get_schedule(self, hk_geb: str, uk_geb: str) -> Union[Tuple[List[ScheduleName], str], ValueError]:
-        zuweisungen: pd.DataFrame = read_occupancy_schedules_zuweisungen_data()
+        data: pd.DataFrame = read_occupancy_schedules_zuweisungen_data()
 
-        if hk_and_uk_in_zuweisungen(zuweisungen, hk_geb, uk_geb):
-            row: pd.DataFrame = find_row(zuweisungen, uk_geb)
+        if hk_and_uk_in_zuweisungen(data, hk_geb, uk_geb):
+            row: pd.DataFrame = find_row(data, uk_geb)
             schedule_name: str = get_schedule_name(row)
             schedule_file: pd.DataFrame = read_schedule_file(schedule_name)
 
@@ -58,10 +57,10 @@ class DataSourceCSV(DataSource):
 
     def get_schedule_sum(self, hk_geb: str, uk_geb: str) -> float:
 
-        zuweisungen: pd.DataFrame = read_occupancy_schedules_zuweisungen_data()
+        data: pd.DataFrame = read_occupancy_schedules_zuweisungen_data()
 
-        if hk_and_uk_in_zuweisungen(zuweisungen, hk_geb, uk_geb):
-            row: pd.DataFrame = find_row(zuweisungen, uk_geb)
+        if hk_and_uk_in_zuweisungen(data, hk_geb, uk_geb):
+            row: pd.DataFrame = find_row(data, uk_geb)
             schedule_name: str = get_schedule_name(row)
             schedule_file: pd.DataFrame = read_schedule_file(schedule_name)
             return schedule_file.People.sum()
@@ -84,19 +83,19 @@ class DataSourceCSV(DataSource):
         :rtype: DataFrame (with floats), string
         """
 
-        zuweisungen: pd.DataFrame = read_vergleichswerte_zuweisung()
+        data: pd.DataFrame = read_vergleichswerte_zuweisung()
         db_teks: pd.DataFrame = read_tek_nwg_vergleichswerte()
 
-        if hk_or_uk_not_in_zuweisungen(zuweisungen, hk_geb, uk_geb):
+        if hk_or_uk_not_in_zuweisungen(data, hk_geb, uk_geb):
             raise_exception('uk_geb or hk_geb')
-        row: pd.DataFrame = find_row(zuweisungen, uk_geb)
+        row: pd.DataFrame = find_row(data, uk_geb)
         tek_name: str = get_tek_name(row)
         df_tek: pd.DataFrame = get_tek_data_frame_based_on_tek_name(db_teks, tek_name)
         tek_dhw: float = get_tek_dhw(df_tek)
         return tek_dhw, tek_name
 
-    def get_weather_data(self, epwfile_path: str) -> List[WeatherData]:
-        weather_data: pd.DataFrame = read_weather_data(epwfile_path)
+    def get_weather_data(self, epw_file_path: str) -> List[WeatherData]:
+        weather_data: pd.DataFrame = read_weather_data(epw_file_path)
         # .drop('datasource', axis=1)
 
         return [
@@ -133,21 +132,21 @@ class DataSourceCSV(DataSource):
         """
         plz_data: pd.DataFrame = read_plz_codes_data()
 
-        weatherfiles_stations: pd.DataFrame = get_weather_files_stations(
+        weather_files_stations: pd.DataFrame = get_weather_files_stations(
             weather_period)
 
-        weatherfiles_stations['latitude_building'], weatherfiles_stations['longitude_building'] = get_coordinates_plz(
+        weather_files_stations['latitude_building'], weather_files_stations['longitude_building'] = get_coordinates_plz(
             plz_data, plz)
 
-        calculate_minimum_distance_to_next_weather_station(weatherfiles_stations)
+        calculate_minimum_distance_to_next_weather_station(weather_files_stations)
 
         epw_filename: str = get_filename_with_minimum_distance(
-            weatherfiles_stations)
+            weather_files_stations)
 
         coordinates_station: List = get_coordinates_station(
-            weatherfiles_stations)
+            weather_files_stations)
 
-        distance: float = get_distance(weatherfiles_stations)
+        distance: float = get_distance(weather_files_stations)
 
         return EPWFile(epw_filename, coordinates_station, distance)
 
@@ -164,7 +163,7 @@ class DataSourceCSV(DataSource):
 
             return get_usage_start_end(usage_from_norm, row)
 
-    def get_gains(self, hk_geb: str, uk_geb: str, profile_from_norm: str, gains_from_group_values) -> Tuple[
+    def get_gains(self, hk_geb: str, uk_geb: str, profile_from_norm: str, gains_from_group_values: str) -> Tuple[
         Tuple[float, str], float]:
         """
         Find data from DIN V 18599-10 or SIA2024
@@ -185,10 +184,10 @@ class DataSourceCSV(DataSource):
         :rtype: tuple (float, float, string)
         """
 
-        gains_zuweisungen: pd.DataFrame = read_profiles_zuweisungen_data()
+        data: pd.DataFrame = read_profiles_zuweisungen_data()
 
-        if hk_and_uk_in_zuweisungen(gains_zuweisungen, hk_geb, uk_geb):
-            row: pd.DataFrame = find_row(gains_zuweisungen, uk_geb)
+        if hk_and_uk_in_zuweisungen(data, hk_geb, uk_geb):
+            row: pd.DataFrame = find_row(data, uk_geb)
 
             gain_person_and_typ_norm: Tuple[float, str]
             appliance_gains: float
@@ -202,45 +201,6 @@ class DataSourceCSV(DataSource):
                     row, gains_from_group_values)
 
         return gain_person_and_typ_norm, appliance_gains
-
-    # def get_g(self, hk_geb, uk_geb, profile_from_norm, gains_from_group_values):
-    #
-    #     gains_zuweisungen: pd.DataFrame = read_profiles_zuweisungen_data()
-    #
-    #     if hk_geb in gains_zuweisungen['hk_geb'].values:
-    #         if uk_geb in gains_zuweisungen['uk_geb'].values:
-    #             row = find_row(gains_zuweisungen, uk_geb)
-    #
-    #             if profile_from_norm == 'sia2024':
-    #                 typ_norm = row['typ_sia2024'].to_string(index=False).strip()
-    #                 gain_per_person = float(row['gain_per_person_sia2024'].to_string(index=False).strip())
-    #                 if gains_from_group_values == 'low':
-    #                     appliance_gains = float(
-    #                         row['appliance_gains_ziel_sia2024'].to_string(index=False).strip())
-    #                     print(appliance_gains)
-    #                 elif gains_from_group_values == 'mid':
-    #                     appliance_gains = float(
-    #                         row['appliance_gains_standard_sia2024'].to_string(index=False).strip())
-    #                     print(appliance_gains)
-    #                 elif gains_from_group_values == 'max':
-    #                     appliance_gains = float(
-    #                         row['appliance_gains_bestand_sia2024'].to_string(index=False).strip())
-    #                     print(appliance_gains)
-    #             else:
-    #                 typ_norm = row['typ_18599'].to_string(index=False).strip()
-    #                 gain_per_person = float(row['gain_per_person_18599'].to_string(index=False).strip())
-    #                 if gains_from_group_values == 'low':
-    #                     appliance_gains = float(row['appliance_gains_tief_18599'].to_string(index=False).strip())
-    #                     print(appliance_gains)
-    #
-    #                 elif gains_from_group_values == 'mid':
-    #                     appliance_gains = float(row['appliance_gains_mittel_18599'].to_string(index=False).strip())
-    #                     print(appliance_gains)
-    #
-    #                 elif gains_from_group_values == 'max':
-    #                     appliance_gains = float(row['appliance_gains_hoch_18599'].to_string(index=False).strip())
-    #                     print(appliance_gains)
-    #         return gain_per_person, appliance_gains, typ_norm
 
     def result_to_pandas_dataframe(self, result: ResultOutput) -> pd.DataFrame:
 
