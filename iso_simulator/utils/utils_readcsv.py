@@ -8,12 +8,14 @@ def read_building_data() -> pd.DataFrame:
 
 
 def read_gwp_pe_factors_data() -> pd.DataFrame:
-    return pd.read_csv(
+    data = pd.read_csv(
         'iso_simulator/annualSimulation/LCA/Primary_energy_and_emission_factors.csv', sep=';', decimal=',',
-        index_col=False, encoding='cp1250', dtype={'Energy Carrier': str, 'Primary Energy Factor GEG   [-]': float,
-                                                   'Relation Calorific to Heating Value GEG  [-]': float,
-                                                   'GWP spezific to heating value GEG [g/kWh]': float, 'Use': str})
-    # df['Energy Carrier'] = df['Energy Carrier'].apply(lambda x: 'None' if x is None else x)
+        index_col=False, encoding='cp1250')
+    nan_values = data[data['Energy Carrier'].isna()]
+    if not nan_values.empty:
+        data['Energy Carrier'].replace({pd.NaT: 'None'}, inplace=True)
+    return data
+
 
 
 def read_plz_codes_data() -> pd.DataFrame:
