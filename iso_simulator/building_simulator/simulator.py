@@ -1,5 +1,3 @@
-import math
-
 from iso_simulator.model.calculations_sum import CalculationOfSum
 from iso_simulator.model.location import Location
 from iso_simulator.model.schedule_name import ScheduleName
@@ -7,7 +5,8 @@ from iso_simulator.model.weather_data import WeatherData
 from iso_simulator.model.results import Result
 from iso_simulator.model.window import Window
 from iso_simulator.data_source.datasource_csv import DataSourceCSV
-from iso_simulator.exceptions.ghg_emission import GHGEmissionException
+from iso_simulator.exceptions.ghg_emission import GHGEmissionError
+from iso_simulator.exceptions.building_not_heated_exception import BuildingNotHeatedError
 
 from typing import List, Tuple, Union
 import time
@@ -32,7 +31,8 @@ class BuildingSimulator:
                  ):
         self.datasourcecsv = datasourcecsv
         self.weather_period = weather_period
-        self.building_object = datasourcecsv.get_building_data()
+        self.all_buildings = datasourcecsv.get_all_buildings()
+        self.building_object = self.all_buildings[0]
         self.gwp_PE_Factors = datasourcecsv.get_epw_pe_factors()
         self.epw_object = datasourcecsv.get_epw_file(
             self.building_object.plz, self.weather_period)
@@ -42,8 +42,6 @@ class BuildingSimulator:
         self.usage_from_norm = usage_from_norm
         self.all_windows = self.build_windows_objects()
         self.weather_data = self.get_weather_data()
-        # self.gwp_PE_Factors[29].energy_carrier = 'None'
-
 
     def initialize_building_time(self) -> float:
         return time.time()
@@ -51,12 +49,14 @@ class BuildingSimulator:
     def calculate_building_time(self) -> float:
         return time.time() - self.initialize_building_time()
 
-    def check_energy_area_and_heating(self) -> None:
+    def check_energy_area_and_heating(self):
         check_energy_ref_area = self.building_object.energy_ref_area == -8
         check_heating_supply_system = self.building_object.heating_supply_system == 'NoHeating'
-        if check_energy_ref_area or check_heating_supply_system:
-            print(
-                f'Building {str(self.building_object.scr_gebaeude_id)} not heated')
+        try:
+            if check_energy_ref_area or check_heating_supply_system:
+                raise BuildingNotHeatedError(f'Building {str(self.building_object.scr_gebaeude_id)} not heated')
+        except BuildingNotHeatedError as error:
+            print(error)
 
     def build_south_window(self) -> Window:
         return Window(azimuth_tilt=0, alititude_tilt=90,
@@ -331,7 +331,7 @@ class BuildingSimulator:
     def hard_coal(self) -> bool:
         return self.coal_solid_fuel_boiler() or self.solid_fuel_liquid_fuel_furnace()
 
-    def choose_the_fuel_type(self) -> Union[str, None]:
+    def choose_the_fuel_type(self) -> Union[str, GHGEmissionError]:
 
         try:
             if self.biogas_boiler_types():
@@ -356,12 +356,11 @@ class BuildingSimulator:
                 return 'District heating (Combined Heat and Power) Coal'
             elif self.no_heating():
                 return 'None'
-        except GHGEmissionException as exception:
-            print(exception.message)
-
-            # print(
-            #     "Error occured during calculation of GHG-Emission for Heating. The following heating_supply_system cannot be considered yet",
-            #     self.building_object.heating_supply_system)
+            else:
+                raise GHGEmissionError(
+                    "Error occured during calculation of GHG-Emission for Heating. The following heating_supply_system cannot be considered yet")
+        except GHGEmissionError as error:
+            print(error)
 
     # ----------------------------------------------End Choose Fuel Type---------------------------------------------------------------
 
@@ -512,20 +511,20 @@ class BuildingSimulator:
     def no_cooling(self) -> bool:
         return self.building_object.cooling_supply_system == 'NoCooling'
 
-    def choose_cooling_energy_fuel_type(self) -> Union[str, None]:
-
-        if self.air_cool():
-            return 'Electricity grid mix'
-        elif self.absorption_refrigeration_system():
-            return 'Waste Heat generated close to building'
-        elif self.district_cooling():
-            return 'District cooling'
-        elif self.gas_engine_piston_scroll():
-            return 'Natural gas'
-        elif self.no_cooling():
-            return 'None'
-        else:
-            print(
-                "Error occured during calculation of GHG-Emission for Cooling. The following cooling_supply_system cannot be considered yet",
-                self.building_object.cooling_supply_system)
-    # ---------------------------------------------------------End Cooling Energy-----------------------------------------------------------------
+    def choose_cooling_energy_fuel_type(self) -> Union[str, GHGEmissionError]:
+        try:
+            if self.air_cool():
+                return 'Electricity grid mix'
+            elif self.absorption_refrigeration_system():
+                return 'Waste Heat generated close to building'
+            elif self.district_cooling():
+                return 'District cooling'
+            elif self.gas_engine_piston_scroll():
+                return 'Natural gas'
+            elif self.no_cooling():
+                return 'None'
+            else:
+                raise GHGEmissionError(
+                    f"Error occured during calculation of GHG-Emission for Cooling. The following cooling_supply_system cannot be considered yet, {self.building_object.cooling_supply_system}")
+        except GHGEmissionError as error:
+            print(error)

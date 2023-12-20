@@ -389,8 +389,8 @@ class Building(object):
 
         else:
             if usage_start < usage_end:
-                if (usage_start <= daytime < usage_end) == True:
-                    if self.night_flushing_on == True:
+                if usage_start <= daytime < usage_end:
+                    if self.night_flushing_on:
                         self.h_ve_adj = 1200 * 1 * self.building_vol * (self.night_flushing_flow / 3600)
 
                         # Set t_set_heating = 0 for the time step, otherwise the heating system heats up during night flushing is on
@@ -400,8 +400,8 @@ class Building(object):
                         self.h_ve_adj = 1200 * ((self.b_ek * self.building_vol * (self.ach_vent / 3600)) + (
                                 1 * self.building_vol * (self.ach_win / 3600)))
 
-                elif (usage_start <= daytime < usage_end) == False:
-                    if self.night_flushing_on == True:
+                elif not usage_start <= daytime < usage_end:
+                    if self.night_flushing_on:
                         self.h_ve_adj = 1200 * 1 * self.building_vol * (self.night_flushing_flow / 3600)
 
                         # Set t_set_heating = 0 for the time step, otherwise the heating system heats up during night flushing is on
@@ -415,8 +415,8 @@ class Building(object):
                     raise ValueError('Something went wrong with ventilation heat loss coefficient h_ve_adj')
 
             else:
-                if (usage_end <= daytime < usage_start) == False:
-                    if self.night_flushing_on == True:
+                if not usage_end <= daytime < usage_start:
+                    if self.night_flushing_on:
 
                         self.h_ve_adj = 1200 * 1 * self.building_vol * (self.night_flushing_flow / 3600)
 
@@ -427,8 +427,8 @@ class Building(object):
                         self.h_ve_adj = 1200 * ((self.b_ek * self.building_vol * (self.ach_vent / 3600)) + (
                                 1 * self.building_vol * (self.ach_win / 3600)))
 
-                elif (usage_end <= daytime < usage_start) == True:
-                    if self.night_flushing_on == True:
+                elif usage_end <= daytime < usage_start:
+                    if self.night_flushing_on:
 
                         self.h_ve_adj = 1200 * 1 * self.building_vol * (self.night_flushing_flow / 3600)
 
@@ -466,8 +466,8 @@ class Building(object):
         # during night time, indoor air temperature is higher than 21 °C and indoor air temp
         # is higher than outdoor temp + 2 °C
         if self.night_flushing_flow > 0 \
-                and (cooling_season == True) \
-                and (is_night_time == True) \
+                and cooling_season \
+                and is_night_time \
                 and (self.t_air > 21) \
                 and (self.t_air > (t_out + 2)):
 
@@ -817,10 +817,7 @@ class Building(object):
         # Calculate the new flows to each node based on the heating/cooling system
         flows = emDirector.calc_flows()
         # Set modified flows to building object
-        first_phi_ia = self.phi_ia
         self.phi_ia += flows.phi_ia_plus
-        f = flows.phi_ia_plus
-        second_phi_ia = self.phi_ia
         self.phi_st += flows.phi_st_plus
         self.phi_m += flows.phi_m_plus
 

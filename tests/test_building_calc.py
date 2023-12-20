@@ -67,7 +67,6 @@ class TestBuildingCalculations(unittest.TestCase):
     def test_t_out(self):
         building_simulator = BuildingSimulator(
             DataSourceCSV(), "2004-2018", 'din', 'low', 'sia2024')
-        weather_data = building_simulator.get_weather_data()
         self.assertEqual(building_simulator.extract_outdoor_temperature(2), -2.00)
 
     def test_h_ve_adj(self):

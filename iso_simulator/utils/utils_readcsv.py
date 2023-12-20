@@ -17,7 +17,6 @@ def read_gwp_pe_factors_data() -> pd.DataFrame:
     return data
 
 
-
 def read_plz_codes_data() -> pd.DataFrame:
     return pd.read_csv(os.path.join(
         'iso_simulator/auxiliary/weather_data/plzcodes.csv'), encoding='latin', dtype={'zipcode': int})

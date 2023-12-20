@@ -12,6 +12,10 @@ class DataSource(ABC):
         pass
 
     @abstractmethod
+    def get_all_buildings(self):
+        pass
+
+    @abstractmethod
     def get_epw_pe_factors(self):
         pass
 
@@ -53,5 +57,13 @@ class DataSource(ABC):
         pass
 
     @abstractmethod
+    def result_of_all_hours_to_excel(self, result, building):
+        pass
+
+    @abstractmethod
     def results_pandas_dataframe_to_excel(self, dataframe: pd.DataFrame) -> None:
+        pass
+
+    @abstractmethod
+    def build_all_results_of_all_buildings(self, results):
         pass

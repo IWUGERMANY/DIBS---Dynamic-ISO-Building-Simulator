@@ -4,7 +4,6 @@ __author__ = "Wail Samjouni"
 __copyright__ = "Copyright 2023, Institut Wohnen und Umwelt"
 __license__ = "MIT"
 
-from typing import Tuple
 
 class EPWFile:
 

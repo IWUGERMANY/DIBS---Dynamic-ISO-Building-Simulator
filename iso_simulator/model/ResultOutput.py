@@ -130,4 +130,4 @@ class ResultOutput:
         return self.carbon_sum / self.building.energy_ref_area
 
     def calc_pe(self):
-        return self.carbon_sum / self.building.energy_ref_area
+        return self.pe_sum / self.building.energy_ref_area

@@ -1,4 +1,5 @@
-import os, pandas as pd
+import os
+import pandas as pd
 from typing import List, Tuple, Union
 
 from iso_simulator.data_source.datasource import DataSource
@@ -6,7 +7,7 @@ from iso_simulator.data_source.datasource import DataSource
 from iso_simulator.utils.utils_epwfile import get_coordinates_plz, get_weather_files_stations, \
     calculate_minimum_distance_to_next_weather_station, get_filename_with_minimum_distance, get_coordinates_station, \
     get_distance
-from iso_simulator.utils.utils_normreader import find_row, get_value_error, get_usage_start_end, \
+from iso_simulator.utils.utils_normreader import find_row, get_usage_start_end, \
     get_gain_per_person_and_appliance_and_typ_norm_sia2024, get_gain_per_person_and_appliance_and_typ_norm_18599
 from iso_simulator.utils.utils_readcsv import read_building_data, read_gwp_pe_factors_data, \
     read_occupancy_schedules_zuweisungen_data, read_schedule_file, read_vergleichswerte_zuweisung, \
@@ -14,7 +15,7 @@ from iso_simulator.utils.utils_readcsv import read_building_data, read_gwp_pe_fa
 from iso_simulator.utils.utils_hkgeb import hk_and_uk_in_zuweisungen, hk_or_uk_not_in_zuweisungen, hk_in_zuweisungen, \
     uk_in_zuweisungen
 from iso_simulator.utils.utils_tekreader import get_tek_name, get_tek_data_frame_based_on_tek_name, get_tek_dhw
-from iso_simulator.utils.utils_schedule import get_schedule_name, raise_exception
+from iso_simulator.utils.utils_schedule import get_schedule_name
 
 from iso_simulator.model.schedule_name import ScheduleName
 from iso_simulator.model.building import Building
@@ -22,6 +23,9 @@ from iso_simulator.model.primary_energy_and_emission_factors import PrimaryEnerg
 from iso_simulator.model.weather_data import WeatherData
 from iso_simulator.model.epw_file import EPWFile
 from iso_simulator.model.ResultOutput import ResultOutput
+from iso_simulator.exceptions.uk_or_hk_exception import HkOrUkNotFoundError
+from iso_simulator.exceptions.usage_time_exception import UsageTimeError
+from iso_simulator.model.results import Result
 
 
 class DataSourceCSV(DataSource):
@@ -29,6 +33,13 @@ class DataSourceCSV(DataSource):
     def get_building_data(self) -> Building:
         building_data: pd.DataFrame = read_building_data()
         return Building(*building_data.iloc[0].values)
+
+    def get_all_buildings(self) -> List[Building]:
+        building_data: pd.DataFrame = read_building_data()
+        return [
+            Building(*row.values)
+            for _, row in building_data.iterrows()
+        ]
 
     def get_epw_pe_factors(self) -> List[PrimaryEnergyAndEmissionFactor]:
         gwp_pe_factors: pd.DataFrame = read_gwp_pe_factors_data()
@@ -38,10 +49,12 @@ class DataSourceCSV(DataSource):
             for _, row in gwp_pe_factors.iterrows()
         ]
 
-    def get_schedule(self, hk_geb: str, uk_geb: str) -> Union[Tuple[List[ScheduleName], str], ValueError]:
+    def get_schedule(self, hk_geb: str, uk_geb: str) -> Union[Tuple[List[ScheduleName], str], HkOrUkNotFoundError]:
         data: pd.DataFrame = read_occupancy_schedules_zuweisungen_data()
 
-        if hk_and_uk_in_zuweisungen(data, hk_geb, uk_geb):
+        try:
+            if not hk_and_uk_in_zuweisungen(data, hk_geb, uk_geb):
+                raise HkOrUkNotFoundError("hk or uk unknown")
             row: pd.DataFrame = find_row(data, uk_geb)
             schedule_name: str = get_schedule_name(row)
             schedule_file: pd.DataFrame = read_schedule_file(schedule_name)
@@ -50,10 +63,8 @@ class DataSourceCSV(DataSource):
                 ScheduleName(*row.values)
                 for _, row in schedule_file.iterrows()
             ], schedule_name
-
-
-        else:
-            raise_exception('hk_geb')
+        except HkOrUkNotFoundError as error:
+            print(error)
 
     def get_schedule_sum(self, hk_geb: str, uk_geb: str) -> float:
 
@@ -65,7 +76,7 @@ class DataSourceCSV(DataSource):
             schedule_file: pd.DataFrame = read_schedule_file(schedule_name)
             return schedule_file.People.sum()
 
-    def get_tek(self, hk_geb: str, uk_geb: str) -> Union[Tuple[float, str], ValueError]:
+    def get_tek(self, hk_geb: str, uk_geb: str) -> Union[Tuple[float, str], HkOrUkNotFoundError]:
         """
         Find TEK values from Teilenergiekennwerte zur Bildung der Vergleichswerte gemäß der Bekanntmachung vom 15.04.2021 zum Gebäudeenergiegesetz (GEG) vom 2020, 
         depending on hk_geb, uk_geb
@@ -86,13 +97,16 @@ class DataSourceCSV(DataSource):
         data: pd.DataFrame = read_vergleichswerte_zuweisung()
         db_teks: pd.DataFrame = read_tek_nwg_vergleichswerte()
 
-        if hk_or_uk_not_in_zuweisungen(data, hk_geb, uk_geb):
-            raise_exception('uk_geb or hk_geb')
-        row: pd.DataFrame = find_row(data, uk_geb)
-        tek_name: str = get_tek_name(row)
-        df_tek: pd.DataFrame = get_tek_data_frame_based_on_tek_name(db_teks, tek_name)
-        tek_dhw: float = get_tek_dhw(df_tek)
-        return tek_dhw, tek_name
+        try:
+            if hk_or_uk_not_in_zuweisungen(data, hk_geb, uk_geb):
+                raise HkOrUkNotFoundError("hk or uk unknown")
+            row: pd.DataFrame = find_row(data, uk_geb)
+            tek_name: str = get_tek_name(row)
+            df_tek: pd.DataFrame = get_tek_data_frame_based_on_tek_name(db_teks, tek_name)
+            tek_dhw: float = get_tek_dhw(df_tek)
+            return tek_dhw, tek_name
+        except HkOrUkNotFoundError as error:
+            print(error)
 
     def get_weather_data(self, epw_file_path: str) -> List[WeatherData]:
         weather_data: pd.DataFrame = read_weather_data(epw_file_path)
@@ -150,18 +164,19 @@ class DataSourceCSV(DataSource):
 
         return EPWFile(epw_filename, coordinates_station, distance)
 
-    def get_usage_time(self, hk_geb: str, uk_geb: str, usage_from_norm: str) -> Union[Tuple[int, int], ValueError]:
+    def get_usage_time(self, hk_geb: str, uk_geb: str, usage_from_norm: str) -> Union[
+        Tuple[int, int], UsageTimeError]:
 
         gains_zuweisungen: pd.DataFrame = read_profiles_zuweisungen_data()
 
-        if hk_in_zuweisungen(hk_geb, gains_zuweisungen):
-
-            if not uk_in_zuweisungen(uk_geb, gains_zuweisungen):
-                get_value_error()
-
-            row: pd.DataFrame = find_row(gains_zuweisungen, uk_geb)
-
-            return get_usage_start_end(usage_from_norm, row)
+        try:
+            if hk_in_zuweisungen(hk_geb, gains_zuweisungen):
+                if not uk_in_zuweisungen(uk_geb, gains_zuweisungen):
+                    raise UsageTimeError("Something went wrong with the function getUsagetime()")
+                row: pd.DataFrame = find_row(gains_zuweisungen, uk_geb)
+                return get_usage_start_end(usage_from_norm, row)
+        except UsageTimeError as error:
+            print(error)
 
     def get_gains(self, hk_geb: str, uk_geb: str, profile_from_norm: str, gains_from_group_values: str) -> Tuple[
         Tuple[float, str], float]:
@@ -297,5 +312,43 @@ class DataSourceCSV(DataSource):
             'EPW-File': [result.epw_filename]
         })
 
+    def result_of_all_hours_to_excel(self, result: Result, building: Building) -> pd.DataFrame:
+        data_frame = pd.DataFrame({
+            'HeatingDemand': result.heating_demand,
+            'HeatingEnergy': result.heating_energy,
+            'Heating_Sys_Electricity': result.heating_sys_electricity,
+            'Heating_Sys_Fossils': result.heating_sys_fossils,
+            'CoolingDemand': result.cooling_demand,
+            'CoolingEnergy': result.cooling_energy,
+            'Cooling_Sys_Electricity': result.cooling_sys_electricity,
+            'Cooling_Sys_Fossils': result.cooling_sys_fossils,
+            'HotWaterDemand': result.all_hot_water_demand,
+            'HotWaterEnergy': result.all_hot_water_energy,
+            'HotWater_Sys_Electricity': result.hot_water_sys_electricity,
+            'HotWater_Sys_Fossils': result.hot_water_sys_fossils,
+            'IndoorAirTemperature': result.temp_air,
+            'OutsideTemperature': result.outside_temp,
+            'LightingDemand': result.lighting_demand,
+            'InternalGains': result.internal_gains,
+            'Appliance_gains_demand': result.appliance_gains_demand,
+            'Appliance_gains_elt_demand': result.appliance_gains_elt_demand,
+            'SolarGainsSouthWindow': result.solar_gains_south_window,
+            'SolarGainsEastWindow': result.solar_gains_east_window,
+            'SolarGainsWestWindow': result.solar_gains_west_window,
+            'SolarGainsNorthWindow': result.solar_gains_north_window,
+            'SolarGainsTotal': result.solar_gains_total,
+            'Daytime': result.DayTime,
+        })
+        build_file_name = f'{building.scr_gebaeude_id}.xlsx'
+        data_frame.to_excel(f'results/{build_file_name}')
+
     def results_pandas_dataframe_to_excel(self, dataframe: pd.DataFrame) -> None:
         dataframe.to_excel(r'./results/annualResults_summary.xlsx', index=False)
+
+    def build_all_results_of_all_buildings(self, results: List[ResultOutput]) -> pd.DataFrame:
+        list_of_results = []
+        for result in results:
+            data_frame = self.result_to_pandas_dataframe(result)
+            list_of_results.append(data_frame)
+        combined_data_frames = pd.concat(list_of_results)
+        combined_data_frames.to_excel(r'results/annualResults_summaries.xlsx', index=False)

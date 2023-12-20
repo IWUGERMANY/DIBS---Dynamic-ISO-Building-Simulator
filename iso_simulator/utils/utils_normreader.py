@@ -1,13 +1,5 @@
 import pandas as pd
-import os
-
 from typing import Tuple
-from iso_simulator.utils.utils_readcsv import read_profiles_zuweisungen_data
-
-
-def get_value_error() -> ValueError:
-    raise ValueError(
-        'Something went wrong with the function getUsagetime()')
 
 
 def get_usage_start_end(usage_from_norm: str, row: pd.DataFrame) -> Tuple[int, int]:
