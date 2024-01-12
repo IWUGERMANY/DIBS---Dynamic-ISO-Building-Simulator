@@ -312,7 +312,7 @@ class DataSourceCSV(DataSource):
             'EPW-File': [result.epw_filename]
         })
 
-    def result_of_all_hours_to_excel(self, result: Result, building: Building) -> pd.DataFrame:
+    def result_of_all_hours_to_excel(self, result: Result, building: Building):
         data_frame = pd.DataFrame({
             'HeatingDemand': result.heating_demand,
             'HeatingEnergy': result.heating_energy,
@@ -338,14 +338,17 @@ class DataSourceCSV(DataSource):
             'SolarGainsNorthWindow': result.solar_gains_north_window,
             'SolarGainsTotal': result.solar_gains_total,
             'Daytime': result.DayTime,
+            'iteration': 5,
+            'GebäudeID': building.scr_gebaeude_id
         })
         build_file_name = f'{building.scr_gebaeude_id}.xlsx'
         data_frame.to_excel(f'results/{build_file_name}')
 
+
     def results_pandas_dataframe_to_excel(self, dataframe: pd.DataFrame) -> None:
         dataframe.to_excel(r'./results/annualResults_summary.xlsx', index=False)
 
-    def build_all_results_of_all_buildings(self, results: List[ResultOutput]) -> pd.DataFrame:
+    def build_all_results_of_all_buildings(self, results: List[ResultOutput]):
         list_of_results = []
         for result in results:
             data_frame = self.result_to_pandas_dataframe(result)

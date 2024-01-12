@@ -63,10 +63,6 @@ class Result:
         self.solar_gains_north_window = []
         self.solar_gains_total = []
         self.DayTime = []
-        # self.hot_water_demand = 0
-        # self.hot_water_energy = 0
-        # self.HotWaterSysElectricity = 0
-        # self.HotWaterSysFossils = 0
         self.appliance_gains_demand = []
         self.appliance_gains_elt_demand = []
 

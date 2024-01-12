@@ -48,6 +48,3 @@ class CalculationOfSum:
         self.SolarGainsWestWindow_sum = SolarGainsWestWindow_sum
         self.SolarGainsNorthWindow_sum = SolarGainsNorthWindow_sum
         self.SolarGainsTotal_sum = SolarGainsTotal_sum
-
-    def get_sums(self):
-        pass

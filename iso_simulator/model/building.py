@@ -589,12 +589,6 @@ class Building(object):
                                                                             has_heating_demand=self.has_heating_demand,
                                                                             has_cooling_demand=self.has_cooling_demand)
                 supply_director.set_builder(my_system)
-                # supply_director.set_builder(self.heating_supply_system(load=self.energy_demand,
-                #                                                        t_out=t_out,
-                #                                                        heating_supply_temperature=self.heating_supply_temperature,
-                #                                                        cooling_supply_temperature=self.cooling_supply_temperature,
-                #                                                        has_heating_demand=self.has_heating_demand,
-                #                                                        has_cooling_demand=self.has_cooling_demand))
                 supplyOut = supply_director.calc_system()
                 # All Variables explained underneath line 467
                 self.heating_demand = self.energy_demand
@@ -613,12 +607,6 @@ class Building(object):
                                                                             has_heating_demand=self.has_heating_demand,
                                                                             has_cooling_demand=self.has_cooling_demand)
                 supply_director.set_builder(my_system)
-                # supply_director.set_builder(self.cooling_supply_system(load=self.energy_demand * (-1),
-                #                                                        t_out=t_out,
-                #                                                        heating_supply_temperature=self.heating_supply_temperature,
-                #                                                        cooling_supply_temperature=self.cooling_supply_temperature,
-                #                                                        has_heating_demand=self.has_heating_demand,
-                #                                                        has_cooling_demand=self.has_cooling_demand))
                 supplyOut = supply_director.calc_system()
                 self.heating_demand = 0
                 self.heating_sys_electricity = 0
@@ -803,20 +791,19 @@ class Building(object):
 
         # Set the emission system to the type specified by the user
         if energy_demand > 0:
-            if self.heating_emission_system in self.class_mapping:
-                my_system = self.class_mapping[self.heating_emission_system](energy_demand)
-                emDirector.set_builder(my_system)
+            my_system = self.class_mapping[self.heating_emission_system](energy_demand)
+            emDirector.set_builder(my_system)
             # emDirector.set_builder(self.heating_emission_system(
             #     energy_demand=energy_demand))
         else:
-            if self.heating_emission_system in self.class_mapping:
-                my_system = self.class_mapping[self.cooling_emission_system](energy_demand)
-                emDirector.set_builder(my_system)
+            my_system = self.class_mapping[self.cooling_emission_system](energy_demand)
+            emDirector.set_builder(my_system)
             # emDirector.set_builder(self.cooling_emission_system(
             #     energy_demand=energy_demand))
         # Calculate the new flows to each node based on the heating/cooling system
         flows = emDirector.calc_flows()
         # Set modified flows to building object
+
         self.phi_ia += flows.phi_ia_plus
         self.phi_st += flows.phi_st_plus
         self.phi_m += flows.phi_m_plus

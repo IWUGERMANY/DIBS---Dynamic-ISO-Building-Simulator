@@ -1,64 +1,38 @@
-from iso_simulator.model.calculations_sum import CalculationOfSum
+from iso_simulator.data_source.datasource_csv import DataSourceCSV
 from iso_simulator.model.location import Location
 from iso_simulator.model.schedule_name import ScheduleName
 from iso_simulator.model.weather_data import WeatherData
-from iso_simulator.model.results import Result
 from iso_simulator.model.window import Window
-from iso_simulator.data_source.datasource_csv import DataSourceCSV
 from iso_simulator.exceptions.ghg_emission import GHGEmissionError
 from iso_simulator.exceptions.building_not_heated_exception import BuildingNotHeatedError
+from iso_simulator.model.calculations_sum import CalculationOfSum
 
 from typing import List, Tuple, Union
 import time
-import logging
-
-logging.basicConfig(level=logging.INFO, filemode='w',
-                    filename='sample.log')
-
-__author__ = "Wail Samjouni"
-__copyright__ = "Copyright 2023, Institut Wohnen und Umwelt"
-__license__ = "MIT"
 
 
-class BuildingSimulator:
+class SimulateAllBuilding:
 
-    def __init__(self,
-                 datasourcecsv: DataSourceCSV,
+    def __init__(self, datasourcecsv: DataSourceCSV,
                  all_building,
-                 building_by_id,
                  gwp_PE_Factors,
+                 index: int,
                  weather_period: str,
                  profile_from_norm: str,
                  gains_from_group_values: str,
-                 usage_from_norm: str
-                 ):
+                 usage_from_norm: str):
         self.datasourcecsv = datasourcecsv
         self.weather_period = weather_period
         self.all_buildings = all_building
-        self.building_object = building_by_id
+        self.building_object = self.all_buildings[index]
         self.gwp_PE_Factors = gwp_PE_Factors
         self.epw_object = datasourcecsv.get_epw_file(
             self.building_object.plz, self.weather_period)
-        self.result = Result()
         self.profile_from_norm = profile_from_norm
         self.gains_from_group_values = gains_from_group_values
         self.usage_from_norm = usage_from_norm
         self.all_windows = self.build_windows_objects()
         self.weather_data = self.get_weather_data()
-
-        # self.datasourcecsv = datasourcecsv
-        # self.weather_period = weather_period
-        # self.all_buildings = datasourcecsv.get_all_buildings()
-        # self.building_object = self.all_buildings[0]
-        # self.gwp_PE_Factors = datasourcecsv.get_epw_pe_factors()
-        # self.epw_object = datasourcecsv.get_epw_file(
-        #     self.building_object.plz, self.weather_period)
-        # self.result = Result()
-        # self.profile_from_norm = profile_from_norm
-        # self.gains_from_group_values = gains_from_group_values
-        # self.usage_from_norm = usage_from_norm
-        # self.all_windows = self.build_windows_objects()
-        # self.weather_data = self.get_weather_data()
 
     def initialize_building_time(self) -> float:
         return time.time()
@@ -97,7 +71,6 @@ class BuildingSimulator:
                       area=self.building_object.window_area_west)
 
     def build_north_window(self) -> Window:
-        logging.info(self.building_object.scr_gebaeude_id)
         return Window(azimuth_tilt=270, alititude_tilt=90,
                       glass_solar_transmittance=self.building_object.glass_solar_transmittance,
                       glass_solar_shading_transmittance=self.building_object.glass_solar_shading_transmittance,
@@ -158,7 +131,7 @@ class BuildingSimulator:
 
     def set_t_air_based_on_hour(self, hour: int) -> float:
         """
-        Define t_air for calc_solar_gains(). Starting condition (hour==0) necessary for first time step 
+        Define t_air for calc_solar_gains(). Starting condition (hour==0) necessary for first time step
         """
         t_air = self.building_object.t_set_heating if hour == 0 else self.building_object.t_air
         return t_air
@@ -166,7 +139,7 @@ class BuildingSimulator:
     def calc_solar_gains_for_all_windows(self, sun_altitude: float, sun_azimuth: float,
                                          t_air: float, hour: int) -> None:
         """
-        Calculate solar gains through each window 
+        Calculate solar gains through each window
         """
 
         for element in self.all_windows:
@@ -178,7 +151,7 @@ class BuildingSimulator:
     def calc_illuminance_for_all_windows(self, sun_altitude: float, sun_azimuth: float,
                                          hour: int) -> None:
         """
-        Calculate solar illuminance through each window 
+        Calculate solar illuminance through each window
         """
 
         for element in self.all_windows:
@@ -232,7 +205,7 @@ class BuildingSimulator:
 
     def calc_energy_demand_for_time_step(self, internal_gains: float, t_out: float, t_m_prev: float) -> None:
         """
-        Calculate energy demand for the time step 
+        Calculate energy demand for the time step
         """
         self.building_object.solve_building_energy(
             internal_gains, self.calc_sum_solar_gains_all_windows(), t_out, t_m_prev)
