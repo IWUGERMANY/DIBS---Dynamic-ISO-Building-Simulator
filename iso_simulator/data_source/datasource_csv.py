@@ -1,3 +1,7 @@
+"""
+This class is one of the implementations of the interface DataSource. This class handles with data from csv files processed with pandas python module
+"""
+
 import os
 import pandas as pd
 from typing import List, Tuple, Union
@@ -11,7 +15,8 @@ from iso_simulator.utils.utils_normreader import find_row, get_usage_start_end, 
     get_gain_per_person_and_appliance_and_typ_norm_sia2024, get_gain_per_person_and_appliance_and_typ_norm_18599
 from iso_simulator.utils.utils_readcsv import read_building_data, read_gwp_pe_factors_data, \
     read_occupancy_schedules_zuweisungen_data, read_schedule_file, read_vergleichswerte_zuweisung, \
-    read_tek_nwg_vergleichswerte, read_weather_data, read_plz_codes_data, read_profiles_zuweisungen_data
+    read_tek_nwg_vergleichswerte, read_weather_data, read_plz_codes_data, read_profiles_zuweisungen_data, \
+    read_one_building
 from iso_simulator.utils.utils_hkgeb import hk_and_uk_in_zuweisungen, hk_or_uk_not_in_zuweisungen, hk_in_zuweisungen, \
     uk_in_zuweisungen
 from iso_simulator.utils.utils_tekreader import get_tek_name, get_tek_data_frame_based_on_tek_name, get_tek_dhw
@@ -29,12 +34,32 @@ from iso_simulator.model.results import Result
 
 
 class DataSourceCSV(DataSource):
+    """
+    This constructor to initialize an instance of the DataSourceCSV class
 
-    def get_building_data(self) -> Building:
-        building_data: pd.DataFrame = read_building_data()
+    """
+
+    def get_building_data(self, building_id: str) -> Building:
+        """
+               This method retrieves one building from the csv file 'iso_simulator/annualSimulation/SimulationData_Breitenerhebung.csv'
+               and maps it to a Building object.
+               Returns:
+                   building
+               Return type:
+                   Building
+               """
+        building_data: pd.DataFrame | None = read_one_building(building_id)
         return Building(*building_data.iloc[0].values)
 
     def get_all_buildings(self) -> List[Building]:
+        """
+                This method retrieves all buildings from the csv file 'iso_simulator/annualSimulation/SimulationData_Breitenerhebung.csv'
+                and maps them to a list of Building objects.
+                Returns:
+                    buildings
+                Return type:
+                    list[Building]
+                """
         building_data: pd.DataFrame = read_building_data()
         return [
             Building(*row.values)
@@ -42,6 +67,14 @@ class DataSourceCSV(DataSource):
         ]
 
     def get_epw_pe_factors(self) -> List[PrimaryEnergyAndEmissionFactor]:
+        """
+                This method retrieves all primary energy and emission factors from this file path
+                'iso_simulator/annualSimulation/LCA/Primary_energy_and_emission_factors.csv'
+                Returns:
+                    epw_pe_factors
+                Return type:
+                    list[PrimaryEnergyAndEmissionFactor]
+                """
         gwp_pe_factors: pd.DataFrame = read_gwp_pe_factors_data()
 
         return [
@@ -49,7 +82,20 @@ class DataSourceCSV(DataSource):
             for _, row in gwp_pe_factors.iterrows()
         ]
 
-    def get_schedule(self, hk_geb: str, uk_geb: str) -> Union[Tuple[List[ScheduleName], str], HkOrUkNotFoundError]:
+    def get_schedule(self, hk_geb: str, uk_geb: str) -> Union[
+        Tuple[List[ScheduleName], str, float], HkOrUkNotFoundError]:
+        """
+               Find occupancy schedule from SIA2024, depending on hk_geb, uk_geb from csv file
+               'iso_simulator/auxiliary/occupancy_schedules/occupancy_schedules_zuweisungen.csv'
+               Args:
+                   hk_geb: Usage type (main category)
+                   uk_geb: Usage type (subcategory)
+
+               Returns:
+                   schedule_name_list, schedule_name or throws an error
+               Return type:
+                   Union[Tuple[List[ScheduleName], str], HkOrUkNotFoundError]
+               """
         data: pd.DataFrame = read_occupancy_schedules_zuweisungen_data()
 
         try:
@@ -62,38 +108,36 @@ class DataSourceCSV(DataSource):
             return [
                 ScheduleName(*row.values)
                 for _, row in schedule_file.iterrows()
-            ], schedule_name
+            ], schedule_name, schedule_file.People.sum()
         except HkOrUkNotFoundError as error:
             print(error)
 
-    def get_schedule_sum(self, hk_geb: str, uk_geb: str) -> float:
-
-        data: pd.DataFrame = read_occupancy_schedules_zuweisungen_data()
-
-        if hk_and_uk_in_zuweisungen(data, hk_geb, uk_geb):
-            row: pd.DataFrame = find_row(data, uk_geb)
-            schedule_name: str = get_schedule_name(row)
-            schedule_file: pd.DataFrame = read_schedule_file(schedule_name)
-            return schedule_file.People.sum()
+    # def get_schedule_sum(self, hk_geb: str, uk_geb: str) -> float:
+    #
+    #     data: pd.DataFrame = read_occupancy_schedules_zuweisungen_data()
+    #
+    #     if hk_and_uk_in_zuweisungen(data, hk_geb, uk_geb):
+    #         row: pd.DataFrame = find_row(data, uk_geb)
+    #         schedule_name: str = get_schedule_name(row)
+    #         schedule_file: pd.DataFrame = read_schedule_file(schedule_name)
+    #         return schedule_file.People.sum()
 
     def get_tek(self, hk_geb: str, uk_geb: str) -> Union[Tuple[float, str], HkOrUkNotFoundError]:
         """
-        Find TEK values from Teilenergiekennwerte zur Bildung der Vergleichswerte gemäß der Bekanntmachung vom 15.04.2021 zum Gebäudeenergiegesetz (GEG) vom 2020, 
-        depending on hk_geb, uk_geb
+                Find TEK values from Partial energy parameters to build the comparative values in accordance with the
+                announcement  of 15.04.2021 on the Building Energy Act (GEG) of 2020, depending on hk_geb, uk_geb
+                File names used:
+                    - 'iso_simulator/auxiliary/TEKs/TEK_NWG_Vergleichswerte_zuweisung.csv'
+                    - 'iso_simulator/auxiliary/TEKs/TEK_NWG_Vergleichswerte.csv'
+                Args:
+                    hk_geb: Usage type (main category)
+                    uk_geb: Usage type (subcategory)
 
-
-        :external input data: ../auxiliary/TEKs/TEK_NWG_Vergleichswerte.csv
-
-
-        :param hk_geb: usage type (main category)
-        :type hk_geb: string
-        :param uk_geb: usage type (subcategory)
-        :type uk_geb: string
-
-        :return: df_TEK, TEK_name
-        :rtype: DataFrame (with floats), string
-        """
-
+                Returns:
+                    tek_dhw, tek_name or throws an error
+                Return type:
+                    Union[Tuple[float, str], ValueError]
+                """
         data: pd.DataFrame = read_vergleichswerte_zuweisung()
         db_teks: pd.DataFrame = read_tek_nwg_vergleichswerte()
 
@@ -109,8 +153,17 @@ class DataSourceCSV(DataSource):
             print(error)
 
     def get_weather_data(self, epw_file_path: str) -> List[WeatherData]:
+        """
+               This method read the csv file epw_file_path and maps the result to objects
+               Args:
+                   epw_file_path: file path
+
+               Returns:
+                   weather_data_list
+               Return type:
+                   List[WeatherData]
+               """
         weather_data: pd.DataFrame = read_weather_data(epw_file_path)
-        # .drop('datasource', axis=1)
 
         return [
             WeatherData(*row.values)
@@ -118,6 +171,17 @@ class DataSourceCSV(DataSource):
         ]
 
     def choose_and_get_the_right_weather_data_from_path(self, weather_period, file_name) -> List[WeatherData]:
+        """
+                This method retrieves the right weather data according to the given weather_period and file_name
+                Args:
+                    weather_period: the period to simulate
+                    file_name: the file name to be read
+
+                Returns:
+                    weather_data_objects
+                Return type:
+                    List[WeatherData]
+                """
         return (
             self.get_weather_data(
                 os.path.join(f'iso_simulator/auxiliary/weather_data/weather_data_TMYx_2007_2021{file_name}',
@@ -132,17 +196,20 @@ class DataSourceCSV(DataSource):
 
     def get_epw_file(self, plz: str, weather_period: str) -> EPWFile:
         """
-        Function finds the epw file depending on building location, Pick latitude and longitude from plz_data and put values into a list and 
-        Calculate minimum distance to next weather station
+        Function finds the epw file depending on building location, Pick latitude and longitude from plz_data and put
+        values into a list and Calculate minimum distance to next weather station
+        Args:
+            plz: zipcode of the building
+            weather_period: the period to simulate
+         File names used:
+            - 'iso_simulator/auxiliary/weather_data/plzcodes.csv'
+            - 'iso_simulator/auxiliary/weather_data/weather_data_TMYx_2007_2021/weatherfiles_stations_109.csv'
+            - 'iso_simulator/auxiliary/weather_data/weatherfiles_stations_93.csv'
 
-
-        :external input data: File with german zip codes [../auxiliary/weather_data/plzcodes.csv]
-                              File with metadata of weather stations (e.g. longitude, latitude) [../auxiliary/weather_data/weatherfiles_stations_93.csv]
-
-        :return epw_filename: filename of the epw
-        :rtype: tuple (string)
-        :return coordinates_station: latitude and longitute of the selected station
-        :rtype: tuple (float)
+        Returns:
+            epw_file object
+        Return type:
+            EPWFile
         """
         plz_data: pd.DataFrame = read_plz_codes_data()
 
@@ -166,6 +233,21 @@ class DataSourceCSV(DataSource):
 
     def get_usage_time(self, hk_geb: str, uk_geb: str, usage_from_norm: str) -> Union[
         Tuple[int, int], UsageTimeError]:
+        """
+                Find building's usage time DIN 18599-10 or SIA2024
+                Args:
+                    hk_geb: Usage type (main category)
+                    uk_geb: Usage type (subcategory)
+                    usage_from_norm: data source either 18599-10 or SIA2024
+
+                File name used:
+                    - 'iso_simulator/auxiliary/norm_profiles/profiles_zuweisungen.csv'
+
+                Returns:
+                    usage_start, usage_end or throws error
+                Return type:
+                    Union[Tuple[int, int], ValueError]
+                """
 
         gains_zuweisungen: pd.DataFrame = read_profiles_zuweisungen_data()
 
@@ -182,21 +264,20 @@ class DataSourceCSV(DataSource):
         Tuple[float, str], float]:
         """
         Find data from DIN V 18599-10 or SIA2024
+        Args:
+            hk_geb: Usage type (main category)
+            uk_geb: Usage type (subcategory)
+            profile_from_norm: data source either 18599-10 or SIA2024 [specified in model/all_building.py
+            or model/simulator.py]
+            gains_from_group_values: group in norm low/medium/high [specified in model/all_building.py
+            or model/simulator.py]
+        File name used:
+            - 'iso_simulator/auxiliary/norm_profiles/profiles_zuweisungen.csv'
 
-
-        :external input data: Assignments [../auxiliary/norm_profiles/profiles_zuweisungen.csv]
-
-        :param hk_geb: usage type (main category)
-        :type hk_geb: string
-        :param uk_geb: usage type (subcategory)
-        :type uk_geb: string
-        :param profile_from_norm: data source either 18599-10 or SIA2024 [specified in annualSimulation.py]
-        :type profile_from_norm: string
-        :param gains_from_group_values: group in norm low/medium/high [specified in annualSimulation.py]
-        :type gains_from_group_values: string
-
-        :return: gain_per_person, appliance_gains, typ_norm
-        :rtype: tuple (float, float, string)
+        Returns:
+            gain_person_and_typ_norm, appliance_gains
+        Return type:
+            Tuple[Tuple[float, str], float]
         """
 
         data: pd.DataFrame = read_profiles_zuweisungen_data()
@@ -218,6 +299,17 @@ class DataSourceCSV(DataSource):
         return gain_person_and_typ_norm, appliance_gains
 
     def result_to_pandas_dataframe(self, result: ResultOutput) -> pd.DataFrame:
+        """
+                Maps a list of ResultOutput objects to a pandas Dataframe
+                Args:
+                    result: result of a simulated building
+
+                Returns:
+                    dataframe
+                Return type:
+                    pd.DataFrame
+
+                """
 
         return pd.DataFrame({
             'GebäudeID': result.building.scr_gebaeude_id,
@@ -313,6 +405,17 @@ class DataSourceCSV(DataSource):
         })
 
     def result_of_all_hours_to_excel(self, result: Result, building: Building):
+        """
+                Maps the results of the simulated building to an Excel file (all hours)
+                Args:
+                    result: result
+                    building: the building to simulate
+
+                Returns:
+                    Saved Excel file in the result directory
+                Return type:
+                    None
+                """
         data_frame = pd.DataFrame({
             'HeatingDemand': result.heating_demand,
             'HeatingEnergy': result.heating_energy,
@@ -344,14 +447,62 @@ class DataSourceCSV(DataSource):
         build_file_name = f'{building.scr_gebaeude_id}.xlsx'
         data_frame.to_excel(f'results/{build_file_name}')
 
+    def result_of_all_hours_to_csv(self, result: Result, building: Building):
+        """
+        Maps the results of the simulated building to an Excel file (all hours)
+        Args:
+            result: result
+            building: the building to simulate
 
-    def results_pandas_dataframe_to_excel(self, dataframe: pd.DataFrame) -> None:
-        dataframe.to_excel(r'./results/annualResults_summary.xlsx', index=False)
+        Returns:
+            Saved Excel file in the result directory
+        Return type:
+            None
+        """
+        data_frame = pd.DataFrame({
+            'HeatingDemand': result.heating_demand,
+            'HeatingEnergy': result.heating_energy,
+            'Heating_Sys_Electricity': result.heating_sys_electricity,
+            'Heating_Sys_Fossils': result.heating_sys_fossils,
+            'CoolingDemand': result.cooling_demand,
+            'CoolingEnergy': result.cooling_energy,
+            'Cooling_Sys_Electricity': result.cooling_sys_electricity,
+            'Cooling_Sys_Fossils': result.cooling_sys_fossils,
+            'HotWaterDemand': result.all_hot_water_demand,
+            'HotWaterEnergy': result.all_hot_water_energy,
+            'HotWater_Sys_Electricity': result.hot_water_sys_electricity,
+            'HotWater_Sys_Fossils': result.hot_water_sys_fossils,
+            'IndoorAirTemperature': result.temp_air,
+            'OutsideTemperature': result.outside_temp,
+            'LightingDemand': result.lighting_demand,
+            'InternalGains': result.internal_gains,
+            'Appliance_gains_demand': result.appliance_gains_demand,
+            'Appliance_gains_elt_demand': result.appliance_gains_elt_demand,
+            'SolarGainsSouthWindow': result.solar_gains_south_window,
+            'SolarGainsEastWindow': result.solar_gains_east_window,
+            'SolarGainsWestWindow': result.solar_gains_west_window,
+            'SolarGainsNorthWindow': result.solar_gains_north_window,
+            'SolarGainsTotal': result.solar_gains_total,
+            'Daytime': result.DayTime,
+            'iteration': 5,
+            'GebäudeID': building.scr_gebaeude_id
+        })
+        build_file_name = f'{building.scr_gebaeude_id}.csv'
+        data_frame.to_csv(f'results/{build_file_name}')
 
     def build_all_results_of_all_buildings(self, results: List[ResultOutput]):
-        list_of_results = []
-        for result in results:
-            data_frame = self.result_to_pandas_dataframe(result)
-            list_of_results.append(data_frame)
+        """
+              Converts the results of all buildings to an Excel file saved in the result directory
+              Args:
+                  results: results of all building
+
+              Returns:
+                    Saved Excel file
+              Return type:
+                  None
+
+              """
+        list_of_results = [self.result_to_pandas_dataframe(result) for result in results]
+
         combined_data_frames = pd.concat(list_of_results)
         combined_data_frames.to_excel(r'results/annualResults_summaries.xlsx', index=False)

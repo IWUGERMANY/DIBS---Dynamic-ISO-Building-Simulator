@@ -1,7 +1,13 @@
+"""
+This file contains auxiliary functions which used to check if the hk_geb (Usage type (main category)) or uk_geb
+(Usage type (subcategory)) are contained in the imported csv files
+"""
+
 import sys
 import os
 
 from pandas import DataFrame
+
 mainPath = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, mainPath)
 

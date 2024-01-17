@@ -14,9 +14,11 @@ class DataSource(ABC):
     """
 
     @abstractmethod
-    def get_building_data(self):
+    def get_building_data(self, building_id: str):
         """
         This method retrieves one building from the csv file and maps them to objects.
+        Args:
+            building_id: building to simulate
         Returns:
             building
         Return type:
@@ -61,9 +63,9 @@ class DataSource(ABC):
         """
         pass
 
-    @abstractmethod
-    def get_schedule_sum(self, hk_geb: str, uk_geb: str) -> float:
-        pass
+    # @abstractmethod
+    # def get_schedule_sum(self, hk_geb: str, uk_geb: str) -> float:
+    #     pass
 
     @abstractmethod
     def get_tek(self, hk_geb: str, uk_geb: str) -> Union[Tuple[float, str], ValueError]:
@@ -184,20 +186,6 @@ class DataSource(ABC):
         Args:
             result: result
             building: the building to simulate
-
-        Returns:
-            Excel file
-        Return type:
-            None
-        """
-        pass
-
-    @abstractmethod
-    def results_pandas_dataframe_to_excel(self, dataframe: pd.DataFrame) -> None:
-        """
-        Converts a pandas Dataframe to an Excel file
-        Args:
-            dataframe: dataframe which contains the results
 
         Returns:
             Excel file

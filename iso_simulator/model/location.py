@@ -1,12 +1,8 @@
-from iso_simulator.data_source.datasource_csv import DataSourceCSV
 import math
 import datetime
 
 
 class Location:
-    def __init__(self):
-        self.datasourcecsv = DataSourceCSV()
-
 
     def calc_sun_position(self, latitude_deg, longitude_deg, year, hoy):
         """
@@ -47,7 +43,7 @@ class Location:
 
         # The deviation between local standard time and true solar time
         equation_of_time = (9.87 * math.sin(2 * angle_of_day)) - \
-            (7.53 * math.cos(angle_of_day)) - (1.5 * math.sin(angle_of_day))
+                           (7.53 * math.cos(angle_of_day)) - (1.5 * math.sin(angle_of_day))
 
         # True Solar Time
         solar_time = ((utc_datetime.hour * 60) + utc_datetime.minute +
@@ -83,7 +79,7 @@ class Location:
         # # http://www.pveducation.org/pvcdrom/properties-of-sunlight/declination-angle
         # declination_rad, angle_of_day = calc_declination_and_angle_of_day(
         #     day_of_year)
-        
+
         # equation_of_time = calc_equation_of_time(angle_of_day)
 
         # # Normalise the day to 2*pi

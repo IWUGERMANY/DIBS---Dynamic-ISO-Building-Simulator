@@ -71,6 +71,25 @@ class Result:
                        t_out: float,
                        internal_gains: float, appliance_gains_demand: float,
                        appliance_gains_elt_demand: float, solar_gains_all_windows: float, hour: int) -> None:
+        """
+        This method appends the result of a simulated hour in the object result
+        Args:
+            building:
+            all_windows:
+            hot_water_demand:
+            hot_water_energy:
+            hot_water_sys_electricity:
+            hot_water_sys_fossils:
+            t_out:
+            internal_gains:
+            appliance_gains_demand:
+            appliance_gains_elt_demand:
+            solar_gains_all_windows:
+            hour:
+
+        Returns:
+            None
+        """
         self.heating_demand.append(building.heating_demand)
         self.heating_energy.append(building.heating_energy)
         self.heating_sys_electricity.append(building.heating_sys_electricity)
@@ -97,6 +116,11 @@ class Result:
         self.appliance_gains_elt_demand.append(appliance_gains_elt_demand)
 
     def calc_sum_of_results(self) -> CalculationOfSum:
+        """
+        Calculates the sum of results
+        Returns:
+            sum_of_all_results
+        """
         heating_demand_sum = sum(self.heating_demand) / 1000
         heating_energy_sum = sum(self.heating_energy) / 1000
         heating_sys_electricity_sum = sum(self.heating_sys_electricity) / 1000

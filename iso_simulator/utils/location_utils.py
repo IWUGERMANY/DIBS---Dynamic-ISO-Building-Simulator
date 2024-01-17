@@ -1,3 +1,7 @@
+"""
+This file contains auxiliary functions used for some calculations
+"""
+
 import datetime
 import math
 

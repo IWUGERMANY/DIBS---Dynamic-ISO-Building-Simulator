@@ -1,8 +1,8 @@
+"""
+This class is used to store the sum of all the simulated hours for a building
+"""
+
 class CalculationOfSum:
-    """
-    the fuel-related final energy sums, f.i. HeatingEnergy_sum, are calculated based upon the superior heating value Hs
-    since the corresponding expenditure factors from TEK 9.24 represent the ration of Hs-related final energy to useful energy
-    """
 
     def __init__(self,
                  HeatingDemand_sum: float,
