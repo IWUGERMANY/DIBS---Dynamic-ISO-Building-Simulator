@@ -10,6 +10,16 @@ from iso_simulator.model.results import Result
 from iso_simulator.model.ResultOutput import ResultOutput
 from iso_simulator.model.generate_data import GenerateData
 import time
+import multiprocessing as mp
+import concurrent.futures
+import threading
+import logging
+import inspect
+import multiprocessing
+
+log_file = 'simulation_log.txt'
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', filename=log_file,
+                    filemode='a')
 
 
 class DIBS:
@@ -289,7 +299,8 @@ class DIBS:
         print(
             f'Complete time to simulate, save results of all hours in an CSV file and save result of the building in an Excel file is: {simulation_time + dt_csv}s')
 
-    def calculate_result_of_all_buildings(self, generate_data: GenerateData, weather_period: str, index: int):
+    def calculate_result_of_all_buildings(self, generate_data: GenerateData, weather_period: str, index: int) -> tuple[
+        Result, ResultOutput]:
         begin_time = time.time()
 
         simulator = SimulateAllBuilding(self.datasource, generate_data.all_buildings, generate_data.gwp_pe_factors,
@@ -500,3 +511,195 @@ class DIBS:
         lang = end - begin_time
         print(f'Time to simulate building {simulator.building_object.scr_gebaeude_id} is : {lang}s')
         return result, result_output
+
+    def parallel_mp_calculation(self, generate_data: GenerateData, weather_period: str):
+
+        processes = []
+        buildings = generate_data.all_buildings
+
+        begin_simulation_time = time.time()
+
+        for index, building in enumerate(buildings):
+            args = [generate_data, weather_period, index]
+            process = mp.Process(target=self.calculate_result_of_all_buildings, args=args)
+            processes.append(process)
+            process.start()
+
+        for process in processes:
+            process.join()
+
+        end_simulation_time = time.time()
+
+        print(
+            f'Time is : {end_simulation_time - begin_simulation_time}s')
+
+    def parallel_thread_max_concurrent(self, generate_data: GenerateData, weather_period, max_concurrent: int):
+        semaphore = concurrent.futures.ThreadPoolExecutor(max_concurrent)
+        buildings = generate_data.all_buildings
+        begin = time.time()
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = []
+
+            for index, building in enumerate(buildings):
+                args = [generate_data, weather_period, index]
+                future = semaphore.submit(self.calculate_result_of_all_buildings, *args)
+                futures.append(future)
+            concurrent.futures.wait(futures)
+        end = time.time()
+        print(f'Simulation time is : {end - begin}')
+
+    def parallel_thread_calculation(self, generate_data: GenerateData, weather_period):
+        current_function_name = inspect.stack()[0][3]
+        buildings = generate_data.all_buildings
+        begin = time.time()
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = [
+                executor.submit(self.calculate_result_of_all_buildings, generate_data, weather_period, index,
+                                ) for index, building in enumerate(buildings)]
+            results = [future.result() for future in concurrent.futures.as_completed(futures)]
+        end = time.time()
+        logging.info(f'-----------Simulation using the method {current_function_name}-----------')
+        logging.info(f"Parallel Process Calculation time is {end - begin:.2f} Seconds.")
+
+        unpack_time, result, result_output = self.unpack_results(results)
+
+        begin_final_result = time.time()
+        self.datasource.build_all_results_of_all_buildings(result_output)
+        end_final_result = time.time()
+
+        saving_time = self.save_results_of_all_buildings_in_csv_parallel_using_thread_executor(
+            buildings, result)
+
+        logging.info(
+            f"Time of saving the final result of {len(buildings)} buildings is {end_final_result - begin_final_result:.2f} Seconds.")
+
+        logging.info(
+            f"Time of saving hours results of {len(buildings)} buildings is {saving_time:.2f} Seconds.")
+        logging.warning(
+            f"Total time to simulate {len(buildings)} buildings and save hourly and final results is {end - begin + saving_time + unpack_time:.2f} Seconds.")
+        logging.info(f'-----------------------------End simulation using process----------------------------')
+
+    def parallel_process_calculation(self, generate_data: GenerateData, weather_period):
+        logging.info("-" * 90)
+        logging.info("-" * 90)
+        current_function_name = inspect.stack()[0][3]
+        buildings = generate_data.all_buildings
+        simulation_time, results = self.simulate_all_buildings_parallel_using_process_executor(
+            buildings, generate_data, weather_period)
+
+        logging.info(f'-----------Simulation using the method {current_function_name}-----------')
+        logging.info(f"Parallel Process Calculation time is {simulation_time:.2f} Seconds.")
+
+        unpack_time, result, result_output = self.unpack_results(results)
+
+        begin_final_result = time.time()
+        self.datasource.build_all_results_of_all_buildings(result_output)
+        end_final_result = time.time()
+        logging.info(
+            f"Time of saving the final result of {len(buildings)} buildings is {end_final_result - begin_final_result:.2f} Seconds.")
+
+        saving_time = self.save_results_of_all_buildings_in_csv_parallel_using_thread_executor(
+            buildings, result)
+
+        logging.info(
+            f"Time of saving hours results of {len(buildings)} buildings is {saving_time:.2f} Seconds.")
+        logging.warning(
+            f"Total time to simulate {len(buildings)} buildings and save hourly and final results is {simulation_time + saving_time + unpack_time:.2f} Seconds.")
+        logging.info(f'-----------------------------End simulation using process----------------------------')
+        logging.info("-" * 90)
+        logging.info("-" * 90)
+
+    def unpack_results(self, results):
+        begin_unpack_time = time.time()
+        result, result_output = zip(*results)
+        end_unpack_time = time.time()
+        return end_unpack_time - begin_unpack_time, result, result_output
+
+    def save_results_of_all_buildings_in_csv_parallel_using_thread_executor(self, buildings, result):
+        begin_saving_time = time.time()
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = [
+                executor.submit(self.datasource.result_of_all_hours_to_csv, result[index], building
+                                ) for index, building in enumerate(buildings)]
+            results = [future.result() for future in concurrent.futures.as_completed(futures)]
+        end_saving_time = time.time()
+        return end_saving_time - begin_saving_time
+
+    def save_results_of_all_buildings_in_excel_parallel_using_thread_executor(self, buildings, result):
+        begin_saving_time = time.time()
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = [
+                executor.submit(self.datasource.result_of_all_hours_to_excel, result[index], building
+                                ) for index, building in enumerate(buildings)]
+            results = [future.result() for future in concurrent.futures.as_completed(futures)]
+        end_saving_time = time.time()
+        return begin_saving_time, end_saving_time
+
+    def simulate_all_buildings_parallel_using_process_executor(self, buildings, generate_data, weather_period):
+        begin_simulation_time = time.time()
+
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            futures = [
+                executor.submit(self.calculate_result_of_all_buildings, generate_data, weather_period, index,
+                                ) for index, building in enumerate(buildings)]
+            results = [future.result() for future in concurrent.futures.as_completed(futures)]
+        end_simulation_time = time.time()
+        return end_simulation_time - begin_simulation_time, results
+
+    def run_simulation(self, generate_data, weather_period, index, max_concurrent):
+        semaphore = threading.BoundedSemaphore(max_concurrent)
+        with semaphore:
+            return self.calculate_result_of_all_buildings(generate_data, weather_period, index)
+
+    def parallel_process_max_concurrent(self, generate_data: GenerateData, weather_period, max_concurrent):
+        buildings = generate_data.all_buildings
+        begin = time.time()
+
+        logging.info(f'------------Simulation using process with max_concurrent {max_concurrent}---------------')
+
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            futures = [
+                executor.submit(self.run_simulation, generate_data, weather_period, index, max_concurrent) for
+                index, building in enumerate(buildings)
+            ]
+
+            results = [future.result() for future in concurrent.futures.as_completed(futures)]
+
+        end = time.time()
+        logging.info(f"Parallel Process Calculation time is {end - begin:.2f} Seconds.")
+
+        unpack_time, result, result_output = self.unpack_results(results)
+
+        begin_final_result = time.time()
+        self.datasource.build_all_results_of_all_buildings(result_output)
+        end_final_result = time.time()
+        logging.info(
+            f"Time of saving the final result of {len(buildings)} buildings is {end_final_result - begin_final_result:.2f} Seconds.")
+
+        saving_time = self.save_results_of_all_buildings_in_csv_parallel_using_thread_executor(
+            buildings, result)
+
+        logging.info(
+            f"Time of saving hours results of {len(buildings)} buildings is {saving_time:.2f} Seconds.")
+        logging.warning(
+            f"Total time to simulate {len(buildings)} buildings and save hourly and final results is {end - begin + saving_time + unpack_time:.2f} Seconds.")
+        logging.info(f'----------------------End simulation using process max_concurrent-----------------------')
+
+    def multi(self, generate_data: GenerateData, weather_data: str):
+        with multiprocessing.Pool() as pool:
+            results = []
+            begin = time.time()
+
+            for index, building in enumerate(generate_data.all_buildings):
+                result = pool.apply_async(self.calculate_result_of_all_buildings, (generate_data, weather_data, index))
+                results.append(result)
+
+            pool.close()
+            pool.join()
+
+            end = time.time()
+            print(f'Timeeeee: {end - begin}')
+
+            results = [result.get() for result in results]

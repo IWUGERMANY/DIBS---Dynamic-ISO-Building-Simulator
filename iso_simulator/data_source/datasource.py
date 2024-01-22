@@ -63,10 +63,6 @@ class DataSource(ABC):
         """
         pass
 
-    # @abstractmethod
-    # def get_schedule_sum(self, hk_geb: str, uk_geb: str) -> float:
-    #     pass
-
     @abstractmethod
     def get_tek(self, hk_geb: str, uk_geb: str) -> Union[Tuple[float, str], ValueError]:
         """

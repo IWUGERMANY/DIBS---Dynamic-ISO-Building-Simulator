@@ -112,16 +112,6 @@ class DataSourceCSV(DataSource):
         except HkOrUkNotFoundError as error:
             print(error)
 
-    # def get_schedule_sum(self, hk_geb: str, uk_geb: str) -> float:
-    #
-    #     data: pd.DataFrame = read_occupancy_schedules_zuweisungen_data()
-    #
-    #     if hk_and_uk_in_zuweisungen(data, hk_geb, uk_geb):
-    #         row: pd.DataFrame = find_row(data, uk_geb)
-    #         schedule_name: str = get_schedule_name(row)
-    #         schedule_file: pd.DataFrame = read_schedule_file(schedule_name)
-    #         return schedule_file.People.sum()
-
     def get_tek(self, hk_geb: str, uk_geb: str) -> Union[Tuple[float, str], HkOrUkNotFoundError]:
         """
                 Find TEK values from Partial energy parameters to build the comparative values in accordance with the
