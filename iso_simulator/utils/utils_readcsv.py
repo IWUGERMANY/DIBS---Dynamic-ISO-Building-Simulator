@@ -6,6 +6,40 @@ import os
 import pandas as pd
 
 
+def read_user_building(path: str):
+    """
+    This method reads the file which contains the building data to simulate.
+    Args:
+        path: where the file is located
+
+    Returns:
+        building
+    Return type:
+        Building
+    """
+    path_parts = path.split('/')
+    file_path = os.path.join(*path_parts)
+
+    return pd.read_csv(file_path, sep=';', index_col=False, encoding='utf8')
+
+
+def read_user_buildings(path: str):
+    """
+    This method reads the file which contains the building data to simulate.
+    Args:
+        path: where the file is located
+
+    Returns:
+        building
+    Return type:
+        Building
+    """
+    path_parts = path.split('/')
+    file_path = os.path.join(*path_parts)
+
+    return pd.read_csv(file_path, sep=';', index_col=False, encoding='utf8')
+
+
 def read_one_building(building_id: str) -> pd.DataFrame | None:
     """
     Searches the building with the given building_id

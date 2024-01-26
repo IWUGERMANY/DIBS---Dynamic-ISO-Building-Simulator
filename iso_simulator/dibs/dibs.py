@@ -10,6 +10,7 @@ from iso_simulator.model.results import Result
 from iso_simulator.model.ResultOutput import ResultOutput
 from iso_simulator.model.generate_data import GenerateData
 import time
+import timeit
 import multiprocessing as mp
 import concurrent.futures
 import threading
@@ -30,6 +31,10 @@ class DIBS:
             datasource: object which can deal with several data format (csv file, JSON, database, etc...)
         """
         self.datasource = datasource
+        self.callback = None
+
+    def set_callback(self, callback_function):
+        self.callback = callback_function
 
     def set_data_source(self, datasource: DataSource):
         self.datasource = datasource
@@ -507,9 +512,9 @@ class DIBS:
                                      appliance_gains_demand_pe_sum, carbon_sum, pe_sum, fe_hi_sum, schedule_name,
                                      typ_norm, simulator.epw_object.file_name)
 
-        end = time.time()
-        lang = end - begin_time
-        print(f'Time to simulate building {simulator.building_object.scr_gebaeude_id} is : {lang}s')
+        # end = time.time()
+        # lang = end - begin_time
+        # print(f'Time to simulate building {simulator.building_object.scr_gebaeude_id} is : {lang}s')
         return result, result_output
 
     def parallel_mp_calculation(self, generate_data: GenerateData, weather_period: str):
@@ -637,6 +642,13 @@ class DIBS:
         end_saving_time = time.time()
         return begin_saving_time, end_saving_time
 
+    def print_time(self, begin, buildings, end, saving_time, unpack_time):
+        logging.info(
+            f"Time of saving hours results of {len(buildings)} buildings is {saving_time:.2f} Seconds.")
+        logging.warning(
+            f"Total time to simulate {len(buildings)} buildings and save hourly and final results is {end - begin + saving_time + unpack_time:.2f} Seconds.")
+        logging.info(f'----------------------End simulation using process -----------------------')
+
     def simulate_all_buildings_parallel_using_process_executor(self, buildings, generate_data, weather_period):
         begin_simulation_time = time.time()
 
@@ -681,25 +693,47 @@ class DIBS:
         saving_time = self.save_results_of_all_buildings_in_csv_parallel_using_thread_executor(
             buildings, result)
 
-        logging.info(
-            f"Time of saving hours results of {len(buildings)} buildings is {saving_time:.2f} Seconds.")
-        logging.warning(
-            f"Total time to simulate {len(buildings)} buildings and save hourly and final results is {end - begin + saving_time + unpack_time:.2f} Seconds.")
-        logging.info(f'----------------------End simulation using process max_concurrent-----------------------')
+        self.print_time(begin, buildings, end, saving_time, unpack_time)
 
     def multi(self, generate_data: GenerateData, weather_data: str):
+        logging.info("-" * 90)
+        logging.info("-" * 90)
+        current_function_name = inspect.stack()[0][3]
+        logging.info(f'-----------Simulation using the method {current_function_name}-----------')
+        buildings = generate_data.all_buildings
         with multiprocessing.Pool() as pool:
             results = []
             begin = time.time()
 
-            for index, building in enumerate(generate_data.all_buildings):
+            for index, building in enumerate(buildings):
                 result = pool.apply_async(self.calculate_result_of_all_buildings, (generate_data, weather_data, index))
                 results.append(result)
 
             pool.close()
             pool.join()
 
-            end = time.time()
-            print(f'Timeeeee: {end - begin}')
-
             results = [result.get() for result in results]
+            end = time.time()
+            logging.info(f"Parallel Process Calculation time is {time.time() - begin:.2f} Seconds.")
+
+            unpack_time, result, result_output = self.unpack_results(results)
+
+            begin_final_result = time.time()
+            self.datasource.build_all_results_of_all_buildings(result_output)
+            end_final_result = time.time()
+            logging.info(
+                f"Time of saving the final result of {len(buildings)} buildings is {end_final_result - begin_final_result:.2f} Seconds.")
+
+            saving_time = self.save_results_of_all_buildings_in_csv_parallel_using_thread_executor(
+                buildings, result)
+
+            self.print_time(begin, buildings, end, saving_time, unpack_time)
+
+    def runtime_estimation(self, callback, *args, **kwargs):
+        self.set_callback(callback)
+        num_iterations = 10
+
+        total_time = sum(timeit.repeat(lambda: self.callback(*args, **kwargs), number=1, repeat=num_iterations))
+
+        average_time = total_time / num_iterations
+        logging.info(f"Average runtime over {num_iterations} Iterations {average_time:.6f} Seconds")

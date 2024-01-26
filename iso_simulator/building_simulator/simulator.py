@@ -24,7 +24,7 @@ class BuildingSimulator:
 
     def __init__(self,
                  datasourcecsv: DataSourceCSV,
-                 building_by_id,
+                 building_by_id: str,
                  weather_period: str,
                  profile_from_norm: str,
                  gains_from_group_values: str,

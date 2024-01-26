@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 from abc import ABC, abstractmethod
 from typing import Union, Tuple, List
@@ -12,6 +13,32 @@ class DataSource(ABC):
     """
     This interface provides several methods that can be implemented in other classes
     """
+
+    @abstractmethod
+    def get_user_building(self, path: str):
+        """
+        This method reads the file which contains the building data to simulate.
+        Args:
+            path: where the file is located
+
+        Returns:
+            building
+        Return type:
+            Building
+        """
+
+    @abstractmethod
+    def get_user_buildings(self, path: str):
+        """
+        This method reads the file which contains the building data to simulate.
+        Args:
+            path: where the file is located
+
+        Returns:
+            building
+        Return type:
+            list [Building]
+        """
 
     @abstractmethod
     def get_building_data(self, building_id: str):

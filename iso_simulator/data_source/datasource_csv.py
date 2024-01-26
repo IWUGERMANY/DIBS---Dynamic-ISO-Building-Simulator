@@ -16,7 +16,7 @@ from iso_simulator.utils.utils_normreader import find_row, get_usage_start_end, 
 from iso_simulator.utils.utils_readcsv import read_building_data, read_gwp_pe_factors_data, \
     read_occupancy_schedules_zuweisungen_data, read_schedule_file, read_vergleichswerte_zuweisung, \
     read_tek_nwg_vergleichswerte, read_weather_data, read_plz_codes_data, read_profiles_zuweisungen_data, \
-    read_one_building
+    read_one_building, read_user_building, read_user_buildings
 from iso_simulator.utils.utils_hkgeb import hk_and_uk_in_zuweisungen, hk_or_uk_not_in_zuweisungen, hk_in_zuweisungen, \
     uk_in_zuweisungen
 from iso_simulator.utils.utils_tekreader import get_tek_name, get_tek_data_frame_based_on_tek_name, get_tek_dhw
@@ -38,6 +38,37 @@ class DataSourceCSV(DataSource):
     This constructor to initialize an instance of the DataSourceCSV class
 
     """
+
+    def get_user_building(self, path: str) -> Building:
+        """
+        This method reads the file which contains the building data to simulate.
+        Args:
+            path: where the file is located
+
+        Returns:
+            building
+        Return type:
+            Building
+        """
+        building_data: pd.DataFrame | None = read_user_building(path)
+        return Building(*building_data.iloc[0].values)
+
+    def get_user_buildings(self, path: str) -> List[Building]:
+        """
+        This method reads the file which contains the building data to simulate.
+        Args:
+            path: where the file is located
+
+        Returns:
+            buildings
+        Return type:
+            list [Building]
+        """
+        building_data: pd.DataFrame = read_user_buildings(path)
+        return [
+            Building(*row.values)
+            for _, row in building_data.iterrows()
+        ]
 
     def get_building_data(self, building_id: str) -> Building:
         """
