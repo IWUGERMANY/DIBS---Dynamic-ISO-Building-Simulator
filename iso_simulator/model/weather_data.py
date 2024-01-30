@@ -1,14 +1,42 @@
 class WeatherData:
-
-    def __init__(self,
-                 year, month, day, hour, minute, datasource, drybulb_C, dewpoint_C, relhum_percent,
-                 atmos_Pa, exthorrad_Whm2, extdirrad_Whm2, horirsky_Whm2, glohorrad_Whm2,
-                 dirnorrad_Whm2, difhorrad_Whm2, glohorillum_lux, dirnorillum_lux, difhorillum_lux,
-                 zenlum_lux, winddir_deg, windspd_ms, totskycvr_tenths, opaqskycvr_tenths, visibility_km,
-                 ceiling_hgt_m, presweathobs, presweathcodes, precip_wtr_mm, aerosol_opt_thousandths,
-                 snowdepth_cm, days_last_snow, Albedo, liq_precip_depth_mm, liq_precip_rate_Hour,
-                 ):
-
+    def __init__(
+        self,
+        year,
+        month,
+        day,
+        hour,
+        minute,
+        datasource,
+        drybulb_C,
+        dewpoint_C,
+        relhum_percent,
+        atmos_Pa,
+        exthorrad_Whm2,
+        extdirrad_Whm2,
+        horirsky_Whm2,
+        glohorrad_Whm2,
+        dirnorrad_Whm2,
+        difhorrad_Whm2,
+        glohorillum_lux,
+        dirnorillum_lux,
+        difhorillum_lux,
+        zenlum_lux,
+        winddir_deg,
+        windspd_ms,
+        totskycvr_tenths,
+        opaqskycvr_tenths,
+        visibility_km,
+        ceiling_hgt_m,
+        presweathobs,
+        presweathcodes,
+        precip_wtr_mm,
+        aerosol_opt_thousandths,
+        snowdepth_cm,
+        days_last_snow,
+        Albedo,
+        liq_precip_depth_mm,
+        liq_precip_rate_Hour,
+    ):
         self.year = year
         self.month = month
         self.day = day

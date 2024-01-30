@@ -8,27 +8,31 @@ from iso_simulator.model.schedule_name import ScheduleName
 from iso_simulator.model.weather_data import WeatherData
 from iso_simulator.model.window import Window
 from iso_simulator.exceptions.ghg_emission import GHGEmissionError
-from iso_simulator.exceptions.building_not_heated_exception import BuildingNotHeatedError
+from iso_simulator.exceptions.building_not_heated_exception import (
+    BuildingNotHeatedError,
+)
 from iso_simulator.model.calculations_sum import CalculationOfSum
+from iso_simulator.model.building import Building
 
 from typing import List, Tuple, Union
 import time
 
 
 class SimulateAllBuilding:
-
-    def __init__(self, datasourcecsv: DataSourceCSV,
-                 all_building,
-                 gwp_pe_factors,
-                 index: int,
-                 weather_period: str,
-                 profile_from_norm: str,
-                 gains_from_group_values: str,
-                 usage_from_norm: str):
+    def __init__(
+        self,
+        datasource: DataSourceCSV,
+        gwp_pe_factors,
+        user_building: Building,
+        weather_period: str,
+        profile_from_norm: str,
+        gains_from_group_values: str,
+        usage_from_norm: str,
+    ):
         """
 
         Args:
-            datasourcecsv: object contains implemented methods of DataSource interface
+            datasource: object contains implemented methods of DataSource interface
             all_building: object contains all buildings
             gwp_pe_factors: all primary energy and emission factors
             index: index of a building
@@ -38,13 +42,13 @@ class SimulateAllBuilding:
             usage_from_norm: data source either 18599-10 or SIA2024
         """
 
-        self.datasourcecsv = datasourcecsv
+        self.datasource = datasource
         self.weather_period = weather_period
-        self.all_buildings = all_building
-        self.building_object = self.all_buildings[index]
+        self.building_object = user_building
         self.gwp_pe_factors = gwp_pe_factors
-        self.epw_object = datasourcecsv.get_epw_file(
-            self.building_object.plz, self.weather_period)
+        self.epw_object = datasource.get_epw_file(
+            self.building_object.plz, self.weather_period
+        )
         self.profile_from_norm = profile_from_norm
         self.gains_from_group_values = gains_from_group_values
         self.usage_from_norm = usage_from_norm
@@ -65,10 +69,14 @@ class SimulateAllBuilding:
 
         """
         check_energy_ref_area = self.building_object.energy_ref_area == -8
-        check_heating_supply_system = self.building_object.heating_supply_system == 'NoHeating'
+        check_heating_supply_system = (
+            self.building_object.heating_supply_system == "NoHeating"
+        )
         try:
             if check_energy_ref_area or check_heating_supply_system:
-                raise BuildingNotHeatedError(f'Building {str(self.building_object.scr_gebaeude_id)} not heated')
+                raise BuildingNotHeatedError(
+                    f"Building {str(self.building_object.scr_gebaeude_id)} not heated"
+                )
         except BuildingNotHeatedError as error:
             print(error)
 
@@ -79,9 +87,14 @@ class SimulateAllBuilding:
             Window object
 
         """
-        return Window(0, 90, self.building_object.glass_solar_transmittance,
-                      self.building_object.glass_solar_shading_transmittance,
-                      self.building_object.glass_light_transmittance, self.building_object.window_area_south)
+        return Window(
+            0,
+            90,
+            self.building_object.glass_solar_transmittance,
+            self.building_object.glass_solar_shading_transmittance,
+            self.building_object.glass_light_transmittance,
+            self.building_object.window_area_south,
+        )
 
     def build_east_window(self) -> Window:
         """
@@ -90,9 +103,14 @@ class SimulateAllBuilding:
             Window object
 
         """
-        return Window(90, 90, self.building_object.glass_solar_transmittance,
-                      self.building_object.glass_solar_shading_transmittance,
-                      self.building_object.glass_light_transmittance, self.building_object.window_area_east)
+        return Window(
+            90,
+            90,
+            self.building_object.glass_solar_transmittance,
+            self.building_object.glass_solar_shading_transmittance,
+            self.building_object.glass_light_transmittance,
+            self.building_object.window_area_east,
+        )
 
     def build_west_window(self) -> Window:
         """
@@ -101,9 +119,14 @@ class SimulateAllBuilding:
             Window object
 
         """
-        return Window(180, 90, self.building_object.glass_solar_transmittance,
-                      self.building_object.glass_solar_shading_transmittance,
-                      self.building_object.glass_light_transmittance, self.building_object.window_area_west)
+        return Window(
+            180,
+            90,
+            self.building_object.glass_solar_transmittance,
+            self.building_object.glass_solar_shading_transmittance,
+            self.building_object.glass_light_transmittance,
+            self.building_object.window_area_west,
+        )
 
     def build_north_window(self) -> Window:
         """
@@ -112,9 +135,14 @@ class SimulateAllBuilding:
             Window object
 
         """
-        return Window(270, 90, self.building_object.glass_solar_transmittance,
-                      self.building_object.glass_solar_shading_transmittance,
-                      self.building_object.glass_light_transmittance, self.building_object.window_area_north)
+        return Window(
+            270,
+            90,
+            self.building_object.glass_solar_transmittance,
+            self.building_object.glass_solar_shading_transmittance,
+            self.building_object.glass_light_transmittance,
+            self.building_object.window_area_north,
+        )
 
     def build_windows_objects(self) -> List[Window]:
         """
@@ -126,7 +154,7 @@ class SimulateAllBuilding:
             self.build_south_window(),
             self.build_east_window(),
             self.build_west_window(),
-            self.build_north_window()
+            self.build_north_window(),
         ]
 
     def get_usage_start_and_end(self) -> Tuple[int, int]:
@@ -135,8 +163,11 @@ class SimulateAllBuilding:
         Returns:
             usage_start, usage_end
         """
-        usage_start, usage_end = self.datasourcecsv.get_usage_time(
-            self.building_object.hk_geb, self.building_object.uk_geb, self.usage_from_norm)
+        usage_start, usage_end = self.datasource.get_usage_time(
+            self.building_object.hk_geb,
+            self.building_object.uk_geb,
+            self.usage_from_norm,
+        )
         return usage_start, usage_end
 
     def get_schedule(self) -> Union[Tuple[List[ScheduleName], str, float], ValueError]:
@@ -145,8 +176,9 @@ class SimulateAllBuilding:
         Returns:
             list_of_schedule_name, schedule_name or throws an error
         """
-        return self.datasourcecsv.get_schedule(
-            self.building_object.hk_geb, self.building_object.uk_geb)
+        return self.datasource.get_schedule(
+            self.building_object.hk_geb, self.building_object.uk_geb
+        )
 
     def get_tek(self) -> Union[Tuple[float, str], ValueError]:
         """
@@ -155,7 +187,9 @@ class SimulateAllBuilding:
         Returns:
             tek_dhw, tek_name or throws an error
         """
-        return self.datasourcecsv.get_tek(self.building_object.hk_geb, self.building_object.uk_geb)
+        return self.datasource.get_tek(
+            self.building_object.hk_geb, self.building_object.uk_geb
+        )
 
     # def get_occupancy_full_usage_hours(self) -> float:
     #     return self.datasourcecsv.get_schedule_sum(self.building_object.hk_geb, self.building_object.uk_geb)
@@ -167,8 +201,9 @@ class SimulateAllBuilding:
         Returns:
             weather_data_objects
         """
-        return self.datasourcecsv.choose_and_get_the_right_weather_data_from_path(self.weather_period,
-                                                                                  self.epw_object.file_name)
+        return self.datasource.choose_and_get_the_right_weather_data_from_path(
+            self.weather_period, self.epw_object.file_name
+        )
 
     def extract_outdoor_temperature(self, hour: int) -> float:
         """
@@ -203,11 +238,15 @@ class SimulateAllBuilding:
         """
         location = Location()
         return location.calc_sun_position(
-            self.epw_object.coordinates_station[0], self.epw_object.coordinates_station[1],
+            self.epw_object.coordinates_station[0],
+            self.epw_object.coordinates_station[1],
             self.extract_year(hour),
-            hour)
+            hour,
+        )
 
-    def calc_building_h_ve_adj(self, hour: int, t_out: float, usage_start: int, usage_end: int) -> float:
+    def calc_building_h_ve_adj(
+        self, hour: int, t_out: float, usage_start: int, usage_end: int
+    ) -> float:
         """
         Calculate H_ve_adj, See building_physics for details
         Args:
@@ -230,11 +269,16 @@ class SimulateAllBuilding:
         Returns:
             t_air
         """
-        t_air = self.building_object.t_set_heating if hour == 0 else self.building_object.t_air
+        t_air = (
+            self.building_object.t_set_heating
+            if hour == 0
+            else self.building_object.t_air
+        )
         return t_air
 
-    def calc_solar_gains_for_all_windows(self, sun_altitude: float, sun_azimuth: float,
-                                         t_air: float, hour: int) -> None:
+    def calc_solar_gains_for_all_windows(
+        self, sun_altitude: float, sun_azimuth: float, t_air: float, hour: int
+    ) -> None:
         """
         Calculates the solar gains in the building zone through the set window
         Args:
@@ -250,12 +294,17 @@ class SimulateAllBuilding:
 
         for element in self.all_windows:
             element.calc_solar_gains(
-                sun_altitude, sun_azimuth, self.weather_data[hour].dirnorrad_Whm2,
-                self.weather_data[hour].difhorrad_Whm2, t_air,
-                hour)
+                sun_altitude,
+                sun_azimuth,
+                self.weather_data[hour].dirnorrad_Whm2,
+                self.weather_data[hour].difhorrad_Whm2,
+                t_air,
+                hour,
+            )
 
-    def calc_illuminance_for_all_windows(self, sun_altitude: float, sun_azimuth: float,
-                                         hour: int) -> None:
+    def calc_illuminance_for_all_windows(
+        self, sun_altitude: float, sun_azimuth: float, hour: int
+    ) -> None:
         """
         Calculates the illuminance in the building zone through the set window
         Args:
@@ -270,10 +319,15 @@ class SimulateAllBuilding:
 
         for element in self.all_windows:
             element.calc_illuminance(
-                sun_altitude, sun_azimuth, self.weather_data[hour].dirnorillum_lux,
-                self.weather_data[hour].difhorillum_lux)
+                sun_altitude,
+                sun_azimuth,
+                self.weather_data[hour].dirnorillum_lux,
+                self.weather_data[hour].difhorillum_lux,
+            )
 
-    def calc_occupancy(self, occupancy_schedule: List[ScheduleName], hour: int) -> float:
+    def calc_occupancy(
+        self, occupancy_schedule: List[ScheduleName], hour: int
+    ) -> float:
         """
         Calc occupancy for the time step
         Args:
@@ -305,10 +359,17 @@ class SimulateAllBuilding:
 
         """
         self.building_object.solve_building_lighting(
-            self.calc_sum_illuminance_all_windows(), occupancy_percent)
+            self.calc_sum_illuminance_all_windows(), occupancy_percent
+        )
 
-    def calc_gains_from_occupancy_and_appliances(self, occupancy_schedule: List[ScheduleName], occupancy: float,
-                                                 gain_per_person: float, appliance_gains: float, hour: int) -> float:
+    def calc_gains_from_occupancy_and_appliances(
+        self,
+        occupancy_schedule: List[ScheduleName],
+        occupancy: float,
+        gain_per_person: float,
+        appliance_gains: float,
+        hour: int,
+    ) -> float:
         """
         Calculate gains from occupancy and appliances
         This is thermal gains. Negative appliance_gains are heat sinks!
@@ -323,11 +384,17 @@ class SimulateAllBuilding:
             internal_gains
 
         """
-        return occupancy * gain_per_person + appliance_gains * occupancy_schedule[
-            hour].Appliances * self.building_object.energy_ref_area + self.building_object.lighting_demand
+        return (
+            occupancy * gain_per_person
+            + appliance_gains
+            * occupancy_schedule[hour].Appliances
+            * self.building_object.energy_ref_area
+            + self.building_object.lighting_demand
+        )
 
-    def calc_appliance_gains_demand(self, occupancy_schedule: List[ScheduleName], appliance_gains: float,
-                                    hour: int) -> float:
+    def calc_appliance_gains_demand(
+        self, occupancy_schedule: List[ScheduleName], appliance_gains: float, hour: int
+    ) -> float:
         """
         Calculate appliance_gains as part of the internal_gains
         Args:
@@ -339,10 +406,15 @@ class SimulateAllBuilding:
             appliance_gains_demand
 
         """
-        return appliance_gains * occupancy_schedule[hour].Appliances * self.building_object.energy_ref_area
+        return (
+            appliance_gains
+            * occupancy_schedule[hour].Appliances
+            * self.building_object.energy_ref_area
+        )
 
-    def get_appliance_gains_elt_demand(self, occupancy_schedule: List[ScheduleName], appliance_gains: float,
-                                       hour: int) -> float:
+    def get_appliance_gains_elt_demand(
+        self, occupancy_schedule: List[ScheduleName], appliance_gains: float, hour: int
+    ) -> float:
         """
         Appliance_gains equal the electric energy that appliances use, except for negative appliance_gains of refrigerated counters in trade buildings for food!
         The assumption is: negative appliance_gains come from referigerated counters with heat pumps for which we assume a COP = 2.
@@ -354,8 +426,14 @@ class SimulateAllBuilding:
         Returns:
 
         """
-        appliance_gains_elt = -1 * appliance_gains / 2 if appliance_gains < 0 else appliance_gains
-        return appliance_gains_elt * occupancy_schedule[hour].Appliances * self.building_object.energy_ref_area
+        appliance_gains_elt = (
+            -1 * appliance_gains / 2 if appliance_gains < 0 else appliance_gains
+        )
+        return (
+            appliance_gains_elt
+            * occupancy_schedule[hour].Appliances
+            * self.building_object.energy_ref_area
+        )
 
     def calc_sum_solar_gains_all_windows(self) -> float:
         """
@@ -366,7 +444,9 @@ class SimulateAllBuilding:
         """
         return sum(element.solar_gains for element in self.all_windows)
 
-    def calc_energy_demand_for_time_step(self, internal_gains: float, t_out: float, t_m_prev: float) -> None:
+    def calc_energy_demand_for_time_step(
+        self, internal_gains: float, t_out: float, t_m_prev: float
+    ) -> None:
         """
         Calculate energy demand for the time step
         Args:
@@ -378,7 +458,8 @@ class SimulateAllBuilding:
 
         """
         self.building_object.solve_building_energy(
-            internal_gains, self.calc_sum_solar_gains_all_windows(), t_out, t_m_prev)
+            internal_gains, self.calc_sum_solar_gains_all_windows(), t_out, t_m_prev
+        )
 
     def check_if_central_heating_or_central_dhw(self) -> bool:
         """
@@ -387,7 +468,7 @@ class SimulateAllBuilding:
             True or False
 
         """
-        central = ['CentralHeating', 'CentralDHW']
+        central = ["CentralHeating", "CentralDHW"]
         return self.building_object.dhw_system in central
 
     def check_if_heat_pump_air_or_ground_source(self) -> bool:
@@ -397,11 +478,15 @@ class SimulateAllBuilding:
             True or False
 
         """
-        heat_source = ['HeatPumpAirSource', 'HeatPumpGroundSource', 'ElectricHeating']
+        heat_source = ["HeatPumpAirSource", "HeatPumpGroundSource", "ElectricHeating"]
         return self.building_object.heating_supply_system in heat_source
 
-    def calc_hot_water_usage(self, occupancy_schedule: List[ScheduleName], tek_dhw_per_occupancy_full_usage_hour: float,
-                             hour: int) -> Tuple[float, float, float, float]:
+    def calc_hot_water_usage(
+        self,
+        occupancy_schedule: List[ScheduleName],
+        tek_dhw_per_occupancy_full_usage_hour: float,
+        hour: int,
+    ) -> Tuple[float, float, float, float]:
         """
         Calculate hot water usage of the building for the time step with (self.building_object.heating_energy / self.building_object.heating_demand)
         represents the Efficiency of the heat generation in the building
@@ -414,18 +499,26 @@ class SimulateAllBuilding:
             hot_water_demand, hot_water_energy, hot_water_sys_electricity, hot_water_sys_fossils
 
         """
-        if self.building_object.dhw_system not in ['NoDHW', ' -']:
-            hot_water_demand = occupancy_schedule[
-                                   hour].People * tek_dhw_per_occupancy_full_usage_hour * 1000 * self.building_object.energy_ref_area
+        if self.building_object.dhw_system not in ["NoDHW", " -"]:
+            hot_water_demand = (
+                occupancy_schedule[hour].People
+                * tek_dhw_per_occupancy_full_usage_hour
+                * 1000
+                * self.building_object.energy_ref_area
+            )
 
             if self.building_object.heating_demand > 0:
                 hot_water_energy = hot_water_demand * (
-                        self.building_object.heating_energy / self.building_object.heating_demand)
+                    self.building_object.heating_energy
+                    / self.building_object.heating_demand
+                )
             else:
                 hot_water_energy = hot_water_demand
 
-            if self.building_object.dhw_system == 'DecentralElectricDHW' or (
-                    self.check_if_central_heating_or_central_dhw() and self.check_if_heat_pump_air_or_ground_source()):
+            if self.building_object.dhw_system == "DecentralElectricDHW" or (
+                self.check_if_central_heating_or_central_dhw()
+                and self.check_if_heat_pump_air_or_ground_source()
+            ):
                 hot_water_sys_electricity = hot_water_energy
                 hot_water_sys_fossils = 0
             else:
@@ -437,7 +530,12 @@ class SimulateAllBuilding:
             hot_water_sys_electricity = 0
             hot_water_sys_fossils = 0
 
-        return hot_water_demand, hot_water_energy, hot_water_sys_electricity, hot_water_sys_fossils
+        return (
+            hot_water_demand,
+            hot_water_energy,
+            hot_water_sys_electricity,
+            hot_water_sys_fossils,
+        )
 
     # ----------------------------Extracted methods from choose the fuel type------------------------------------
 
@@ -449,7 +547,9 @@ class SimulateAllBuilding:
         """
 
         biogas_boiler_types = [
-            'BiogasBoilerCondensingBefore95', 'BiogasBoilerCondensingFrom95']
+            "BiogasBoilerCondensingBefore95",
+            "BiogasBoilerCondensingFrom95",
+        ]
         return self.building_object.heating_supply_system in biogas_boiler_types
 
     def biogas_oil_boilers_types(self) -> bool:
@@ -459,8 +559,11 @@ class SimulateAllBuilding:
             True or False
 
         """
-        biogas_oil_boilers_types = ['BiogasOilBoilerLowTempBefore95',
-                                    'BiogasOilBoilerCondensingFrom95', 'BiogasOilBoilerCondensingImproved']
+        biogas_oil_boilers_types = [
+            "BiogasOilBoilerLowTempBefore95",
+            "BiogasOilBoilerCondensingFrom95",
+            "BiogasOilBoilerCondensingImproved",
+        ]
         return self.building_object.heating_supply_system in biogas_oil_boilers_types
 
     def oil_boiler_types(self) -> bool:
@@ -470,10 +573,16 @@ class SimulateAllBuilding:
             True or False
 
         """
-        oil_boiler_types = ['OilBoilerStandardBefore86', 'OilBoilerStandardFrom95', 'OilBoilerLowTempBefore87',
-                            'OilBoilerLowTempBefore95',
-                            'OilBoilerLowTempFrom95', 'OilBoilerCondensingBefore95', 'OilBoilerCondensingFrom95',
-                            'OilBoilerCondensingImproved']
+        oil_boiler_types = [
+            "OilBoilerStandardBefore86",
+            "OilBoilerStandardFrom95",
+            "OilBoilerLowTempBefore87",
+            "OilBoilerLowTempBefore95",
+            "OilBoilerLowTempFrom95",
+            "OilBoilerCondensingBefore95",
+            "OilBoilerCondensingFrom95",
+            "OilBoilerCondensingImproved",
+        ]
         return self.building_object.heating_supply_system in oil_boiler_types
 
     def lgas_boiler_temp(self) -> bool:
@@ -483,8 +592,14 @@ class SimulateAllBuilding:
             True or False
 
         """
-        lgas_boiler_temp = ['LGasBoilerLowTempBefore95', 'LGasBoilerLowTempFrom95', 'LGasBoilerCondensingBefore95',
-                            'LGasBoilerCondensingFrom95', 'LGasBoilerCondensingImproved', 'LGasBoilerLowTempBefore87']
+        lgas_boiler_temp = [
+            "LGasBoilerLowTempBefore95",
+            "LGasBoilerLowTempFrom95",
+            "LGasBoilerCondensingBefore95",
+            "LGasBoilerCondensingFrom95",
+            "LGasBoilerCondensingImproved",
+            "LGasBoilerLowTempBefore87",
+        ]
         return self.building_object.heating_supply_system in lgas_boiler_temp
 
     def gas_boiler_standard(self) -> bool:
@@ -494,11 +609,19 @@ class SimulateAllBuilding:
             True or False
 
         """
-        gas_boiler_standard = ['GasBoilerStandardBefore86', 'GasBoilerStandardBefore95', 'GasBoilerStandardFrom95',
-                               'GasBoilerLowTempBefore87', 'GasBoilerLowTempBefore95',
-                               'GasBoilerLowTempFrom95', 'GasBoilerLowTempSpecialFrom78',
-                               'GasBoilerLowTempSpecialFrom95', 'GasBoilerCondensingBefore95',
-                               'GasBoilerCondensingImproved', 'GasBoilerCondensingFrom95']
+        gas_boiler_standard = [
+            "GasBoilerStandardBefore86",
+            "GasBoilerStandardBefore95",
+            "GasBoilerStandardFrom95",
+            "GasBoilerLowTempBefore87",
+            "GasBoilerLowTempBefore95",
+            "GasBoilerLowTempFrom95",
+            "GasBoilerLowTempSpecialFrom78",
+            "GasBoilerLowTempSpecialFrom95",
+            "GasBoilerCondensingBefore95",
+            "GasBoilerCondensingImproved",
+            "GasBoilerCondensingFrom95",
+        ]
         return self.building_object.heating_supply_system in gas_boiler_standard
 
     def coal_solid_fuel_boiler(self) -> bool:
@@ -508,7 +631,7 @@ class SimulateAllBuilding:
             True or False
 
         """
-        return self.building_object.heating_supply_system == 'CoalSolidFuelBoiler'
+        return self.building_object.heating_supply_system == "CoalSolidFuelBoiler"
 
     def solid_fuel_liquid_fuel_furnace(self) -> bool:
         """
@@ -517,7 +640,9 @@ class SimulateAllBuilding:
             True or False
 
         """
-        return self.building_object.heating_supply_system == 'SolidFuelLiquidFuelFurnace'
+        return (
+            self.building_object.heating_supply_system == "SolidFuelLiquidFuelFurnace"
+        )
 
     def heat_pump(self) -> bool:
         """
@@ -526,7 +651,7 @@ class SimulateAllBuilding:
             True or False
 
         """
-        heat_pumping = ['HeatPumpAirSource', 'HeatPumpGroundSource']
+        heat_pumping = ["HeatPumpAirSource", "HeatPumpGroundSource"]
         return self.building_object.heating_supply_system in heat_pumping
 
     def wood(self) -> bool:
@@ -536,8 +661,11 @@ class SimulateAllBuilding:
             True or False
 
         """
-        wood = ['WoodChipSolidFuelBoiler',
-                'WoodPelletSolidFuelBoiler', 'WoodSolidFuelBoilerCentral']
+        wood = [
+            "WoodChipSolidFuelBoiler",
+            "WoodPelletSolidFuelBoiler",
+            "WoodSolidFuelBoilerCentral",
+        ]
         return self.building_object.heating_supply_system in wood
 
     def gas_chip(self) -> bool:
@@ -547,7 +675,7 @@ class SimulateAllBuilding:
             True or False
 
         """
-        return self.building_object.heating_supply_system == 'GasCHP'
+        return self.building_object.heating_supply_system == "GasCHP"
 
     def district_heating(self) -> bool:
         """
@@ -556,7 +684,7 @@ class SimulateAllBuilding:
             True or False
 
         """
-        return self.building_object.heating_supply_system == 'DistrictHeating'
+        return self.building_object.heating_supply_system == "DistrictHeating"
 
     def electric_heating(self) -> bool:
         """
@@ -565,7 +693,7 @@ class SimulateAllBuilding:
             True or False
 
         """
-        return self.building_object.heating_supply_system == 'ElectricHeating'
+        return self.building_object.heating_supply_system == "ElectricHeating"
 
     def direct_heater(self) -> bool:
         """
@@ -574,7 +702,7 @@ class SimulateAllBuilding:
             True or False
 
         """
-        return self.building_object.heating_supply_system == 'DirectHeater'
+        return self.building_object.heating_supply_system == "DirectHeater"
 
     def no_heating(self) -> bool:
         """
@@ -583,7 +711,7 @@ class SimulateAllBuilding:
             True or False
 
         """
-        return self.building_object.heating_supply_system == 'NoHeating'
+        return self.building_object.heating_supply_system == "NoHeating"
 
     def first_natural_gas(self) -> bool:
         """
@@ -592,8 +720,14 @@ class SimulateAllBuilding:
             True or False
 
         """
-        lgaz = ['LGasBoilerLowTempBefore95', 'LGasBoilerLowTempFrom95', 'LGasBoilerCondensingBefore95',
-                'LGasBoilerCondensingFrom95', 'LGasBoilerCondensingImproved', 'LGasBoilerLowTempBefore87']
+        lgaz = [
+            "LGasBoilerLowTempBefore95",
+            "LGasBoilerLowTempFrom95",
+            "LGasBoilerCondensingBefore95",
+            "LGasBoilerCondensingFrom95",
+            "LGasBoilerCondensingImproved",
+            "LGasBoilerLowTempBefore87",
+        ]
         return self.building_object.heating_supply_system in lgaz
 
     def heat_pump_or_electric_heating(self) -> bool:
@@ -622,36 +756,37 @@ class SimulateAllBuilding:
         """
         try:
             if self.biogas_boiler_types():
-                return 'Biogas (general)'
+                return "Biogas (general)"
             elif self.biogas_oil_boilers_types():
-                return 'Biogas Bio-oil Mix (general)'
+                return "Biogas Bio-oil Mix (general)"
             elif self.oil_boiler_types():
-                return 'Light fuel oil'
+                return "Light fuel oil"
             elif self.first_natural_gas():
-                return 'Natural gas'
+                return "Natural gas"
             elif self.gas_boiler_standard():
-                return 'Natural gas'
+                return "Natural gas"
             elif self.wood():
-                return 'Wood'
+                return "Wood"
             elif self.coal_solid_fuel_boiler():
-                return 'Hard coal'
+                return "Hard coal"
             elif self.solid_fuel_liquid_fuel_furnace():
-                return 'Hard coal'
+                return "Hard coal"
             elif self.heat_pump():
-                return 'Electricity grid mix'
+                return "Electricity grid mix"
             elif self.gas_chip():
-                return 'Natural gas'
+                return "Natural gas"
             elif self.district_heating():
-                return 'District heating (Combined Heat and Power) Gas or Liquid fuels'
+                return "District heating (Combined Heat and Power) Gas or Liquid fuels"
             elif self.electric_heating():
-                return 'Electricity grid mix'
+                return "Electricity grid mix"
             elif self.direct_heater():
-                return 'District heating (Combined Heat and Power) Coal'
+                return "District heating (Combined Heat and Power) Coal"
             elif self.no_heating():
-                return 'None'
+                return "None"
             else:
                 raise GHGEmissionError(
-                    "Error occured during calculation of GHG-Emission for Heating. The following heating_supply_system cannot be considered yet")
+                    "Error occured during calculation of GHG-Emission for Heating. The following heating_supply_system cannot be considered yet"
+                )
         except GHGEmissionError as error:
             print(error)
 
@@ -666,8 +801,10 @@ class SimulateAllBuilding:
         """
 
         filtered_list = [
-            gwp_PE_Factor.gwp_spezific_to_heating_value_GEG for gwp_PE_Factor in self.gwp_pe_factors if
-            gwp_PE_Factor.energy_carrier == fuel_type]
+            gwp_PE_Factor.gwp_spezific_to_heating_value_GEG
+            for gwp_PE_Factor in self.gwp_pe_factors
+            if gwp_PE_Factor.energy_carrier == fuel_type
+        ]
         return filtered_list[0] if filtered_list else None
 
     def get_pe_factor_heating(self, fuel_type: str):
@@ -681,8 +818,10 @@ class SimulateAllBuilding:
         """
 
         filtered_list = [
-            gwp_PE_Factor.primary_energy_factor_GEG for gwp_PE_Factor in self.gwp_pe_factors if
-            gwp_PE_Factor.energy_carrier == fuel_type]
+            gwp_PE_Factor.primary_energy_factor_GEG
+            for gwp_PE_Factor in self.gwp_pe_factors
+            if gwp_PE_Factor.energy_carrier == fuel_type
+        ]
         return filtered_list[0] if filtered_list else None
 
     def get_conversion_factor_heating(self, fuel_type: str):
@@ -696,16 +835,27 @@ class SimulateAllBuilding:
         """
 
         filtered_list = [
-            gwp_PE_Factor.relation_calorific_to_heating_value_GEG for gwp_PE_Factor in self.gwp_pe_factors if
-            gwp_PE_Factor.energy_carrier == fuel_type]
+            gwp_PE_Factor.relation_calorific_to_heating_value_GEG
+            for gwp_PE_Factor in self.gwp_pe_factors
+            if gwp_PE_Factor.energy_carrier == fuel_type
+        ]
         return filtered_list[0] if filtered_list else None
 
     def get_ghg_pe_conversion_factors(self, fuel_type):
-        return self.get_ghg_factor_heating(fuel_type), self.get_pe_factor_heating(
-            fuel_type), self.get_conversion_factor_heating(fuel_type), fuel_type
+        return (
+            self.get_ghg_factor_heating(fuel_type),
+            self.get_pe_factor_heating(fuel_type),
+            self.get_conversion_factor_heating(fuel_type),
+            fuel_type,
+        )
 
-    def check_heating_sys_electricity_sum(self, calculation_of_sum: CalculationOfSum, f_hs_hi: float, f_ghg: int,
-                                          f_pe: float) -> Tuple[int, float, float, float]:
+    def check_heating_sys_electricity_sum(
+        self,
+        calculation_of_sum: CalculationOfSum,
+        f_hs_hi: float,
+        f_ghg: int,
+        f_pe: float,
+    ) -> Tuple[int, float, float, float]:
         """
 
         Args:
@@ -722,20 +872,32 @@ class SimulateAllBuilding:
         heating_sys_fossils_hi_sum = 0
 
         if calculation_of_sum.Heating_Sys_Electricity_sum > 0:
-            heating_sys_electricity_hi_sum = calculation_of_sum.Heating_Sys_Electricity_sum / f_hs_hi
-            heating_sys_carbon_sum = (
-                                             heating_sys_electricity_hi_sum * f_ghg) / 1000
+            heating_sys_electricity_hi_sum = (
+                calculation_of_sum.Heating_Sys_Electricity_sum / f_hs_hi
+            )
+            heating_sys_carbon_sum = (heating_sys_electricity_hi_sum * f_ghg) / 1000
             heating_sys_pe_sum = heating_sys_electricity_hi_sum * f_pe
         else:
-            heating_sys_fossils_hi_sum = calculation_of_sum.Heating_Sys_Fossils_sum / f_hs_hi
-            heating_sys_carbon_sum = (
-                                             heating_sys_fossils_hi_sum * f_ghg) / 1000
+            heating_sys_fossils_hi_sum = (
+                calculation_of_sum.Heating_Sys_Fossils_sum / f_hs_hi
+            )
+            heating_sys_carbon_sum = (heating_sys_fossils_hi_sum * f_ghg) / 1000
             heating_sys_pe_sum = heating_sys_fossils_hi_sum * f_pe
 
-        return heating_sys_electricity_hi_sum, heating_sys_carbon_sum, heating_sys_pe_sum, heating_sys_fossils_hi_sum
+        return (
+            heating_sys_electricity_hi_sum,
+            heating_sys_carbon_sum,
+            heating_sys_pe_sum,
+            heating_sys_fossils_hi_sum,
+        )
 
-    def check_hotwater_sys_electricity_sum(self, calculation_of_sum: CalculationOfSum, f_hs_hi: float, f_ghg: int,
-                                           f_pe: float) -> Tuple[int, float, float, float]:
+    def check_hotwater_sys_electricity_sum(
+        self,
+        calculation_of_sum: CalculationOfSum,
+        f_hs_hi: float,
+        f_ghg: int,
+        f_pe: float,
+    ) -> Tuple[int, float, float, float]:
         """
 
         Args:
@@ -752,19 +914,31 @@ class SimulateAllBuilding:
         hot_water_sys_fossils_hi_sum = 0
 
         if calculation_of_sum.HotWater_Sys_Electricity_sum > 0:
-            hot_water_sys_electricity_hi_sum = calculation_of_sum.HotWater_Sys_Electricity_sum / f_hs_hi
+            hot_water_sys_electricity_hi_sum = (
+                calculation_of_sum.HotWater_Sys_Electricity_sum / f_hs_hi
+            )
             hot_water_sys_pe_sum = hot_water_sys_electricity_hi_sum * f_pe
-            hot_water_sys_carbon_sum = (
-                                               hot_water_sys_electricity_hi_sum * f_ghg) / 1000
+            hot_water_sys_carbon_sum = (hot_water_sys_electricity_hi_sum * f_ghg) / 1000
         else:
-            hot_water_sys_fossils_hi_sum = calculation_of_sum.HotWater_Sys_Fossils_sum / f_hs_hi
+            hot_water_sys_fossils_hi_sum = (
+                calculation_of_sum.HotWater_Sys_Fossils_sum / f_hs_hi
+            )
             hot_water_sys_pe_sum = hot_water_sys_fossils_hi_sum * f_pe
-            hot_water_sys_carbon_sum = (
-                                               hot_water_sys_fossils_hi_sum * f_ghg) / 1000
-        return hot_water_sys_electricity_hi_sum, hot_water_sys_pe_sum, hot_water_sys_carbon_sum, hot_water_sys_fossils_hi_sum
+            hot_water_sys_carbon_sum = (hot_water_sys_fossils_hi_sum * f_ghg) / 1000
+        return (
+            hot_water_sys_electricity_hi_sum,
+            hot_water_sys_pe_sum,
+            hot_water_sys_carbon_sum,
+            hot_water_sys_fossils_hi_sum,
+        )
 
-    def check_cooling_system_elctricity_sum(self, calculation_of_sum: CalculationOfSum, f_hs_hi: float, f_ghg: int,
-                                            f_pe: float) -> Tuple[int, float, float, float]:
+    def check_cooling_system_elctricity_sum(
+        self,
+        calculation_of_sum: CalculationOfSum,
+        f_hs_hi: float,
+        f_ghg: int,
+        f_pe: float,
+    ) -> Tuple[int, float, float, float]:
         """
         Args:
             calculation_of_sum: sum object
@@ -780,19 +954,28 @@ class SimulateAllBuilding:
         cooling_sys_fossils_hi_sum = 0
 
         if calculation_of_sum.Cooling_Sys_Electricity_sum > 0:
-            cooling_sys_electricity_hi_sum = calculation_of_sum.Cooling_Sys_Electricity_sum / f_hs_hi
-            cooling_sys_carbon_sum = (
-                                             cooling_sys_electricity_hi_sum * f_ghg) / 1000
+            cooling_sys_electricity_hi_sum = (
+                calculation_of_sum.Cooling_Sys_Electricity_sum / f_hs_hi
+            )
+            cooling_sys_carbon_sum = (cooling_sys_electricity_hi_sum * f_ghg) / 1000
             cooling_sys_pe_sum = cooling_sys_electricity_hi_sum * f_pe
         else:
-            cooling_sys_fossils_hi_sum = calculation_of_sum.Cooling_Sys_Fossils_sum / f_hs_hi
+            cooling_sys_fossils_hi_sum = (
+                calculation_of_sum.Cooling_Sys_Fossils_sum / f_hs_hi
+            )
             cooling_sys_carbon_sum = (cooling_sys_fossils_hi_sum * f_ghg) / 1000
             cooling_sys_pe_sum = cooling_sys_fossils_hi_sum * f_pe
-        return cooling_sys_electricity_hi_sum, cooling_sys_carbon_sum, cooling_sys_pe_sum, cooling_sys_fossils_hi_sum
+        return (
+            cooling_sys_electricity_hi_sum,
+            cooling_sys_carbon_sum,
+            cooling_sys_pe_sum,
+            cooling_sys_fossils_hi_sum,
+        )
 
     # -----------------------------------Sum Electricity Fossil, Hot Energy and Cooling System--------------------------------------------------
-    def sys_electricity_folssils_sum(self, heating_sys_electricity_hi_sum: int,
-                                     heating_sys_fossils_hi_sum: float) -> float:
+    def sys_electricity_folssils_sum(
+        self, heating_sys_electricity_hi_sum: int, heating_sys_fossils_hi_sum: float
+    ) -> float:
         """
         Calculates sum of heating_sys_electricity_hi_sum and heating_sys_fossils_hi_sum
         Args:
@@ -805,8 +988,9 @@ class SimulateAllBuilding:
         """
         return heating_sys_electricity_hi_sum + heating_sys_fossils_hi_sum
 
-    def hot_energy_hi_sum(self, hotWater_sys_electricity_hi_sum: int,
-                          hot_water_sys_fossils_hi_sum: float):
+    def hot_energy_hi_sum(
+        self, hotWater_sys_electricity_hi_sum: int, hot_water_sys_fossils_hi_sum: float
+    ):
         """
         Calculates sum of hotWater_sys_electricity_hi_sum and hot_water_sys_fossils_hi_sum
         Args:
@@ -818,13 +1002,14 @@ class SimulateAllBuilding:
         """
         return hotWater_sys_electricity_hi_sum + hot_water_sys_fossils_hi_sum
 
-    def cooling_sys_hi_sum(self, cooling_sys_electricity_hi_sum: int, cooling_sys_fossils_hi_sum:
-    float) -> float:
+    def cooling_sys_hi_sum(
+        self, cooling_sys_electricity_hi_sum: int, cooling_sys_fossils_hi_sum: float
+    ) -> float:
         """
         Calculates sum of cooling_sys_electricity_hi_sum and cooling_sys_fossils_hi_sum
         Args:
-            cooling_sys_electricity_hi_sum: 
-            cooling_sys_fossils_hi_sum: 
+            cooling_sys_electricity_hi_sum:
+            cooling_sys_fossils_hi_sum:
 
         Returns:
             cooling_sys_electricity_hi_sum + cooling_sys_fossils_hi_sum
@@ -832,7 +1017,9 @@ class SimulateAllBuilding:
         """
         return cooling_sys_electricity_hi_sum + cooling_sys_fossils_hi_sum
 
-    def check_if_central_dhw_use_same_fuel_type_as_heating_system(self, fuel_type) -> str:
+    def check_if_central_dhw_use_same_fuel_type_as_heating_system(
+        self, fuel_type
+    ) -> str:
         """
         Checks if central dhw uses the same fuel type as the heating system
         Assumption: Central DHW-Systems use the same Fuel_type as Heating-Systems, only decentral DHW-Systems might have another Fuel-Type
@@ -843,10 +1030,10 @@ class SimulateAllBuilding:
             fuel_type
 
         """
-        if self.building_object.dhw_system == 'DecentralElectricDHW':
-            return 'Electricity grid mix'
-        elif self.building_object.dhw_system == 'DecentralFuelBasedDHW':
-            return 'Natural gas'
+        if self.building_object.dhw_system == "DecentralElectricDHW":
+            return "Electricity grid mix"
+        elif self.building_object.dhw_system == "DecentralFuelBasedDHW":
+            return "Natural gas"
         else:
             return fuel_type
 
@@ -857,8 +1044,12 @@ class SimulateAllBuilding:
             bool
 
         """
-        air_cool = ['AirCooledPistonScroll', 'AirCooledPistonScrollMulti',
-                    'WaterCooledPistonScroll', 'DirectCooler']
+        air_cool = [
+            "AirCooledPistonScroll",
+            "AirCooledPistonScrollMulti",
+            "WaterCooledPistonScroll",
+            "DirectCooler",
+        ]
         return self.building_object.cooling_supply_system in air_cool
 
     def absorption_refrigeration_system(self) -> bool:
@@ -868,7 +1059,10 @@ class SimulateAllBuilding:
             bool
 
         """
-        return self.building_object.cooling_supply_system == 'AbsorptionRefrigerationSystem'
+        return (
+            self.building_object.cooling_supply_system
+            == "AbsorptionRefrigerationSystem"
+        )
 
     def district_cooling(self) -> bool:
         """
@@ -877,7 +1071,7 @@ class SimulateAllBuilding:
             bool
 
         """
-        return self.building_object.cooling_supply_system == 'DistrictCooling'
+        return self.building_object.cooling_supply_system == "DistrictCooling"
 
     def gas_engine_piston_scroll(self) -> bool:
         """
@@ -886,7 +1080,7 @@ class SimulateAllBuilding:
             bool
 
         """
-        return self.building_object.cooling_supply_system == 'GasEnginePistonScroll'
+        return self.building_object.cooling_supply_system == "GasEnginePistonScroll"
 
     def no_cooling(self) -> bool:
         """
@@ -895,7 +1089,7 @@ class SimulateAllBuilding:
             bool
 
         """
-        return self.building_object.cooling_supply_system == 'NoCooling'
+        return self.building_object.cooling_supply_system == "NoCooling"
 
     def choose_cooling_energy_fuel_type(self) -> Union[str, GHGEmissionError]:
         """
@@ -905,17 +1099,18 @@ class SimulateAllBuilding:
         """
         try:
             if self.air_cool():
-                return 'Electricity grid mix'
+                return "Electricity grid mix"
             elif self.absorption_refrigeration_system():
-                return 'Waste Heat generated close to building'
+                return "Waste Heat generated close to building"
             elif self.district_cooling():
-                return 'District cooling'
+                return "District cooling"
             elif self.gas_engine_piston_scroll():
-                return 'Natural gas'
+                return "Natural gas"
             elif self.no_cooling():
-                return 'None'
+                return "None"
             else:
                 raise GHGEmissionError(
-                    f"Error occured during calculation of GHG-Emission for Cooling. The following cooling_supply_system cannot be considered yet, {self.building_object.cooling_supply_system}")
+                    f"Error occured during calculation of GHG-Emission for Cooling. The following cooling_supply_system cannot be considered yet, {self.building_object.cooling_supply_system}"
+                )
         except GHGEmissionError as error:
             print(error)

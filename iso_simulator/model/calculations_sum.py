@@ -2,31 +2,32 @@
 This class is used to store the sum of all the simulated hours for a building
 """
 
-class CalculationOfSum:
 
-    def __init__(self,
-                 HeatingDemand_sum: float,
-                 HeatingEnergy_sum: float,
-                 Heating_Sys_Electricity_sum: float,
-                 Heating_Sys_Fossils_sum: float,
-                 CoolingDemand_sum: float,
-                 CoolingEnergy_sum: float,
-                 Cooling_Sys_Electricity_sum: float,
-                 Cooling_Sys_Fossils_sum: float,
-                 HotWaterDemand_sum: float,
-                 HotWaterEnergy_sum: float,
-                 HotWater_Sys_Electricity_sum: float,
-                 HotWater_Sys_Fossils_sum: float,
-                 InternalGains_sum: float,
-                 Appliance_gains_demand_sum: float,
-                 Appliance_gains_elt_demand_sum: float,
-                 LightingDemand_sum: float,
-                 SolarGainsSouthWindow_sum: float,
-                 SolarGainsEastWindow_sum: float,
-                 SolarGainsWestWindow_sum: float,
-                 SolarGainsNorthWindow_sum: float,
-                 SolarGainsTotal_sum: float
-                 ):
+class CalculationOfSum:
+    def __init__(
+        self,
+        HeatingDemand_sum: float,
+        HeatingEnergy_sum: float,
+        Heating_Sys_Electricity_sum: float,
+        Heating_Sys_Fossils_sum: float,
+        CoolingDemand_sum: float,
+        CoolingEnergy_sum: float,
+        Cooling_Sys_Electricity_sum: float,
+        Cooling_Sys_Fossils_sum: float,
+        HotWaterDemand_sum: float,
+        HotWaterEnergy_sum: float,
+        HotWater_Sys_Electricity_sum: float,
+        HotWater_Sys_Fossils_sum: float,
+        InternalGains_sum: float,
+        Appliance_gains_demand_sum: float,
+        Appliance_gains_elt_demand_sum: float,
+        LightingDemand_sum: float,
+        SolarGainsSouthWindow_sum: float,
+        SolarGainsEastWindow_sum: float,
+        SolarGainsWestWindow_sum: float,
+        SolarGainsNorthWindow_sum: float,
+        SolarGainsTotal_sum: float,
+    ):
         self.HeatingDemand_sum = HeatingDemand_sum
         self.HeatingEnergy_sum = HeatingEnergy_sum
         self.Heating_Sys_Electricity_sum = Heating_Sys_Electricity_sum

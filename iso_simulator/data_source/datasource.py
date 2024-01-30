@@ -1,10 +1,11 @@
-import os
 import pandas as pd
 from abc import ABC, abstractmethod
 from typing import Union, Tuple, List
 from iso_simulator.model.weather_data import WeatherData
 from iso_simulator.model.epw_file import EPWFile
-from iso_simulator.model.primary_energy_and_emission_factors import PrimaryEnergyAndEmissionFactor
+from iso_simulator.model.primary_energy_and_emission_factors import (
+    PrimaryEnergyAndEmissionFactor,
+)
 from iso_simulator.model.schedule_name import ScheduleName
 from iso_simulator.exceptions.uk_or_hk_exception import HkOrUkNotFoundError
 
@@ -15,7 +16,7 @@ class DataSource(ABC):
     """
 
     @abstractmethod
-    def get_user_building(self, path: str):
+    def get_user_building(self, path):
         """
         This method reads the file which contains the building data to simulate.
         Args:
@@ -76,7 +77,9 @@ class DataSource(ABC):
         pass
 
     @abstractmethod
-    def get_schedule(self, hk_geb: str, uk_geb: str) -> Union[Tuple[List[ScheduleName], str], HkOrUkNotFoundError]:
+    def get_schedule(
+        self, hk_geb: str, uk_geb: str
+    ) -> Union[Tuple[List[ScheduleName], str], HkOrUkNotFoundError]:
         """
         Find occupancy schedule from SIA2024, depending on hk_geb, uk_geb
         Args:
@@ -121,7 +124,9 @@ class DataSource(ABC):
         pass
 
     @abstractmethod
-    def choose_and_get_the_right_weather_data_from_path(self, weather_period, file_name) -> List[WeatherData]:
+    def choose_and_get_the_right_weather_data_from_path(
+        self, weather_period, file_name
+    ) -> List[WeatherData]:
         """
         This method retrieves the right weather data according to the given weather_period and file_name
         Args:
@@ -152,7 +157,9 @@ class DataSource(ABC):
         pass
 
     @abstractmethod
-    def get_usage_time(self, hk_geb: str, uk_geb: str, usage_from_norm: str) -> Union[Tuple[int, int], ValueError]:
+    def get_usage_time(
+        self, hk_geb: str, uk_geb: str, usage_from_norm: str
+    ) -> Union[Tuple[int, int], ValueError]:
         """
         Find building's usage time DIN 18599-10 or SIA2024
         Args:
@@ -168,8 +175,13 @@ class DataSource(ABC):
         pass
 
     @abstractmethod
-    def get_gains(self, hk_geb: str, uk_geb: str, profile_from_norm: str, gains_from_group_values: str) -> Tuple[
-        Tuple[float, str], float]:
+    def get_gains(
+        self,
+        hk_geb: str,
+        uk_geb: str,
+        profile_from_norm: str,
+        gains_from_group_values: str,
+    ) -> Tuple[Tuple[float, str], float]:
         """
         Find data from DIN V 18599-10 or SIA2024
         Args:
@@ -188,11 +200,12 @@ class DataSource(ABC):
         pass
 
     @abstractmethod
-    def result_to_pandas_dataframe(self, result) -> pd.DataFrame:
+    def result_to_pandas_dataframe(self, result, user_arguments) -> pd.DataFrame:
         """
         Maps a list of objects to a pandas Dataframe
         Args:
             result: result of a simulated building
+            user_arguments
 
         Returns:
             dataframe
@@ -218,11 +231,13 @@ class DataSource(ABC):
         pass
 
     @abstractmethod
-    def build_all_results_of_all_buildings(self, results):
+    def build_all_results_of_all_buildings(self, results, user_arguments, folder_path):
         """
         Converts the results of all buildings to an Excel file
         Args:
             results: results of all building
+            user_arguments
+            folder_path
 
         Returns:
             Excel file

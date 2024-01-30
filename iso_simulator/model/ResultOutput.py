@@ -3,18 +3,47 @@ from iso_simulator.model.calculations_sum import CalculationOfSum
 
 
 class ResultOutput:
-    def __init__(self, building: Building, sum_object: CalculationOfSum, heating_sys_hi_sum: float,
-                 heating_sys_electricity_hi_sum: float, heating_sys_fossils_hi_sum: float,
-                 heating_sys_carbon_sum: float, heating_sys_pe_sum: float, cooling_sys_carbon_sum: float,
-                 cooling_sys_pe_sum: float, hot_water_energy_hi_sum: float, heating_fuel_type: str,
-                 heating_f_ghg: float, heating_f_pe: float, heating_f_hs_hi: float, hot_water_fuel_type: str,
-                 hot_water_f_ghg: float, hot_water_f_pe: float, hot_water_f_hs_hi: float, cooling_fuel_type: str,
-                 cooling_f_ghg: float, cooling_f_pe: float, cooling_f_hs_hi: float, light_appl_fuel_type: str,
-                 light_appl_f_ghg: float, light_appl_f_pe: float, light_appl_f_hs_hi: float,
-                 hot_water_sys_carbon_sum: float, hot_water_sys_pe_sum: float, lighting_demand_carbon_sum: float,
-                 lighting_demand_pe_sum: float, appliance_gains_demand_carbon_sum: float,
-                 appliance_gains_demand_pe_sum: float, carbon_sum: float, pe_sum: float, fe_hi_sum: float,
-                 schedule_name: str, typ_norm: str, epw_filename: str):
+    def __init__(
+        self,
+        building: Building,
+        sum_object: CalculationOfSum,
+        heating_sys_hi_sum: float,
+        heating_sys_electricity_hi_sum: float,
+        heating_sys_fossils_hi_sum: float,
+        heating_sys_carbon_sum: float,
+        heating_sys_pe_sum: float,
+        cooling_sys_carbon_sum: float,
+        cooling_sys_pe_sum: float,
+        hot_water_energy_hi_sum: float,
+        heating_fuel_type: str,
+        heating_f_ghg: float,
+        heating_f_pe: float,
+        heating_f_hs_hi: float,
+        hot_water_fuel_type: str,
+        hot_water_f_ghg: float,
+        hot_water_f_pe: float,
+        hot_water_f_hs_hi: float,
+        cooling_fuel_type: str,
+        cooling_f_ghg: float,
+        cooling_f_pe: float,
+        cooling_f_hs_hi: float,
+        light_appl_fuel_type: str,
+        light_appl_f_ghg: float,
+        light_appl_f_pe: float,
+        light_appl_f_hs_hi: float,
+        hot_water_sys_carbon_sum: float,
+        hot_water_sys_pe_sum: float,
+        lighting_demand_carbon_sum: float,
+        lighting_demand_pe_sum: float,
+        appliance_gains_demand_carbon_sum: float,
+        appliance_gains_demand_pe_sum: float,
+        carbon_sum: float,
+        pe_sum: float,
+        fe_hi_sum: float,
+        schedule_name: str,
+        typ_norm: str,
+        epw_filename: str,
+    ):
         self.building = building
         self.sum_object = sum_object
         self.heating_sys_hi_sum = heating_sys_hi_sum
@@ -61,7 +90,9 @@ class ResultOutput:
         return self.sum_object.HeatingEnergy_sum / self.building.energy_ref_area
 
     def calc_heating_sys_electricity(self):
-        return self.sum_object.Heating_Sys_Electricity_sum / self.building.energy_ref_area
+        return (
+            self.sum_object.Heating_Sys_Electricity_sum / self.building.energy_ref_area
+        )
 
     def calc_heating_sys_fossils(self):
         return self.sum_object.Heating_Sys_Fossils_sum / self.building.energy_ref_area
@@ -79,7 +110,9 @@ class ResultOutput:
         return self.sum_object.CoolingEnergy_sum / self.building.energy_ref_area
 
     def calc_cooling_sys_electricity(self):
-        return self.sum_object.Cooling_Sys_Electricity_sum / self.building.energy_ref_area
+        return (
+            self.sum_object.Cooling_Sys_Electricity_sum / self.building.energy_ref_area
+        )
 
     def calc_cooling_sys_fossils(self):
         return self.sum_object.Cooling_Sys_Fossils_sum / self.building.energy_ref_area
@@ -103,13 +136,22 @@ class ResultOutput:
         return self.hot_water_sys_pe_sum / self.building.energy_ref_area
 
     def calc_electricity_demand_total(self):
-        return self.sum_object.Heating_Sys_Electricity_sum + self.sum_object.HotWater_Sys_Electricity_sum + self.sum_object.Cooling_Sys_Electricity_sum + self.sum_object.LightingDemand_sum + self.sum_object.Appliance_gains_elt_demand_sum
+        return (
+            self.sum_object.Heating_Sys_Electricity_sum
+            + self.sum_object.HotWater_Sys_Electricity_sum
+            + self.sum_object.Cooling_Sys_Electricity_sum
+            + self.sum_object.LightingDemand_sum
+            + self.sum_object.Appliance_gains_elt_demand_sum
+        )
 
     def calc_electricity_demand_total_ref(self):
         return self.calc_electricity_demand_total() / self.building.energy_ref_area
 
     def calc_fossils_demand_total(self):
-        return self.sum_object.Heating_Sys_Fossils_sum + self.sum_object.Cooling_Sys_Fossils_sum
+        return (
+            self.sum_object.Heating_Sys_Fossils_sum
+            + self.sum_object.Cooling_Sys_Fossils_sum
+        )
 
     def calc_fossils_demand_total_ref(self):
         return self.calc_fossils_demand_total() / self.building.energy_ref_area

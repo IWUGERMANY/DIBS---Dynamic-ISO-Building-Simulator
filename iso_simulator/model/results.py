@@ -10,7 +10,7 @@ class Result:
     This class contains the result for the calculation of a building
 
     Args:
-    
+
         heating_demand (List[float]): Space heating demand of the building
         heating_energy (List[float]): Total exergy consumed (electricity + fossils) for heating
         heating_sys_electricity (List[float]): Hating electricity consumption
@@ -20,21 +20,21 @@ class Result:
         cooling_sys_electricity (List[float]): Electricity consumption from cooling
         cooling_sys_fossils (List[float]): Fossil fuel consumption from cooling
         hotwater_demand (List[float]): Hot water demand of the building
-        hotwater_energy (List[float]): 
+        hotwater_energy (List[float]):
         hotwater_sys_electricity (List[float]):
         hotwater_sys_fossils (List[float]):
         temp_air (List[float]): Temperature of the air
         outside_temp (List[float]): Temperature of the outside air
         lighting_demand (List[float]): Lighting Energy Required for the timestep
         internal_gains (List[float]): Internal Heat Gains [W]
-        solar_gains_south_window (List[float]): 
-        solar_gains_east_window (List[float]): 
-        solar_gains_west_window (List[float]): 
-        solar_gains_north_window (List[float]): 
+        solar_gains_south_window (List[float]):
+        solar_gains_east_window (List[float]):
+        solar_gains_west_window (List[float]):
+        solar_gains_north_window (List[float]):
         solar_gains_total (List[float]):
-        day_time: 
+        day_time:
         hotwaterdemand:
-        hotwaterenergy: 
+        hotwaterenergy:
         hot)water_sys_electricity:
         hot_water_sys_fossils:
 
@@ -66,11 +66,21 @@ class Result:
         self.appliance_gains_demand = []
         self.appliance_gains_elt_demand = []
 
-    def append_results(self, building: Building, all_windows: List[Window], hot_water_demand: float,
-                       hot_water_energy: float, hot_water_sys_electricity: float, hot_water_sys_fossils: float,
-                       t_out: float,
-                       internal_gains: float, appliance_gains_demand: float,
-                       appliance_gains_elt_demand: float, solar_gains_all_windows: float, hour: int) -> None:
+    def append_results(
+        self,
+        building: Building,
+        all_windows: List[Window],
+        hot_water_demand: float,
+        hot_water_energy: float,
+        hot_water_sys_electricity: float,
+        hot_water_sys_fossils: float,
+        t_out: float,
+        internal_gains: float,
+        appliance_gains_demand: float,
+        appliance_gains_elt_demand: float,
+        solar_gains_all_windows: float,
+        hour: int,
+    ) -> None:
         """
         This method appends the result of a simulated hour in the object result
         Args:
@@ -143,10 +153,26 @@ class Result:
         solar_gains_north_window_sum = sum(self.solar_gains_north_window) / 1000
         solar_gains_total_sum = sum(self.solar_gains_total) / 1000
 
-        return CalculationOfSum(heating_demand_sum, heating_energy_sum, heating_sys_electricity_sum,
-                                heating_sys_fossils_sum, cooling_demand_sum, cooling_energy_sum,
-                                cooling_sys_electricity_sum, cooling_sys_fossils_sum, hot_water_demand_sum,
-                                hot_water_energy_sum, hot_water_sys_electricity_sum, hot_water_sys_fossils_sum,
-                                internal_gains_sum, appliance_gains_demand_sum, appliance_gains_elt_demand_sum,
-                                lighting_demand_sum, solar_gains_south_window_sum, solar_gains_east_window_sum,
-                                solar_gains_west_window_sum, solar_gains_north_window_sum, solar_gains_total_sum)
+        return CalculationOfSum(
+            heating_demand_sum,
+            heating_energy_sum,
+            heating_sys_electricity_sum,
+            heating_sys_fossils_sum,
+            cooling_demand_sum,
+            cooling_energy_sum,
+            cooling_sys_electricity_sum,
+            cooling_sys_fossils_sum,
+            hot_water_demand_sum,
+            hot_water_energy_sum,
+            hot_water_sys_electricity_sum,
+            hot_water_sys_fossils_sum,
+            internal_gains_sum,
+            appliance_gains_demand_sum,
+            appliance_gains_elt_demand_sum,
+            lighting_demand_sum,
+            solar_gains_south_window_sum,
+            solar_gains_east_window_sum,
+            solar_gains_west_window_sum,
+            solar_gains_north_window_sum,
+            solar_gains_total_sum,
+        )
