@@ -901,6 +901,8 @@ building_data.replace(cleanup_rlt_encode, inplace = True)
 # 'Neubau ohne Dichtheitstest': 4,
 # 'Bestehendes Gebäude ohne Dichtheitstest': 6,
 # 'Bestehndes Gebäude mit offensichtlichen Undichtheiten': 10
+
+# DIN V 18599-2: 2018-09 n50 values for building <= 1500 m3
 def assign_n_50_standard_av(row):
     if row['bak_grob'] == 3:
         if row['qH1'] == 'Ja, zentrale Anlage(n) vorhanden':
@@ -968,6 +970,8 @@ cleanup_rlt_funkt_encode = {"qH3": {
                             -8: 'keine RLT vorhanden'}}
 building_data.replace(cleanup_rlt_funkt_encode, inplace = True)
 
+# Die Wäremrückgewinnung wird mit 70% im groben mittleren Bereich der üblichen Rückgewinnungsgrade von Plattenwäremtauschern angenommen. 
+# Xu, Qi; Riffat, Saffa; Zhang, Shihao (2019): Review of Heat Recovery Technologies for Building Applications. In Energies 12 (7), p. 1285. DOI: 10.3390/en12071285.
 def find_heat_recovery_efficiency(row):
     if row['qH3'] in ('Wärmerückgewinnung'):
             heat_recovery_efficiency = 0.7
@@ -1112,6 +1116,7 @@ building_data['night_flushing_flow'] = building_data['scr_gebaeude_id'].map(be_d
 # 3: Ja, beides
 # 4: Nein
 
+# Der Luftwechsel wird mit 2 1/h auf das minimum eines erhöhten Nachtluftwechsels nach DIN 4108-2 gesetzt
 def night_flushing_flow(row):
     if row['night_flushing_flow'] == 4:
         flow_rate = 0
