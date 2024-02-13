@@ -27,18 +27,15 @@ class DIBS:
         self.datasource = datasource
         self.callback = None
 
-    def set_callback(self, callback_function):
-        self.callback = callback_function
-
     def set_data_source(self, datasource: DataSource):
         self.datasource = datasource
 
     def calculate_result_of_one_building(self, path: str, user_arguments: List):
         """
-        This method simulates the building with the given building_id as parameter
+        This method simulates the building which located in the given path
         Args:
             path: The path to the file which contains the building to simulate
-            user_arguments: List of user arguments
+            user_arguments: are profile_from_norm, gains_from_group_values, usage_from_norm, weather_period
 
         Returns:
 
@@ -65,7 +62,9 @@ class DIBS:
 
         t_set_heating_temp = simulator.building_object.t_set_heating
 
-        result, result_output = self.extracted_method_to_simulate_one_building(simulator, t_set_heating_temp)
+        result, result_output = self.extracted_method_to_simulate_one_building(
+            simulator, t_set_heating_temp
+        )
 
         simulation_time = time.time() - time_begin
 
@@ -107,7 +106,21 @@ class DIBS:
             csv_file_name,
         )
 
-    def extracted_method_to_simulate_one_building(self, simulator, t_set_heating_temp):
+    def extracted_method_to_simulate_one_building(
+        self, simulator, t_set_heating_temp
+    ) -> tuple[Result, ResultOutput]:
+        """
+
+        Parameters
+            simulator: object that contains the methods needed to simulate one building
+            t_set_heating_temp: Thermal heating set point [C]
+
+        Returns
+            (result, result_output)
+        Return type
+            tuple[Result, ResultOutput]
+
+        """
         result = Result()
         simulator.check_energy_area_and_heating()
         gain_person_and_typ_norm, appliance_gains = simulator.datasource.get_gains(
@@ -313,23 +326,23 @@ class DIBS:
             fuel_type
         )
         lighting_demand_hi_sum = (
-                sum_of_all_results.LightingDemand_sum / f_hs_hi
+            sum_of_all_results.LightingDemand_sum / f_hs_hi
         )  # for kWhHi Final Energy Demand
         lighting_demand_carbon_sum = (
-                                             lighting_demand_hi_sum * f_ghg
-                                     ) / 1000  # for kg CO2eq
+            lighting_demand_hi_sum * f_ghg
+        ) / 1000  # for kg CO2eq
         lighting_demand_pe_sum = (
-                lighting_demand_hi_sum * f_pe
+            lighting_demand_hi_sum * f_pe
         )  # for kWhHs Primary Energy Demand
         appliance_gains_demand_hi_sum = (
-                sum_of_all_results.Appliance_gains_elt_demand_sum / f_hs_hi
+            sum_of_all_results.Appliance_gains_elt_demand_sum / f_hs_hi
         )  # for kWhHi Final Energy Demand
         appliance_gains_demand_pe_sum = (
-                appliance_gains_demand_hi_sum * f_pe
+            appliance_gains_demand_hi_sum * f_pe
         )  # for kWhHs Primary Energy Demand
         appliance_gains_demand_carbon_sum = (
-                                                    appliance_gains_demand_hi_sum * f_ghg
-                                            ) / 1000  # for kg CO2eq
+            appliance_gains_demand_hi_sum * f_ghg
+        ) / 1000  # for kg CO2eq
         light_appl_fuel_type = fuel_type
         light_appl_f_ghg = f_ghg
         light_appl_f_pe = f_pe
@@ -339,61 +352,117 @@ class DIBS:
                 Cooling_Sys_Carbon_sum + LightingDemand_Carbon_sum + Appliance_gains_demand_Carbon_sum)
                 """
         carbon_sum = (
-                heating_sys_carbon_sum
-                + cooling_sys_carbon_sum
-                + lighting_demand_carbon_sum
-                + appliance_gains_demand_carbon_sum
-                + hot_water_sys_carbon_sum
+            heating_sys_carbon_sum
+            + cooling_sys_carbon_sum
+            + lighting_demand_carbon_sum
+            + appliance_gains_demand_carbon_sum
+            + hot_water_sys_carbon_sum
         )
         """
                 Calculation of Primary Energy Demand related to the entire energy consumption (Heating_Sys_PE_sum +
                  Cooling_Sys_PE_sum + LightingDemand_PE_sum + Appliance_gains_demand_PE_sum + HotWater_Sys_PE_sum)
                 """
         pe_sum = (
-                heating_sys_pe_sum
-                + cooling_sys_pe_sum
-                + lighting_demand_pe_sum
-                + appliance_gains_demand_pe_sum
-                + hot_water_sys_pe_sum
+            heating_sys_pe_sum
+            + cooling_sys_pe_sum
+            + lighting_demand_pe_sum
+            + appliance_gains_demand_pe_sum
+            + hot_water_sys_pe_sum
         )
         """
                 Calculation of Final Energy Hi Demand related to the entire energy consumption
                 """
         fe_hi_sum = (
-                heating_sys_hi_sum
-                + cooling_sys_hi_sum
-                + lighting_demand_hi_sum
-                + appliance_gains_demand_hi_sum
-                + hot_water_energy_hi_sum
+            heating_sys_hi_sum
+            + cooling_sys_hi_sum
+            + lighting_demand_hi_sum
+            + appliance_gains_demand_hi_sum
+            + hot_water_energy_hi_sum
         )
         """
                 Build Results of a building
                 """
-        result_output = self.save_result_output_object(appliance_gains_demand_carbon_sum, appliance_gains_demand_pe_sum,
-                                                       carbon_sum, cooling_f_ghg, cooling_f_hs_hi, cooling_f_pe,
-                                                       cooling_fuel_type, cooling_sys_carbon_sum, cooling_sys_pe_sum,
-                                                       fe_hi_sum, heating_f_ghg, heating_f_hs_hi, heating_f_pe,
-                                                       heating_fuel_type, heating_sys_carbon_sum,
-                                                       heating_sys_electricity_hi_sum, heating_sys_fossils_hi_sum,
-                                                       heating_sys_hi_sum, heating_sys_pe_sum, hot_water_energy_hi_sum,
-                                                       hot_water_f_ghg, hot_water_f_hs_hi, hot_water_f_pe,
-                                                       hot_water_fuel_type, hot_water_sys_carbon_sum,
-                                                       hot_water_sys_pe_sum, light_appl_f_ghg, light_appl_f_hs_hi,
-                                                       light_appl_f_pe, light_appl_fuel_type,
-                                                       lighting_demand_carbon_sum, lighting_demand_pe_sum, pe_sum,
-                                                       schedule_name, simulator, sum_of_all_results, typ_norm)
+        result_output = self.save_result_output_object(
+            appliance_gains_demand_carbon_sum,
+            appliance_gains_demand_pe_sum,
+            carbon_sum,
+            cooling_f_ghg,
+            cooling_f_hs_hi,
+            cooling_f_pe,
+            cooling_fuel_type,
+            cooling_sys_carbon_sum,
+            cooling_sys_pe_sum,
+            fe_hi_sum,
+            heating_f_ghg,
+            heating_f_hs_hi,
+            heating_f_pe,
+            heating_fuel_type,
+            heating_sys_carbon_sum,
+            heating_sys_electricity_hi_sum,
+            heating_sys_fossils_hi_sum,
+            heating_sys_hi_sum,
+            heating_sys_pe_sum,
+            hot_water_energy_hi_sum,
+            hot_water_f_ghg,
+            hot_water_f_hs_hi,
+            hot_water_f_pe,
+            hot_water_fuel_type,
+            hot_water_sys_carbon_sum,
+            hot_water_sys_pe_sum,
+            light_appl_f_ghg,
+            light_appl_f_hs_hi,
+            light_appl_f_pe,
+            light_appl_fuel_type,
+            lighting_demand_carbon_sum,
+            lighting_demand_pe_sum,
+            pe_sum,
+            schedule_name,
+            simulator,
+            sum_of_all_results,
+            typ_norm,
+        )
         return result, result_output
 
-    def save_result_output_object(self, appliance_gains_demand_carbon_sum, appliance_gains_demand_pe_sum, carbon_sum,
-                                  cooling_f_ghg, cooling_f_hs_hi, cooling_f_pe, cooling_fuel_type,
-                                  cooling_sys_carbon_sum, cooling_sys_pe_sum, fe_hi_sum, heating_f_ghg, heating_f_hs_hi,
-                                  heating_f_pe, heating_fuel_type, heating_sys_carbon_sum,
-                                  heating_sys_electricity_hi_sum, heating_sys_fossils_hi_sum, heating_sys_hi_sum,
-                                  heating_sys_pe_sum, hot_water_energy_hi_sum, hot_water_f_ghg, hot_water_f_hs_hi,
-                                  hot_water_f_pe, hot_water_fuel_type, hot_water_sys_carbon_sum, hot_water_sys_pe_sum,
-                                  light_appl_f_ghg, light_appl_f_hs_hi, light_appl_f_pe, light_appl_fuel_type,
-                                  lighting_demand_carbon_sum, lighting_demand_pe_sum, pe_sum, schedule_name, simulator,
-                                  sum_of_all_results, typ_norm):
+    def save_result_output_object(
+        self,
+        appliance_gains_demand_carbon_sum,
+        appliance_gains_demand_pe_sum,
+        carbon_sum,
+        cooling_f_ghg,
+        cooling_f_hs_hi,
+        cooling_f_pe,
+        cooling_fuel_type,
+        cooling_sys_carbon_sum,
+        cooling_sys_pe_sum,
+        fe_hi_sum,
+        heating_f_ghg,
+        heating_f_hs_hi,
+        heating_f_pe,
+        heating_fuel_type,
+        heating_sys_carbon_sum,
+        heating_sys_electricity_hi_sum,
+        heating_sys_fossils_hi_sum,
+        heating_sys_hi_sum,
+        heating_sys_pe_sum,
+        hot_water_energy_hi_sum,
+        hot_water_f_ghg,
+        hot_water_f_hs_hi,
+        hot_water_f_pe,
+        hot_water_fuel_type,
+        hot_water_sys_carbon_sum,
+        hot_water_sys_pe_sum,
+        light_appl_f_ghg,
+        light_appl_f_hs_hi,
+        light_appl_f_pe,
+        light_appl_fuel_type,
+        lighting_demand_carbon_sum,
+        lighting_demand_pe_sum,
+        pe_sum,
+        schedule_name,
+        simulator,
+        sum_of_all_results,
+        typ_norm,
+    ):
         result_output = ResultOutput(
             simulator.building_object,
             sum_of_all_results,
@@ -437,8 +506,23 @@ class DIBS:
         return result_output
 
     def calculate_result_of_all_buildings(
-            self, user_buildings: List[Building], user_arguments: List, index: int
+        self, user_buildings: List[Building], user_arguments: List, index: int
     ) -> tuple[Result, ResultOutput]:
+        """
+        Simulate one building
+        Parameters
+            user_buildings: used to pick the t_set_heating of a building based on an index
+            user_arguments: profile_from_norm, gains_from_group_values, usage_from_norm, weather_period
+            index: index of the building
+
+        Returns
+            (result, result_output)
+
+        Return type
+        tuple[Result, ResultOutput]
+
+
+        """
         gwp_pe_factors = self.datasource.get_epw_pe_factors()
 
         (
@@ -460,19 +544,49 @@ class DIBS:
 
         t_set_heating_temp = user_buildings[index].t_set_heating
 
-        result, result_output = self.extracted_method_to_simulate_one_building(simulator, t_set_heating_temp)
+        result, result_output = self.extracted_method_to_simulate_one_building(
+            simulator, t_set_heating_temp
+        )
 
         return result, result_output
 
-    def unpack_results(self, results):
+    def unpack_results(
+        self, results
+    ) -> tuple[float, Result : List[Result], List[ResultOutput]]:
+        """
+        Unpacks the results and calculates the runtime
+        Parameters
+            results: contains result of all simulated hours and the end result
+
+        Returns
+            unpack_time, result, result_output
+
+        Return type
+            tuple[float, float, : List[Result], List[ResultOutput]]
+
+        """
         begin_unpack_time = time.time()
         result, result_output = zip(*results)
         end_unpack_time = time.time()
         return end_unpack_time - begin_unpack_time, result, result_output
 
     def save_results_of_all_buildings_in_csv_parallel_using_thread_executor(
-            self, folder_path: str, buildings, result
-    ):
+        self, folder_path: str, buildings: List[Building], result: List[Result]
+    ) -> float:
+        """
+        Saves results in csv files and calculates the time needed
+        Parameters
+        folder_path: where to save the result
+        buildings: list of the buildings
+        result
+
+        Returns
+            saving_time
+        Return type
+            float
+
+
+        """
         with Progress() as progress:
             task = progress.add_task("[cyan]Saving results in csv files...", total=1)
             begin_saving_time = time.time()
@@ -495,7 +609,22 @@ class DIBS:
             progress.update(task, completed=1)
         return end_saving_time - begin_saving_time
 
-    def multi(self, user_buildings, path: str, user_arguments: List):
+    def multi(
+        self, user_buildings: List[Building], path: str, user_arguments: List
+    ) -> tuple[float, float, float, str]:
+        """
+        Simulates all buildings parallel using multiprocessing.Pool()
+        Parameters
+            user_buildings: all buildings to simulate
+            path: where the file which contains the building should be located
+            user_arguments: profile_from_norm, gains_from_group_values, usage_from_norm, weather_period
+
+        Returns
+            (simulation_time, excel_time, saving_time, folder_path)
+
+        Return type
+            tuple[float, float, float, str]
+        """
         folder_path = os.path.dirname(path)
 
         with multiprocessing.Pool() as pool:

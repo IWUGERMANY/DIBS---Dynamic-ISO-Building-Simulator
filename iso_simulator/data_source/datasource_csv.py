@@ -28,7 +28,7 @@ from iso_simulator.utils.utils_readcsv import (
     read_occupancy_schedules_zuweisungen_data,
     read_schedule_file,
     read_vergleichswerte_zuweisung,
-    read_tek_nwg_vergleichswerte,
+    read_tek_nwg_comparative_values,
     read_weather_data,
     read_plz_codes_data,
     read_profiles_zuweisungen_data,
@@ -98,8 +98,10 @@ class DataSourceCSV(DataSource):
 
     def get_building_data(self, building_id: str) -> Building:
         """
-        This method retrieves one building from the csv file 'iso_simulator/annualSimulation/SimulationData_Breitenerhebung.csv'
+        This method retrieves one building from a given csv file provided by the user based on a given building_id.
         and maps it to a Building object.
+        Args:
+            building_id: the building to simulate
         Returns:
             building
         Return type:
@@ -110,7 +112,7 @@ class DataSourceCSV(DataSource):
 
     def get_all_buildings(self) -> List[Building]:
         """
-        This method retrieves all buildings from the csv file 'iso_simulator/annualSimulation/SimulationData_Breitenerhebung.csv'
+        This method retrieves all buildings from a given csv file provided by the user.
         and maps them to a list of Building objects.
         Returns:
             buildings
@@ -122,8 +124,8 @@ class DataSourceCSV(DataSource):
 
     def get_epw_pe_factors(self) -> List[PrimaryEnergyAndEmissionFactor]:
         """
-        This method retrieves all primary energy and emission factors from this file path
-        'iso_simulator/annualSimulation/LCA/Primary_energy_and_emission_factors.csv'
+        This method retrieves all primary energy and emission factors from this file
+        'Primary_energy_and_emission_factors.csv' which is in the module dibs_data
         Returns:
             epw_pe_factors
         Return type:
@@ -137,17 +139,17 @@ class DataSourceCSV(DataSource):
         ]
 
     def get_schedule(
-            self, hk_geb: str, uk_geb: str
+        self, hk_geb: str, uk_geb: str
     ) -> Union[Tuple[List[ScheduleName], str, float], HkOrUkNotFoundError]:
         """
         Find occupancy schedule from SIA2024, depending on hk_geb, uk_geb from csv file
-        'iso_simulator/auxiliary/occupancy_schedules/occupancy_schedules_zuweisungen.csv'
+        'occupancy_schedules_zuweisungen.csv' which is in the module dibs_data
         Args:
             hk_geb: Usage type (main category)
             uk_geb: Usage type (subcategory)
 
         Returns:
-            schedule_name_list, schedule_name or throws an error
+            (schedule_name_list, schedule_name) or throws an error
         Return type:
             Union[Tuple[List[ScheduleName], str], HkOrUkNotFoundError]
         """
@@ -169,14 +171,13 @@ class DataSourceCSV(DataSource):
             print(error)
 
     def get_tek(
-            self, hk_geb: str, uk_geb: str
+        self, hk_geb: str, uk_geb: str
     ) -> Union[Tuple[float, str], HkOrUkNotFoundError]:
         """
         Find TEK values from Partial energy parameters to build the comparative values in accordance with the
         announcement  of 15.04.2021 on the Building Energy Act (GEG) of 2020, depending on hk_geb, uk_geb
         File names used:
-            - 'iso_simulator/auxiliary/TEKs/TEK_NWG_Vergleichswerte_zuweisung.csv'
-            - 'iso_simulator/auxiliary/TEKs/TEK_NWG_Vergleichswerte.csv'
+            - 'TEK_NWG_Vergleichswerte_zuweisung.csv' and TEK_NWG_Vergleichswerte.csv which are in the module dibs_data
         Args:
             hk_geb: Usage type (main category)
             uk_geb: Usage type (subcategory)
@@ -187,7 +188,7 @@ class DataSourceCSV(DataSource):
             Union[Tuple[float, str], ValueError]
         """
         data: pd.DataFrame = read_vergleichswerte_zuweisung()
-        db_teks: pd.DataFrame = read_tek_nwg_vergleichswerte()
+        db_teks: pd.DataFrame = read_tek_nwg_comparative_values()
 
         try:
             if hk_or_uk_not_in_zuweisungen(data, hk_geb, uk_geb):
@@ -218,7 +219,7 @@ class DataSourceCSV(DataSource):
         return [WeatherData(*row.values) for _, row in weather_data.iterrows()]
 
     def choose_and_get_the_right_weather_data_from_path(
-            self, weather_period, file_name
+        self, weather_period, file_name
     ) -> List[WeatherData]:
         """
         This method retrieves the right weather data according to the given weather_period and file_name
@@ -245,15 +246,14 @@ class DataSourceCSV(DataSource):
 
     def get_epw_file(self, plz: str, weather_period: str) -> EPWFile:
         """
-        Function finds the epw file depending on building location, Pick latitude and longitude from plz_data and put
+        This method finds the epw file depending on building location, Pick latitude and longitude from plz_data and put
         values into a list and Calculate minimum distance to next weather station
+
         Args:
             plz: zipcode of the building
             weather_period: the period to simulate
          File names used:
-            - 'iso_simulator/auxiliary/weather_data/plzcodes.csv'
-            - 'iso_simulator/auxiliary/weather_data/weather_data_TMYx_2007_2021/weatherfiles_stations_109.csv'
-            - 'iso_simulator/auxiliary/weather_data/weatherfiles_stations_93.csv'
+            - 'weather_data/plzcodes.csv', 'weatherfiles_stations_109.csv' and 'weatherfiles_stations_93.csv' which are in the module dibs_data
 
         Returns:
             epw_file object
@@ -282,7 +282,7 @@ class DataSourceCSV(DataSource):
         return EPWFile(epw_filename, coordinates_station, distance)
 
     def get_usage_time(
-            self, hk_geb: str, uk_geb: str, usage_from_norm: str
+        self, hk_geb: str, uk_geb: str, usage_from_norm: str
     ) -> Union[Tuple[int, int], UsageTimeError]:
         """
         Find building's usage time DIN 18599-10 or SIA2024
@@ -292,7 +292,7 @@ class DataSourceCSV(DataSource):
             usage_from_norm: data source either 18599-10 or SIA2024
 
         File name used:
-            - 'iso_simulator/auxiliary/norm_profiles/profiles_zuweisungen.csv'
+            - 'profiles_zuweisungen.csv' which is in the module dibs_data
 
         Returns:
             usage_start, usage_end or throws error
@@ -314,23 +314,21 @@ class DataSourceCSV(DataSource):
             print(error)
 
     def get_gains(
-            self,
-            hk_geb: str,
-            uk_geb: str,
-            profile_from_norm: str,
-            gains_from_group_values: str,
+        self,
+        hk_geb: str,
+        uk_geb: str,
+        profile_from_norm: str,
+        gains_from_group_values: str,
     ) -> Tuple[Tuple[float, str], float]:
         """
         Find data from DIN V 18599-10 or SIA2024
         Args:
             hk_geb: Usage type (main category)
             uk_geb: Usage type (subcategory)
-            profile_from_norm: data source either 18599-10 or SIA2024 [specified in model/all_building.py
-            or model/simulator.py]
-            gains_from_group_values: group in norm low/medium/high [specified in model/all_building.py
-            or model/simulator.py]
+            profile_from_norm: data source either 18599-10 or SIA2024 [muss be provided by the user]
+            gains_from_group_values: group in norm low/medium/high [muss be provided by th]
         File name used:
-            - 'iso_simulator/auxiliary/norm_profiles/profiles_zuweisungen.csv'
+            - 'profiles_zuweisungen.csv' which is in the module dibs_data
 
         Returns:
             gain_person_and_typ_norm, appliance_gains
@@ -365,13 +363,13 @@ class DataSourceCSV(DataSource):
         return gain_person_and_typ_norm, appliance_gains
 
     def result_to_pandas_dataframe(
-            self, result: ResultOutput, user_arguments: List
+        self, result: ResultOutput, user_arguments: List
     ) -> pd.DataFrame:
         """
         Maps a list of ResultOutput objects to a pandas Dataframe
         Args:
             result: result of a simulated building
-            user_arguments
+            user_arguments: are path (where the file is located which contains the building or buildings data), profile_from_norm, gains_from_group_values, usage_from_norm, weather_period
 
         Returns:
             dataframe
@@ -486,7 +484,7 @@ class DataSourceCSV(DataSource):
         )
 
     def result_of_all_hours_to_csv(
-            self, folder_path: str, result: Result, building: Building
+        self, folder_path: str, result: Result, building: Building
     ):
         """
         Maps the results of the simulated building to an Excel file (all hours)
@@ -536,14 +534,14 @@ class DataSourceCSV(DataSource):
         return build_file_name
 
     def build_all_results_of_all_buildings(
-            self, results: List[ResultOutput], user_arguments: List, folder_path: str
+        self, results: List[ResultOutput], user_arguments: List, folder_path: str
     ):
         """
         Converts the results of all buildings to an Excel file saved in the result directory
         Args:
             results: results of all building
-            user_arguments
-            folder_path
+            user_arguments: are profile_from_norm, gains_from_group_values, usage_from_norm, weather_period
+            folder_path: path where the result will be saved
 
         Returns:
               Saved Excel file
@@ -562,7 +560,7 @@ class DataSourceCSV(DataSource):
         )
 
     def result_of_all_hours_to_excel(
-            self, folder_path: str, result: Result, building: Building
+        self, folder_path: str, result: Result, building: Building
     ):
         """
         Maps the results of the simulated building to an Excel file (all hours)
@@ -606,7 +604,7 @@ class DataSourceCSV(DataSource):
                 "GebäudeID": building.scr_gebaeude_id,
             }
         )
-        build_file_name = f"{building.scr_gebaeude_id}.xlsx"
+        build_file_name = f"aa{building.scr_gebaeude_id}.xlsx"
         data_frame.to_excel(f"{folder_path}/{build_file_name}")
 
         return build_file_name
