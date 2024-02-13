@@ -291,7 +291,7 @@ class DIBS:
         print(f'Simulation time without saving time of all hours is: {simulation_time}s')
 
         begin_time_csv = time.time()
-        simulator.datasourcecsv.result_of_all_hours_to_csv(result,
+        simulator.datasourcecsv.result_of_all_hours_to_excel(result,
                                                            simulator.building_object)
 
         dt_csv = time.time() - begin_time_csv

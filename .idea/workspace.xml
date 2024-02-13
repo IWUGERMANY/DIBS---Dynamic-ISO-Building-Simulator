@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4b728a28-c1e4-4000-9504-d34d8666c0f5" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/iso_simulator/annualSimulation/SimulationData_Breitenerhebung.csv" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/annualSimulation/SimulationData_Breitenerhebung.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/data_source/datasource_csv.py" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/data_source/datasource_csv.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/iso_simulator/dibs/dibs.py" beforeDir="false" afterPath="$PROJECT_DIR$/iso_simulator/dibs/dibs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/AB123456_1_00.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/AB123456_1_01.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/AB123456_1_02.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/AB123456_1_03.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/AB123456_1_04.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/AB123456_1_05.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/AB123456_1_06.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/AB123456_1_07.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/AB123456_1_08.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/annualResults_summaries.xlsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/results/annualResults_summary.xlsx" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2YTyslTcNx3aRmXaB2ZRrU6Qm0n" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "updated__nopandas",
+    "last_opened_file_path": "C:/Users/wail/Desktop/dibs_alt",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\wail\Desktop\Projekt\Dibs updated\DIBS---Dynamic-ISO-Building-Simulator\iso_simulator\building_simulator" />
+      <recent name="C:\Users\wail\Desktop\Projekt\Dibs updated\DIBS---Dynamic-ISO-Building-Simulator" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Python.main">
+    <configuration name="dibscli" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="DIBS---Dynamic-ISO-Building-Simulator" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\wail\Desktop\Projekt\Dibs updated\DIBS---Dynamic-ISO-Building-Simulator\dibscli.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="DIBS---Dynamic-ISO-Building-Simulator" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/main.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_calculations.TestCalculations.test_tek_dhw_and_name" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="DIBS---Dynamic-ISO-Building-Simulator" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_calculations.TestCalculations.test_tek_dhw_and_name&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for test_calculations.TestCalculations.test_tek_dhw_and_name" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="DIBS---Dynamic-ISO-Building-Simulator" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;test_calculations.TestCalculations.test_tek_dhw_and_name&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for tests.test_building_calc.TestBuildingCalculations" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="DIBS---Dynamic-ISO-Building-Simulator" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;tests.test_building_calc.TestBuildingCalculations&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for tests.test_building_calc.TestBuildingCalculations" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="DIBS---Dynamic-ISO-Building-Simulator" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;tests.test_building_calc.TestBuildingCalculations&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for tests.test_building_calc.TestBuildingCalculations.test_mass_area" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="DIBS---Dynamic-ISO-Building-Simulator" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;tests.test_building_calc.TestBuildingCalculations.test_mass_area&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for tests.test_building_calc.TestBuildingCalculations.test_mass_area" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="DIBS---Dynamic-ISO-Building-Simulator" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;tests.test_building_calc.TestBuildingCalculations.test_mass_area&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for tests.test_building_calc.TestBuildingCalculations.test_total_internal_area" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="DIBS---Dynamic-ISO-Building-Simulator" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;tests.test_building_calc.TestBuildingCalculations.test_total_internal_area&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests for tests.test_building_calc.TestBuildingCalculations.test_total_internal_area" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="DIBS---Dynamic-ISO-Building-Simulator" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;tests.test_building_calc.TestBuildingCalculations.test_total_internal_area&quot;" />
+      <option name="_new_targetType" value="&quot;PYTHON&quot;" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.main" />
+        <item itemvalue="Python.dibscli" />
+        <item itemvalue="Python tests.Python tests for tests.test_building_calc.TestBuildingCalculations.test_total_internal_area" />
+        <item itemvalue="Python tests.Python tests for tests.test_building_calc.TestBuildingCalculations.test_mass_area" />
+        <item itemvalue="Python tests.Python tests for tests.test_building_calc.TestBuildingCalculations" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4b728a28-c1e4-4000-9504-d34d8666c0f5" name="Changes" comment="" />
+      <created>1700564072445</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1700564072445</updated>
+      <workItem from="1700564073654" duration="378000" />
+      <workItem from="1700817014881" duration="269000" />
+      <workItem from="1700992612068" duration="396000" />
+      <workItem from="1701075987174" duration="230000" />
+      <workItem from="1701076672950" duration="294000" />
+      <workItem from="1701080651572" duration="23000" />
+      <workItem from="1701168232255" duration="413000" />
+      <workItem from="1701784272604" duration="21984000" />
+      <workItem from="1701871508239" duration="6455000" />
+      <workItem from="1701936529513" duration="13975000" />
+      <workItem from="1701958850396" duration="9028000" />
+      <workItem from="1702026027567" duration="20196000" />
+      <workItem from="1702228115141" duration="5195000" />
+      <workItem from="1702299589628" duration="15475000" />
+      <workItem from="1702326899387" duration="2956000" />
+      <workItem from="1702330957452" duration="5277000" />
+      <workItem from="1702383187924" duration="13145000" />
+      <workItem from="1702457878921" duration="22450000" />
+      <workItem from="1702488445968" duration="1012000" />
+      <workItem from="1702542262967" duration="9618000" />
+      <workItem from="1702655608844" duration="7333000" />
+      <workItem from="1702890514225" duration="13712000" />
+      <workItem from="1702913585602" duration="8072000" />
+      <workItem from="1702975706908" duration="1514000" />
+      <workItem from="1702979345641" duration="13788000" />
+      <workItem from="1703090278641" duration="2631000" />
+      <workItem from="1703157507856" duration="9197000" />
+      <workItem from="1703257748251" duration="2184000" />
+      <workItem from="1703262568984" duration="192000" />
+      <workItem from="1703262821548" duration="670000" />
+      <workItem from="1704271150929" duration="21918000" />
+      <workItem from="1704442722698" duration="15807000" />
+      <workItem from="1704703949671" duration="7837000" />
+      <workItem from="1704720118244" duration="10243000" />
+      <workItem from="1704791991854" duration="14342000" />
+      <workItem from="1704878623801" duration="22540000" />
+      <workItem from="1704979748788" duration="3283000" />
+      <workItem from="1705048214491" duration="15348000" />
+      <workItem from="1705308172470" duration="16646000" />
+      <workItem from="1705344148467" duration="20125000" />
+      <workItem from="1705438708709" duration="2503000" />
+      <workItem from="1705441243015" duration="253000" />
+      <workItem from="1705441517989" duration="972000" />
+      <workItem from="1705480994556" duration="815000" />
+      <workItem from="1705483164267" duration="160000" />
+      <workItem from="1705483342195" duration="162000" />
+      <workItem from="1705483525246" duration="2661000" />
+      <workItem from="1705580364177" duration="8477000" />
+      <workItem from="1705658651543" duration="14820000" />
+      <workItem from="1705680519712" duration="652000" />
+      <workItem from="1705868478939" duration="2227000" />
+      <workItem from="1705913291821" duration="12621000" />
+      <workItem from="1705938403046" duration="1247000" />
+      <workItem from="1705951275138" duration="5713000" />
+      <workItem from="1706025443368" duration="21000" />
+      <workItem from="1706082176544" duration="610000" />
+      <workItem from="1706216776811" duration="231000" />
+      <workItem from="1706277397280" duration="15087000" />
+      <workItem from="1706444469866" duration="101000" />
+      <workItem from="1706444593186" duration="33000" />
+      <workItem from="1706454895352" duration="5030000" />
+      <workItem from="1706461999931" duration="4038000" />
+      <workItem from="1706514914374" duration="16521000" />
+      <workItem from="1706603709774" duration="11749000" />
+      <workItem from="1707726676805" duration="4432000" />
+      <workItem from="1707747612927" duration="14000" />
+      <workItem from="1707815524825" duration="2490000" />
+      <workItem from="1707818034182" duration="4649000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <condition expression="hour == 2170" language="Python" />
+          <url>file://$PROJECT_DIR$/iso_simulator/dibs/dibs.py</url>
+          <line>159</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/DIBS___Dynamic_ISO_Building_Simulator$.coverage" NAME=" Coverage Results" MODIFIED="1701856129222" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tests" />
+    <SUITE FILE_PATH="coverage/DIBS___Dynamic_ISO_Building_Simulator$annualSimulation.coverage" NAME="annualSimulation Coverage Results" MODIFIED="1701076903955" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/iso_simulator/annualSimulation" />
+    <SUITE FILE_PATH="coverage/DIBS___Dynamic_ISO_Building_Simulator$dibscli.coverage" NAME="dibscli Coverage Results" MODIFIED="1706461976091" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/DIBS___Dynamic_ISO_Building_Simulator$mainclass_object.coverage" NAME="mainclass_object Coverage Results" MODIFIED="1701076949280" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/iso_simulator/building_simulator" />
+    <SUITE FILE_PATH="coverage/DIBS___Dynamic_ISO_Building_Simulator$main.coverage" NAME="main Coverage Results" MODIFIED="1707822895856" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/DIBS___Dynamic_ISO_Building_Simulator$datasource_csv.coverage" NAME="datasource_csv Coverage Results" MODIFIED="1701076200892" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/iso_simulator/data_source" />
+    <SUITE FILE_PATH="coverage/DIBS___Dynamic_ISO_Building_Simulator$building.coverage" NAME="building Coverage Results" MODIFIED="1701870905762" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/iso_simulator/model" />
+    <SUITE FILE_PATH="coverage/DIBS___Dynamic_ISO_Building_Simulator$annualSimulationUpdate.coverage" NAME="annualSimulationUpdate Coverage Results" MODIFIED="1700992921643" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/iso_simulator/annualSimulation" />
+  </component>
+</project>

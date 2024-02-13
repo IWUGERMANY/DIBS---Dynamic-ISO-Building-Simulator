@@ -174,7 +174,7 @@ class DataSourceCSV(DataSource):
                 """
         return (
             self.get_weather_data(
-                os.path.join(f'iso_simulator/auxiliary/weather_data/weather_data_TMYx_2007_2021{file_name}',
+                os.path.join(f'iso_simulator/auxiliary/weather_data/weather_data_TMYx_2007_2021/{file_name}',
                              )
             )
             if weather_period == "2007-2021"
