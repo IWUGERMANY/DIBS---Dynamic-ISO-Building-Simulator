@@ -125,3 +125,240 @@
 2024-01-22 10:12:54,278 - INFO - -----------------------------End simulation using process----------------------------
 2024-01-22 10:12:54,278 - INFO - ------------------------------------------------------------------------------------------
 2024-01-22 10:12:54,278 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 12:06:39,224 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 12:06:39,225 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 12:06:58,907 - INFO - -----------Simulation using the method parallel_process_calculation-----------
+2024-01-22 12:06:58,907 - INFO - Parallel Process Calculation time is 19.57 Seconds.
+2024-01-22 12:06:59,367 - INFO - Time of saving the final result of 80 buildings is 0.46 Seconds.
+2024-01-22 12:07:13,234 - INFO - Time of saving hours results of 80 buildings is 13.87 Seconds.
+2024-01-22 12:07:13,235 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 33.43 Seconds.
+2024-01-22 12:07:13,235 - INFO - -----------------------------End simulation using process----------------------------
+2024-01-22 12:07:13,235 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 12:07:13,235 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 12:19:58,616 - INFO - Parallel Process Calculation time is 19.39 Seconds.
+2024-01-22 12:19:59,063 - INFO - Time of saving the final result of 80 buildings is 0.45 Seconds.
+2024-01-22 12:20:13,221 - INFO - Time of saving hours results of 80 buildings is 14.16 Seconds.
+2024-01-22 12:20:13,221 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 33.55 Seconds.
+2024-01-22 12:20:13,221 - INFO - ----------------------End simulation using process max_concurrent-----------------------
+2024-01-22 12:35:56,183 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 12:35:56,183 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 12:35:56,291 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 12:36:15,861 - INFO - Parallel Process Calculation time is 19.44 Seconds.
+2024-01-22 12:36:16,318 - INFO - Time of saving the final result of 80 buildings is 0.46 Seconds.
+2024-01-22 12:36:30,663 - INFO - Time of saving hours results of 80 buildings is 14.35 Seconds.
+2024-01-22 12:36:30,664 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 33.79 Seconds.
+2024-01-22 12:36:30,664 - INFO - ----------------------End simulation using process max_concurrent-----------------------
+2024-01-22 14:32:42,763 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 14:32:42,763 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 14:32:42,888 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 14:33:04,329 - INFO - Parallel Process Calculation time is 21.29 Seconds.
+2024-01-22 14:33:04,817 - INFO - Time of saving the final result of 80 buildings is 0.49 Seconds.
+2024-01-22 14:33:19,060 - INFO - Time of saving hours results of 80 buildings is 14.24 Seconds.
+2024-01-22 14:33:19,060 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 35.53 Seconds.
+2024-01-22 14:33:19,060 - INFO - ----------------------End simulation using process max_concurrent-----------------------
+2024-01-22 14:33:24,460 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 14:33:24,460 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 14:33:24,584 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 14:33:46,481 - INFO - Parallel Process Calculation time is 21.75 Seconds.
+2024-01-22 14:33:46,971 - INFO - Time of saving the final result of 80 buildings is 0.49 Seconds.
+2024-01-22 14:34:01,669 - INFO - Time of saving hours results of 80 buildings is 14.70 Seconds.
+2024-01-22 14:34:01,669 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 36.45 Seconds.
+2024-01-22 14:34:01,669 - INFO - ----------------------End simulation using process max_concurrent-----------------------
+2024-01-22 14:34:06,195 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 14:34:06,195 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 14:34:06,313 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 14:34:27,655 - INFO - Parallel Process Calculation time is 21.18 Seconds.
+2024-01-22 14:34:28,148 - INFO - Time of saving the final result of 80 buildings is 0.49 Seconds.
+2024-01-22 14:34:42,772 - INFO - Time of saving hours results of 80 buildings is 14.62 Seconds.
+2024-01-22 14:34:42,773 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 35.80 Seconds.
+2024-01-22 14:34:42,773 - INFO - ----------------------End simulation using process max_concurrent-----------------------
+2024-01-22 16:34:14,000 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:34:14,001 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:34:14,113 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 16:34:34,253 - INFO - Parallel Process Calculation time is 20.01 Seconds.
+2024-01-22 16:34:34,599 - INFO - Time of saving the final result of 80 buildings is 0.35 Seconds.
+2024-01-22 16:34:48,512 - INFO - Time of saving hours results of 80 buildings is 13.91 Seconds.
+2024-01-22 16:34:48,512 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 33.92 Seconds.
+2024-01-22 16:34:48,512 - INFO - ----------------------End simulation using process -----------------------
+2024-01-22 16:35:45,980 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:35:45,980 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:35:46,099 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 16:36:05,319 - INFO - Parallel Process Calculation time is 19.09 Seconds.
+2024-01-22 16:36:05,670 - INFO - Time of saving the final result of 80 buildings is 0.35 Seconds.
+2024-01-22 16:36:19,643 - INFO - Time of saving hours results of 80 buildings is 13.97 Seconds.
+2024-01-22 16:36:19,643 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 33.06 Seconds.
+2024-01-22 16:36:19,643 - INFO - ----------------------End simulation using process -----------------------
+2024-01-22 16:36:19,758 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:36:19,758 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:36:19,793 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 16:36:39,340 - INFO - Parallel Process Calculation time is 19.43 Seconds.
+2024-01-22 16:36:39,549 - INFO - Time of saving the final result of 80 buildings is 0.21 Seconds.
+2024-01-22 16:36:53,664 - INFO - Time of saving hours results of 80 buildings is 14.11 Seconds.
+2024-01-22 16:36:53,664 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 33.54 Seconds.
+2024-01-22 16:36:53,664 - INFO - ----------------------End simulation using process -----------------------
+2024-01-22 16:36:53,770 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:36:53,771 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:36:53,774 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 16:37:13,894 - INFO - Parallel Process Calculation time is 19.95 Seconds.
+2024-01-22 16:37:14,125 - INFO - Time of saving the final result of 80 buildings is 0.23 Seconds.
+2024-01-22 16:37:28,253 - INFO - Time of saving hours results of 80 buildings is 14.13 Seconds.
+2024-01-22 16:37:28,253 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 34.07 Seconds.
+2024-01-22 16:37:28,253 - INFO - ----------------------End simulation using process -----------------------
+2024-01-22 16:37:28,352 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:37:28,353 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:37:28,355 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 16:37:53,961 - INFO - Parallel Process Calculation time is 25.40 Seconds.
+2024-01-22 16:37:54,173 - INFO - Time of saving the final result of 80 buildings is 0.21 Seconds.
+2024-01-22 16:38:08,239 - INFO - Time of saving hours results of 80 buildings is 14.07 Seconds.
+2024-01-22 16:38:08,239 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 39.46 Seconds.
+2024-01-22 16:38:08,239 - INFO - ----------------------End simulation using process -----------------------
+2024-01-22 16:38:08,335 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:38:08,336 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:38:08,338 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 16:38:34,929 - INFO - Parallel Process Calculation time is 26.36 Seconds.
+2024-01-22 16:38:35,143 - INFO - Time of saving the final result of 80 buildings is 0.21 Seconds.
+2024-01-22 16:38:49,233 - INFO - Time of saving hours results of 80 buildings is 14.09 Seconds.
+2024-01-22 16:38:49,233 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 40.45 Seconds.
+2024-01-22 16:38:49,233 - INFO - ----------------------End simulation using process -----------------------
+2024-01-22 16:38:49,329 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:38:49,329 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:38:49,332 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 16:39:17,955 - INFO - Parallel Process Calculation time is 28.44 Seconds.
+2024-01-22 16:39:18,167 - INFO - Time of saving the final result of 80 buildings is 0.21 Seconds.
+2024-01-22 16:39:32,398 - INFO - Time of saving hours results of 80 buildings is 14.23 Seconds.
+2024-01-22 16:39:32,398 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 42.67 Seconds.
+2024-01-22 16:39:32,398 - INFO - ----------------------End simulation using process -----------------------
+2024-01-22 16:39:32,511 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:39:32,511 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:39:32,514 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 16:40:00,279 - INFO - Parallel Process Calculation time is 27.57 Seconds.
+2024-01-22 16:40:00,583 - INFO - Time of saving the final result of 80 buildings is 0.30 Seconds.
+2024-01-22 16:40:14,810 - INFO - Time of saving hours results of 80 buildings is 14.23 Seconds.
+2024-01-22 16:40:14,810 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 41.80 Seconds.
+2024-01-22 16:40:14,810 - INFO - ----------------------End simulation using process -----------------------
+2024-01-22 16:40:14,906 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:40:14,906 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:40:14,909 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 16:40:41,463 - INFO - Parallel Process Calculation time is 26.36 Seconds.
+2024-01-22 16:40:41,690 - INFO - Time of saving the final result of 80 buildings is 0.23 Seconds.
+2024-01-22 16:40:57,885 - INFO - Time of saving hours results of 80 buildings is 16.19 Seconds.
+2024-01-22 16:40:57,886 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 42.55 Seconds.
+2024-01-22 16:40:57,886 - INFO - ----------------------End simulation using process -----------------------
+2024-01-22 16:40:58,001 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:40:58,001 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:40:58,005 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 16:41:28,306 - INFO - Parallel Process Calculation time is 30.02 Seconds.
+2024-01-22 16:41:28,527 - INFO - Time of saving the final result of 80 buildings is 0.22 Seconds.
+2024-01-22 16:41:44,658 - INFO - Time of saving hours results of 80 buildings is 16.13 Seconds.
+2024-01-22 16:41:44,658 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 46.15 Seconds.
+2024-01-22 16:41:44,658 - INFO - ----------------------End simulation using process -----------------------
+2024-01-22 16:41:44,761 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:41:44,761 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:41:44,764 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 16:42:12,167 - INFO - Parallel Process Calculation time is 27.19 Seconds.
+2024-01-22 16:42:12,382 - INFO - Time of saving the final result of 80 buildings is 0.22 Seconds.
+2024-01-22 16:42:26,434 - INFO - Time of saving hours results of 80 buildings is 14.05 Seconds.
+2024-01-22 16:42:26,434 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 41.24 Seconds.
+2024-01-22 16:42:26,434 - INFO - ----------------------End simulation using process -----------------------
+2024-01-22 16:42:26,535 - INFO - Average runtime over 10 Iterations 40.051652 Seconds
+2024-01-22 16:42:45,304 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:42:45,304 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:42:45,422 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 16:43:12,786 - INFO - Parallel Process Calculation time is 27.22 Seconds.
+2024-01-22 16:43:13,290 - INFO - Time of saving the final result of 80 buildings is 0.50 Seconds.
+2024-01-22 16:43:28,005 - INFO - Time of saving hours results of 80 buildings is 14.71 Seconds.
+2024-01-22 16:43:28,005 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 41.94 Seconds.
+2024-01-22 16:43:28,005 - INFO - ----------------------End simulation using process -----------------------
+2024-01-22 16:43:40,209 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:43:40,210 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:43:40,325 - INFO - -----------Simulation using the method multi-----------
+2024-01-22 16:44:08,177 - INFO - Parallel Process Calculation time is 27.71 Seconds.
+2024-01-22 16:44:08,696 - INFO - Time of saving the final result of 80 buildings is 0.52 Seconds.
+2024-01-22 16:44:23,278 - INFO - Time of saving hours results of 80 buildings is 14.58 Seconds.
+2024-01-22 16:44:23,278 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 42.30 Seconds.
+2024-01-22 16:44:23,278 - INFO - ----------------------End simulation using process -----------------------
+2024-01-22 16:44:33,485 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:44:33,485 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:45:02,793 - INFO - -----------Simulation using the method parallel_process_calculation-----------
+2024-01-22 16:45:02,793 - INFO - Parallel Process Calculation time is 29.20 Seconds.
+2024-01-22 16:45:03,269 - INFO - Time of saving the final result of 80 buildings is 0.48 Seconds.
+2024-01-22 16:45:17,969 - INFO - Time of saving hours results of 80 buildings is 14.70 Seconds.
+2024-01-22 16:45:17,969 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 43.90 Seconds.
+2024-01-22 16:45:17,969 - INFO - -----------------------------End simulation using process----------------------------
+2024-01-22 16:45:17,969 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:45:17,969 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:45:30,259 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:45:30,259 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:45:59,427 - INFO - -----------Simulation using the method parallel_process_calculation-----------
+2024-01-22 16:45:59,428 - INFO - Parallel Process Calculation time is 29.03 Seconds.
+2024-01-22 16:45:59,885 - INFO - Time of saving the final result of 80 buildings is 0.46 Seconds.
+2024-01-22 16:46:13,938 - INFO - Time of saving hours results of 80 buildings is 14.05 Seconds.
+2024-01-22 16:46:13,939 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 43.08 Seconds.
+2024-01-22 16:46:13,939 - INFO - -----------------------------End simulation using process----------------------------
+2024-01-22 16:46:13,939 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:46:13,939 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:46:53,855 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:46:53,855 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:47:21,575 - INFO - -----------Simulation using the method parallel_process_calculation-----------
+2024-01-22 16:47:21,575 - INFO - Parallel Process Calculation time is 27.61 Seconds.
+2024-01-22 16:47:22,018 - INFO - Time of saving the final result of 80 buildings is 0.44 Seconds.
+2024-01-22 16:47:35,860 - INFO - Time of saving hours results of 80 buildings is 13.84 Seconds.
+2024-01-22 16:47:35,860 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 41.45 Seconds.
+2024-01-22 16:47:35,860 - INFO - -----------------------------End simulation using process----------------------------
+2024-01-22 16:47:35,860 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:47:35,860 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:57:32,382 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:57:32,382 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:57:51,623 - INFO - -----------Simulation using the method parallel_process_calculation-----------
+2024-01-22 16:57:51,624 - INFO - Parallel Process Calculation time is 19.12 Seconds.
+2024-01-22 16:57:52,082 - INFO - Time of saving the final result of 80 buildings is 0.46 Seconds.
+2024-01-22 16:58:06,041 - INFO - Time of saving hours results of 80 buildings is 13.96 Seconds.
+2024-01-22 16:58:06,041 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 33.08 Seconds.
+2024-01-22 16:58:06,041 - INFO - -----------------------------End simulation using process----------------------------
+2024-01-22 16:58:06,042 - INFO - ------------------------------------------------------------------------------------------
+2024-01-22 16:58:06,042 - INFO - ------------------------------------------------------------------------------------------
+2024-01-23 09:36:42,008 - INFO - ------------------------------------------------------------------------------------------
+2024-01-23 09:36:42,008 - INFO - ------------------------------------------------------------------------------------------
+2024-01-23 09:37:03,830 - INFO - -----------Simulation using the method parallel_process_calculation-----------
+2024-01-23 09:37:03,830 - INFO - Parallel Process Calculation time is 21.71 Seconds.
+2024-01-23 09:37:04,416 - INFO - Time of saving the final result of 80 buildings is 0.59 Seconds.
+2024-01-23 09:37:18,440 - INFO - Time of saving hours results of 80 buildings is 14.02 Seconds.
+2024-01-23 09:37:18,440 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 35.73 Seconds.
+2024-01-23 09:37:18,440 - INFO - -----------------------------End simulation using process----------------------------
+2024-01-23 09:37:18,440 - INFO - ------------------------------------------------------------------------------------------
+2024-01-23 09:37:18,440 - INFO - ------------------------------------------------------------------------------------------
+2024-01-25 22:07:49,778 - INFO - ------------------------------------------------------------------------------------------
+2024-01-25 22:07:49,778 - INFO - ------------------------------------------------------------------------------------------
+2024-01-25 22:07:49,889 - INFO - -----------Simulation using the method multi-----------
+2024-01-25 22:08:11,354 - INFO - Parallel Process Calculation time is 21.41 Seconds.
+2024-01-25 22:08:11,983 - INFO - Time of saving the final result of 80 buildings is 0.63 Seconds.
+2024-01-25 22:08:25,895 - INFO - Time of saving hours results of 80 buildings is 13.91 Seconds.
+2024-01-25 22:08:25,895 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 35.32 Seconds.
+2024-01-25 22:08:25,895 - INFO - ----------------------End simulation using process -----------------------
+2024-01-25 22:08:36,766 - INFO - ------------------------------------------------------------------------------------------
+2024-01-25 22:08:36,766 - INFO - ------------------------------------------------------------------------------------------
+2024-01-25 22:08:36,887 - INFO - -----------Simulation using the method multi-----------
+2024-01-25 22:08:56,218 - INFO - Parallel Process Calculation time is 19.27 Seconds.
+2024-01-25 22:08:56,643 - INFO - Time of saving the final result of 80 buildings is 0.42 Seconds.
+2024-01-25 22:09:10,633 - INFO - Time of saving hours results of 80 buildings is 13.99 Seconds.
+2024-01-25 22:09:10,634 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 33.26 Seconds.
+2024-01-25 22:09:10,634 - INFO - ----------------------End simulation using process -----------------------
+2024-01-25 22:09:15,781 - INFO - ------------------------------------------------------------------------------------------
+2024-01-25 22:09:15,781 - INFO - ------------------------------------------------------------------------------------------
+2024-01-25 22:09:15,893 - INFO - -----------Simulation using the method multi-----------
+2024-01-25 22:09:35,915 - INFO - Parallel Process Calculation time is 19.93 Seconds.
+2024-01-25 22:09:36,340 - INFO - Time of saving the final result of 80 buildings is 0.42 Seconds.
+2024-01-25 22:09:51,053 - INFO - Time of saving hours results of 80 buildings is 14.71 Seconds.
+2024-01-25 22:09:51,053 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 34.64 Seconds.
+2024-01-25 22:09:51,053 - INFO - ----------------------End simulation using process -----------------------
+2024-01-26 15:44:20,907 - INFO - ------------------------------------------------------------------------------------------
+2024-01-26 15:44:20,907 - INFO - ------------------------------------------------------------------------------------------
+2024-01-26 15:44:21,022 - INFO - -----------Simulation using the method multi-----------
+2024-01-26 15:44:40,765 - INFO - Parallel Process Calculation time is 19.59 Seconds.
+2024-01-26 15:44:41,275 - INFO - Time of saving the final result of 80 buildings is 0.51 Seconds.
+2024-01-26 15:44:55,202 - INFO - Time of saving hours results of 80 buildings is 13.93 Seconds.
+2024-01-26 15:44:55,202 - WARNING - Total time to simulate 80 buildings and save hourly and final results is 33.51 Seconds.
+2024-01-26 15:44:55,202 - INFO - ----------------------End simulation using process -----------------------
+2024-01-28 13:18:02,118 - INFO - ------------------------------------------------------------------------------------------
+2024-01-28 13:18:02,118 - INFO - ------------------------------------------------------------------------------------------
+2024-01-28 13:18:02,266 - INFO - -----------Simulation using the method multi-----------

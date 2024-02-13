@@ -137,7 +137,7 @@ class DataSourceCSV(DataSource):
         ]
 
     def get_schedule(
-        self, hk_geb: str, uk_geb: str
+            self, hk_geb: str, uk_geb: str
     ) -> Union[Tuple[List[ScheduleName], str, float], HkOrUkNotFoundError]:
         """
         Find occupancy schedule from SIA2024, depending on hk_geb, uk_geb from csv file
@@ -169,7 +169,7 @@ class DataSourceCSV(DataSource):
             print(error)
 
     def get_tek(
-        self, hk_geb: str, uk_geb: str
+            self, hk_geb: str, uk_geb: str
     ) -> Union[Tuple[float, str], HkOrUkNotFoundError]:
         """
         Find TEK values from Partial energy parameters to build the comparative values in accordance with the
@@ -218,7 +218,7 @@ class DataSourceCSV(DataSource):
         return [WeatherData(*row.values) for _, row in weather_data.iterrows()]
 
     def choose_and_get_the_right_weather_data_from_path(
-        self, weather_period, file_name
+            self, weather_period, file_name
     ) -> List[WeatherData]:
         """
         This method retrieves the right weather data according to the given weather_period and file_name
@@ -234,7 +234,7 @@ class DataSourceCSV(DataSource):
         return (
             self.get_weather_data(
                 os.path.join(
-                    f"iso_simulator/auxiliary/weather_data/weather_data_TMYx_2007_2021{file_name}",
+                    f"iso_simulator/auxiliary/weather_data/weather_data_TMYx_2007_2021/{file_name}",
                 )
             )
             if weather_period == "2007-2021"
@@ -282,7 +282,7 @@ class DataSourceCSV(DataSource):
         return EPWFile(epw_filename, coordinates_station, distance)
 
     def get_usage_time(
-        self, hk_geb: str, uk_geb: str, usage_from_norm: str
+            self, hk_geb: str, uk_geb: str, usage_from_norm: str
     ) -> Union[Tuple[int, int], UsageTimeError]:
         """
         Find building's usage time DIN 18599-10 or SIA2024
@@ -314,11 +314,11 @@ class DataSourceCSV(DataSource):
             print(error)
 
     def get_gains(
-        self,
-        hk_geb: str,
-        uk_geb: str,
-        profile_from_norm: str,
-        gains_from_group_values: str,
+            self,
+            hk_geb: str,
+            uk_geb: str,
+            profile_from_norm: str,
+            gains_from_group_values: str,
     ) -> Tuple[Tuple[float, str], float]:
         """
         Find data from DIN V 18599-10 or SIA2024
@@ -365,7 +365,7 @@ class DataSourceCSV(DataSource):
         return gain_person_and_typ_norm, appliance_gains
 
     def result_to_pandas_dataframe(
-        self, result: ResultOutput, user_arguments: List
+            self, result: ResultOutput, user_arguments: List
     ) -> pd.DataFrame:
         """
         Maps a list of ResultOutput objects to a pandas Dataframe
@@ -485,57 +485,13 @@ class DataSourceCSV(DataSource):
             }
         )
 
-    def result_of_all_hours_to_excel(self, result: Result, building: Building):
-        """
-        Maps the results of the simulated building to an Excel file (all hours)
-        Args:
-            result: result
-            building: the building to simulate
-
-        Returns:
-            Saved Excel file in the result directory
-        Return type:
-            None
-        """
-        data_frame = pd.DataFrame(
-            {
-                "HeatingDemand": result.heating_demand,
-                "HeatingEnergy": result.heating_energy,
-                "Heating_Sys_Electricity": result.heating_sys_electricity,
-                "Heating_Sys_Fossils": result.heating_sys_fossils,
-                "CoolingDemand": result.cooling_demand,
-                "CoolingEnergy": result.cooling_energy,
-                "Cooling_Sys_Electricity": result.cooling_sys_electricity,
-                "Cooling_Sys_Fossils": result.cooling_sys_fossils,
-                "HotWaterDemand": result.all_hot_water_demand,
-                "HotWaterEnergy": result.all_hot_water_energy,
-                "HotWater_Sys_Electricity": result.hot_water_sys_electricity,
-                "HotWater_Sys_Fossils": result.hot_water_sys_fossils,
-                "IndoorAirTemperature": result.temp_air,
-                "OutsideTemperature": result.outside_temp,
-                "LightingDemand": result.lighting_demand,
-                "InternalGains": result.internal_gains,
-                "Appliance_gains_demand": result.appliance_gains_demand,
-                "Appliance_gains_elt_demand": result.appliance_gains_elt_demand,
-                "SolarGainsSouthWindow": result.solar_gains_south_window,
-                "SolarGainsEastWindow": result.solar_gains_east_window,
-                "SolarGainsWestWindow": result.solar_gains_west_window,
-                "SolarGainsNorthWindow": result.solar_gains_north_window,
-                "SolarGainsTotal": result.solar_gains_total,
-                "Daytime": result.DayTime,
-                "iteration": 5,
-                "GebäudeID": building.scr_gebaeude_id,
-            }
-        )
-        build_file_name = f"{building.scr_gebaeude_id}.xlsx"
-        data_frame.to_excel(f"results/{build_file_name}")
-
     def result_of_all_hours_to_csv(
-        self, folder_path: str, result: Result, building: Building
+            self, folder_path: str, result: Result, building: Building
     ):
         """
         Maps the results of the simulated building to an Excel file (all hours)
         Args:
+            folder_path: where to store results
             result: result
             building: the building to simulate
 
@@ -580,7 +536,7 @@ class DataSourceCSV(DataSource):
         return build_file_name
 
     def build_all_results_of_all_buildings(
-        self, results: List[ResultOutput], user_arguments: List, folder_path: str
+            self, results: List[ResultOutput], user_arguments: List, folder_path: str
     ):
         """
         Converts the results of all buildings to an Excel file saved in the result directory
@@ -604,3 +560,53 @@ class DataSourceCSV(DataSource):
         combined_data_frames.to_excel(
             rf"{folder_path}/annualResults_summaries.xlsx", index=False
         )
+
+    def result_of_all_hours_to_excel(
+            self, folder_path: str, result: Result, building: Building
+    ):
+        """
+        Maps the results of the simulated building to an Excel file (all hours)
+        Args:
+            folder_path: where to store results
+            result: result
+            building: the building to simulate
+
+        Returns:
+            Saved Excel file in the result directory
+        Return type:
+            None
+        """
+        data_frame = pd.DataFrame(
+            {
+                "HeatingDemand": result.heating_demand,
+                "HeatingEnergy": result.heating_energy,
+                "Heating_Sys_Electricity": result.heating_sys_electricity,
+                "Heating_Sys_Fossils": result.heating_sys_fossils,
+                "CoolingDemand": result.cooling_demand,
+                "CoolingEnergy": result.cooling_energy,
+                "Cooling_Sys_Electricity": result.cooling_sys_electricity,
+                "Cooling_Sys_Fossils": result.cooling_sys_fossils,
+                "HotWaterDemand": result.all_hot_water_demand,
+                "HotWaterEnergy": result.all_hot_water_energy,
+                "HotWater_Sys_Electricity": result.hot_water_sys_electricity,
+                "HotWater_Sys_Fossils": result.hot_water_sys_fossils,
+                "IndoorAirTemperature": result.temp_air,
+                "OutsideTemperature": result.outside_temp,
+                "LightingDemand": result.lighting_demand,
+                "InternalGains": result.internal_gains,
+                "Appliance_gains_demand": result.appliance_gains_demand,
+                "Appliance_gains_elt_demand": result.appliance_gains_elt_demand,
+                "SolarGainsSouthWindow": result.solar_gains_south_window,
+                "SolarGainsEastWindow": result.solar_gains_east_window,
+                "SolarGainsWestWindow": result.solar_gains_west_window,
+                "SolarGainsNorthWindow": result.solar_gains_north_window,
+                "SolarGainsTotal": result.solar_gains_total,
+                "Daytime": result.DayTime,
+                "iteration": 5,
+                "GebäudeID": building.scr_gebaeude_id,
+            }
+        )
+        build_file_name = f"{building.scr_gebaeude_id}.xlsx"
+        data_frame.to_excel(f"{folder_path}/{build_file_name}")
+
+        return build_file_name

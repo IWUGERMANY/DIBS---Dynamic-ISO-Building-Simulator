@@ -43,11 +43,18 @@ class SupplyDirector:
 
 class SupplySystemBase:
     """
-     The base class in which Supply systems are built from 
+    The base class in which Supply systems are built from
     """
 
-    def __init__(self, load, t_out, heating_supply_temperature, cooling_supply_temperature, has_heating_demand,
-                 has_cooling_demand):
+    def __init__(
+        self,
+        load,
+        t_out,
+        heating_supply_temperature,
+        cooling_supply_temperature,
+        has_heating_demand,
+        has_cooling_demand,
+    ):
         self.load = load  # Energy Demand of the building at that time step
         self.t_out = t_out  # Outdoor Air Temperature
         # Temperature required by the emission system
@@ -56,7 +63,8 @@ class SupplySystemBase:
         self.has_heating_demand = has_heating_demand
         self.has_cooling_demand = has_cooling_demand
 
-    def calc_loads(self): pass
+    def calc_loads(self):
+        pass
 
     """
     Caculates the electricty / fossil fuel consumption of the set supply system
@@ -65,8 +73,8 @@ class SupplySystemBase:
 
 
 ##############################################################################
-# Oil Boilers 
-##############################################################################    
+# Oil Boilers
+##############################################################################
 class OilBoilerStandardBefore86(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -140,7 +148,7 @@ class OilBoilerLowTempFrom95(SupplySystemBase):
 class OilBoilerCondensingBefore95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
-    Brennwertkessel vor 1995 - Oil 
+    Brennwertkessel vor 1995 - Oil
     """
 
     def calc_loads(self):
@@ -154,7 +162,7 @@ class OilBoilerCondensingBefore95(SupplySystemBase):
 class OilBoilerCondensingFrom95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
-    Brennwertkessel ab 1995 - Oil 
+    Brennwertkessel ab 1995 - Oil
     """
 
     def calc_loads(self):
@@ -168,7 +176,7 @@ class OilBoilerCondensingFrom95(SupplySystemBase):
 class OilBoilerCondensingImproved(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
-    Brennwertkessel verbessert 
+    Brennwertkessel verbessert
     """
 
     def calc_loads(self):
@@ -181,7 +189,7 @@ class OilBoilerCondensingImproved(SupplySystemBase):
 
 ##############################################################################
 # Gas Boilers
-##############################################################################    
+##############################################################################
 class GasBoilerStandardBefore86(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
@@ -447,12 +455,13 @@ class LGasBoilerCondensingFrom95(SupplySystemBase):
 #         system.fossils_in = self.load * 1.054
 #         system.electricity_in = 0
 #         system.electricity_out = 0
-#         return system      
+#         return system
+
 
 class BiogasOilBoilerCondensingFrom95(SupplySystemBase):
     """
     expenditure factor (=Erzeugeraufwandszahl) from TEK-Tool 9.24
-    Brennwertkessel ab 1995 - Biogas/Bioöl Mix 
+    Brennwertkessel ab 1995 - Biogas/Bioöl Mix
     """
 
     def calc_loads(self):
@@ -569,7 +578,7 @@ class CoalSolidFuelBoiler(SupplySystemBase):
 
 
 # Furnaces
-##############################################################################    
+##############################################################################
 class SolidFuelLiquidFuelFurnace(SupplySystemBase):
     """
     Minimum efficiency according to '1. BImSchV, Anlage 4'
@@ -601,19 +610,20 @@ class HeatPumpAirSource(SupplySystemBase):
             # determine the temperature difference, if negative, set to 0
             deltaT = max(0, self.heating_supply_temperature - self.t_out)
             # Eq (4) in Staggell et al.
-            system.cop = 6.81 - 0.121 * deltaT + 0.000630 * deltaT ** 2
+            system.cop = 6.81 - 0.121 * deltaT + 0.000630 * deltaT**2
             system.electricity_in = self.load / system.cop
 
         elif self.has_cooling_demand:
             # determine the temperature difference, if negative, set to 0
             deltaT = max(0, self.t_out - self.cooling_supply_temperature)
             # Eq (4) in Staggell et al.
-            system.cop = 6.81 - 0.121 * deltaT + 0.000630 * deltaT ** 2
+            system.cop = 6.81 - 0.121 * deltaT + 0.000630 * deltaT**2
             system.electricity_in = self.load / system.cop
 
         else:
             raise ValueError(
-                'HeatPumpAir called although there is no heating/cooling demand')
+                "HeatPumpAir called although there is no heating/cooling demand"
+            )
 
         system.fossils_in = 0
         system.electricity_out = 0
@@ -621,14 +631,14 @@ class HeatPumpAirSource(SupplySystemBase):
 
 
 class HeatPumpGroundSource(SupplySystemBase):
-    """"
+    """ "
     BETA Version
     Ground source heat pumps can be designed in an open-loop system where they "extract water directly from, and reject it
-    back to rivers or groundwater resources such as aquifers and springs" or in an closed-loop system where they use "a 
-    sealed loop to extract heat from the surrounding soil or rock". 
+    back to rivers or groundwater resources such as aquifers and springs" or in an closed-loop system where they use "a
+    sealed loop to extract heat from the surrounding soil or rock".
     Source: Staffell et al. (2012): A review of domestic heat pumps, In: Energy & Environmental Science, 2012, 5, p. 9291-9306
 
-    Reservoir temperatures 7 degC (winter) and 12 degC (summer). 
+    Reservoir temperatures 7 degC (winter) and 12 degC (summer).
     COP based on regression analysis of manufacturers data
     Source: Staffell et al. (2012): A review of domestic heat pumps, In: Energy & Environmental Science, 2012, 5, p. 9291-9306
     """
@@ -638,13 +648,13 @@ class HeatPumpGroundSource(SupplySystemBase):
         if self.has_heating_demand:
             deltaT = max(0, self.heating_supply_temperature - 7.0)
             # Eq (4) in Staggell et al.
-            system.cop = 8.77 - 0.150 * deltaT + 0.000734 * deltaT ** 2
+            system.cop = 8.77 - 0.150 * deltaT + 0.000734 * deltaT**2
             system.electricity_in = self.load / system.cop
 
         elif self.has_cooling_demand:
             deltaT = max(0, 13.0 - self.cooling_supply_temperature)
             # Eq (4) in Staggell et al.
-            system.cop = 8.77 - 0.150 * deltaT + 0.000734 * deltaT ** 2
+            system.cop = 8.77 - 0.150 * deltaT + 0.000734 * deltaT**2
             system.electricity_in = self.load / system.cop
 
         system.fossils_in = 0
@@ -671,7 +681,7 @@ class GasCHP(SupplySystemBase):
 
 ##############################################################################
 # District Heating
-# Assumption: Indirect system with two water circuits          
+# Assumption: Indirect system with two water circuits
 ##############################################################################
 class DistrictHeating(SupplySystemBase):
     """
@@ -706,7 +716,7 @@ class ElectricHeating(SupplySystemBase):
 
 ##############################################################################
 # Direct Heater for testing purposes
-##############################################################################  
+##############################################################################
 class DirectHeater(SupplySystemBase):
     """
     Created by PJ to check accuracy against previous simulation
@@ -727,7 +737,7 @@ class AirCooledPistonScroll(SupplySystemBase):
     """
     Wärmeabfuhr Kältemaschine (Kondensator): Luftgekühlt (Primärkreis)
     Verdichterart: Kolben-/Scrollverdichter - on/off Betrieb
-    
+
     Informationsblatt zur Kälteerzeugung gemäss Norm SIA 382-1:2014, S. 4
     Kälteerzeugerleistung der Kältemaschine: 100 kW
     EER (full load): 3,1
@@ -749,7 +759,7 @@ class AirCooledPistonScrollMulti(SupplySystemBase):
     """
     Wärmeabfuhr Kältemaschine (Kondensator): Luftgekühlt (Primärkreis)
     Verdichterart: Kolben-/Scrollverdichter - mehrstufig
-    
+
     Informationsblatt zur Kälteerzeugung gemäss Norm SIA 382-1:2014
     Kälteerzeugerleistung der Kältemaschine: 100 kW
     EER (full load): 3,1
@@ -771,7 +781,7 @@ class WaterCooledPistonScroll(SupplySystemBase):
     """
     Wärmeabfuhr Kältemaschine (Kondensator): Wassergekühlt (Primärkreis)
     Verdichterart: Kolben-/Scrollverdichter - on/off Betrieb
-    
+
     Informationsblatt zur Kälteerzeugung gemäss Norm SIA 382-1:2014
     Kälteerzeugerleistung der Kältemaschine: 100 kW
     EER (full load): 4,25
@@ -792,11 +802,11 @@ class AbsorptionRefrigerationSystem(SupplySystemBase):
     """
     Wärmeabfuhr Kältemaschine (Kondensator): Wassergekühlt (Primärkreis)
     Verdichterart: Absorptionskälteanlage H2O/LiBr
-      
+
     Assumption: Driving heat comes from waste heat, not from fossils (this may lead to biased results if this is not the case), due to the fact that
-    absorption chillers usually have a lower efficiency compared to compression chillers. We assume that building owners only use absorption chillers if 
+    absorption chillers usually have a lower efficiency compared to compression chillers. We assume that building owners only use absorption chillers if
     they have access to heat free of charge.
-    
+
     Furthermore: Electricity consumption for pumps etc. are not considered at this stage
     """
 
@@ -832,7 +842,7 @@ class GasEnginePistonScroll(SupplySystemBase):
     """
     ANALYSIS OF ENERGY EFFICIENCY OF GAS DRIVEN HEAT PUMPS - PhD Work of
     M.Sc. Essam Mahrous Elgenady Elgendy
-    Fakultaet fuer Verfahrens- und Systemtechnik 
+    Fakultaet fuer Verfahrens- und Systemtechnik
     der Otto-von-Guericke-Universitaet Magdeburg
     """
 
@@ -897,10 +907,12 @@ class NoCooler(SupplySystemBase):
 
 ##############################################################################
 
+
 class SupplyOut:
     """
     The System class which is used to output the final results
     """
+
     fossils_in = float("nan")
     electricity_in = float("nan")
     electricity_out = float("nan")

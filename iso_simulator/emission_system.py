@@ -32,10 +32,10 @@ class EmissionDirector:
     def set_builder(self, builder):
         # self.__builder = builder
         self.builder = builder
+
     # Calcs the energy load of that system. This is the main() fu
 
     def calc_flows(self):
-
         # Director asks the builder to produce the system body. self.builder
         # is an instance of the class
 
@@ -46,21 +46,21 @@ class EmissionDirector:
 
 class EmissionSystemBase:
 
-    """ 
+    """
     The base class in which systems are built from
     """
 
     def __init__(self, energy_demand):
-
         self.energy_demand = energy_demand
 
+    def heat_flows(self):
+        pass
 
-    def heat_flows(self): pass
     """
     determines the node where the heating/cooling system is active based on the system used
     Also determines the return and supply temperatures for the heating/cooling system
     """
-    
+
 
 class AirConditioning(EmissionSystemBase):
     """
@@ -81,11 +81,11 @@ class AirConditioning(EmissionSystemBase):
         flows.cooling_return_temperature = 21
 
         return flows
-    
-    
+
+
 class SurfaceHeatingCooling(EmissionSystemBase):
     """
-    All HC energy goes into the surface node, assumed low supply temperature 
+    All HC energy goes into the surface node, assumed low supply temperature
     Heat is emitted to the surface node
     """
 
@@ -101,11 +101,11 @@ class SurfaceHeatingCooling(EmissionSystemBase):
         flows.cooling_return_temperature = 21
 
         return flows
-    
-    
+
+
 class ThermallyActivated(EmissionSystemBase):
     """
-    Heat is emitted to the thermal mass node, assumed low supply temperature 
+    Heat is emitted to the thermal mass node, assumed low supply temperature
     """
 
     def heat_flows(self):
@@ -138,9 +138,9 @@ class NoCooling(EmissionSystemBase):
         flows.cooling_supply_temperature = 0
         flows.cooling_return_temperature = 0
 
-        return flows 
-    
-    
+        return flows
+
+
 class NoHeating(EmissionSystemBase):
     """
     Dummy Class used for buildings with no heating supply system
@@ -157,7 +157,7 @@ class NoHeating(EmissionSystemBase):
         flows.cooling_supply_temperature = 0
         flows.cooling_return_temperature = 0
 
-        return flows       
+        return flows
 
 
 class Flows:

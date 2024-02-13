@@ -33,7 +33,7 @@ def simulate_one_building(
         "sia2024", callback=validate_usage_from_norm, help="Choose a usage norm from"
     ),
     weather_period: str = typer.Argument(
-        "2004-2018",
+        "2007-2021",
         callback=validate_weather_period,
         help="Invalid date range format. Please use 'YYYY-YYYY'.",
     ),

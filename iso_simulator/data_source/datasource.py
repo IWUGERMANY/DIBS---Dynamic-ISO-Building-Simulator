@@ -78,7 +78,7 @@ class DataSource(ABC):
 
     @abstractmethod
     def get_schedule(
-        self, hk_geb: str, uk_geb: str
+            self, hk_geb: str, uk_geb: str
     ) -> Union[Tuple[List[ScheduleName], str], HkOrUkNotFoundError]:
         """
         Find occupancy schedule from SIA2024, depending on hk_geb, uk_geb
@@ -125,7 +125,7 @@ class DataSource(ABC):
 
     @abstractmethod
     def choose_and_get_the_right_weather_data_from_path(
-        self, weather_period, file_name
+            self, weather_period, file_name
     ) -> List[WeatherData]:
         """
         This method retrieves the right weather data according to the given weather_period and file_name
@@ -158,7 +158,7 @@ class DataSource(ABC):
 
     @abstractmethod
     def get_usage_time(
-        self, hk_geb: str, uk_geb: str, usage_from_norm: str
+            self, hk_geb: str, uk_geb: str, usage_from_norm: str
     ) -> Union[Tuple[int, int], ValueError]:
         """
         Find building's usage time DIN 18599-10 or SIA2024
@@ -176,11 +176,11 @@ class DataSource(ABC):
 
     @abstractmethod
     def get_gains(
-        self,
-        hk_geb: str,
-        uk_geb: str,
-        profile_from_norm: str,
-        gains_from_group_values: str,
+            self,
+            hk_geb: str,
+            uk_geb: str,
+            profile_from_norm: str,
+            gains_from_group_values: str,
     ) -> Tuple[Tuple[float, str], float]:
         """
         Find data from DIN V 18599-10 or SIA2024
@@ -216,17 +216,16 @@ class DataSource(ABC):
         pass
 
     @abstractmethod
-    def result_of_all_hours_to_excel(self, result, building):
+    def result_of_all_hours_to_csv(self, folder_path, result, building):
         """
-        Maps the results of the simulated building to an Excel file (all hours)
+
         Args:
-            result: result
-            building: the building to simulate
+            folder_path: where to store results
+            result: calculated results
+            building: building to simulate
 
         Returns:
-            Excel file
-        Return type:
-            None
+
         """
         pass
 
@@ -245,4 +244,8 @@ class DataSource(ABC):
             None
 
         """
+        pass
+
+    @abstractmethod
+    def result_of_all_hours_to_excel(self, folder_path, result, building):
         pass
