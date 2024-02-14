@@ -274,7 +274,7 @@ class SimulateAllBuilding:
             if hour == 0
             else self.building_object.t_air
         )
-        return round(t_air, 0)
+        return round(t_air, 2)
 
     def calc_solar_gains_for_all_windows(
             self, sun_altitude: float, sun_azimuth: float, t_air: float, hour: int

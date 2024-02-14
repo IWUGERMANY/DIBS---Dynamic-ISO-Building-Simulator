@@ -3,13 +3,13 @@ import math
 
 class Window:
     def __init__(
-        self,
-        azimuth_tilt,
-        alititude_tilt=90,
-        glass_solar_transmittance=0.7,
-        glass_solar_shading_transmittance=0.2,
-        glass_light_transmittance=0.8,
-        area=1,
+            self,
+            azimuth_tilt,
+            alititude_tilt=90,
+            glass_solar_transmittance=0.7,
+            glass_solar_shading_transmittance=0.2,
+            glass_light_transmittance=0.8,
+            area=1,
     ):
         self.alititude_tilt_rad = math.radians(alititude_tilt)
         self.azimuth_tilt_rad = math.radians(azimuth_tilt)
@@ -19,13 +19,13 @@ class Window:
         self.glass_solar_shading_transmittance = glass_solar_shading_transmittance
 
     def calc_solar_gains(
-        self,
-        sun_altitude: float,
-        sun_azimuth: float,
-        normal_direct_radiation: int,
-        horizontal_diffuse_radiation: int,
-        t_air: float,
-        hour: int,
+            self,
+            sun_altitude: float,
+            sun_azimuth: float,
+            normal_direct_radiation: int,
+            horizontal_diffuse_radiation: int,
+            t_air: float,
+            hour: int,
     ) -> None:
         """
         Calculates the solar gains in the building zone through the set window
@@ -61,21 +61,21 @@ class Window:
             horizontal_diffuse_radiation,
         )
         if (
-            t_air > 24 and cooling_season and self.glass_solar_shading_transmittance > 0
+                round(t_air, 1) > 24 and cooling_season and self.glass_solar_shading_transmittance > 0
         ):  # Check if the building has sunshading
             self.solar_gains = (
-                self.glass_solar_shading_transmittance * self.incident_solar
+                    self.glass_solar_shading_transmittance * self.incident_solar
             )
 
         else:
             self.solar_gains = self.glass_solar_transmittance * self.incident_solar
 
     def set_variable_for_calc_sun(
-        self,
-        sun_altitude: float,
-        sun_azimuth: float,
-        normal_direct_radiation: int,
-        horizontal_diffuse_radiation: int,
+            self,
+            sun_altitude: float,
+            sun_azimuth: float,
+            normal_direct_radiation: int,
+            horizontal_diffuse_radiation: int,
     ) -> None:
         direct_factor = self.calc_direct_solar_factor(
             sun_altitude,
@@ -95,11 +95,11 @@ class Window:
         return (1 + math.cos(self.alititude_tilt_rad)) / 2
 
     def calc_illuminance(
-        self,
-        sun_altitude: float,
-        sun_azimuth: float,
-        normal_direct_illuminance: int,
-        horizontal_diffuse_illuminance: int,
+            self,
+            sun_altitude: float,
+            sun_azimuth: float,
+            normal_direct_illuminance: int,
+            horizontal_diffuse_illuminance: int,
     ) -> None:
         """
         Calculates the illuminance in the building zone through the set window
@@ -127,14 +127,14 @@ class Window:
         diffuse_illuminance = diffuse_factor * horizontal_diffuse_illuminance
 
         self.incident_illuminance = (
-            direct_illuminance + diffuse_illuminance
-        ) * self.area
+                                            direct_illuminance + diffuse_illuminance
+                                    ) * self.area
         self.transmitted_illuminance = (
-            self.incident_illuminance * self.glass_light_transmittance
+                self.incident_illuminance * self.glass_light_transmittance
         )
 
     def calc_direct_solar_factor(
-        self, sun_altitude: float, sun_azimuth: float
+            self, sun_altitude: float, sun_azimuth: float
     ) -> float:
         """
         Calculates the cosine of the angle of incidence on the window

@@ -24,13 +24,13 @@ __license__ = "MIT"
 
 class BuildingSimulator:
     def __init__(
-        self,
-        path: str,
-        datasource: DataSourceCSV,
-        weather_period: str,
-        profile_from_norm: str,
-        gains_from_group_values: str,
-        usage_from_norm: str,
+            self,
+            path: str,
+            datasource: DataSourceCSV,
+            weather_period: str,
+            profile_from_norm: str,
+            gains_from_group_values: str,
+            usage_from_norm: str,
     ):
         """
         This constructor to initialize an instance of the BuildingSimulator class
@@ -73,7 +73,7 @@ class BuildingSimulator:
         """
         check_energy_ref_area = self.building_object.energy_ref_area == -8
         check_heating_supply_system = (
-            self.building_object.heating_supply_system == "NoHeating"
+                self.building_object.heating_supply_system == "NoHeating"
         )
         try:
             if check_energy_ref_area or check_heating_supply_system:
@@ -246,7 +246,7 @@ class BuildingSimulator:
         )
 
     def calc_building_h_ve_adj(
-        self, hour: int, t_out: float, usage_start: int, usage_end: int
+            self, hour: int, t_out: float, usage_start: int, usage_end: int
     ) -> float:
         """
         Calculate H_ve_adj, See building_physics for details
@@ -275,10 +275,10 @@ class BuildingSimulator:
             if hour == 0
             else self.building_object.t_air
         )
-        return round(t_air, 0)
+        return round(t_air, 2)
 
     def calc_solar_gains_for_all_windows(
-        self, sun_altitude: float, sun_azimuth: float, t_air: float, hour: int
+            self, sun_altitude: float, sun_azimuth: float, t_air: float, hour: int
     ) -> None:
         """
         Calculates the solar gains in the building zone through the set window
@@ -304,7 +304,7 @@ class BuildingSimulator:
             )
 
     def calc_illuminance_for_all_windows(
-        self, sun_altitude: float, sun_azimuth: float, hour: int
+            self, sun_altitude: float, sun_azimuth: float, hour: int
     ) -> None:
         """
         Calculates the illuminance in the building zone through the set window
@@ -327,7 +327,7 @@ class BuildingSimulator:
             )
 
     def calc_occupancy(
-        self, occupancy_schedule: List[ScheduleName], hour: int
+            self, occupancy_schedule: List[ScheduleName], hour: int
     ) -> float:
         """
         Calc occupancy for the time step
@@ -364,12 +364,12 @@ class BuildingSimulator:
         )
 
     def calc_gains_from_occupancy_and_appliances(
-        self,
-        occupancy_schedule: List[ScheduleName],
-        occupancy: float,
-        gain_per_person: float,
-        appliance_gains: float,
-        hour: int,
+            self,
+            occupancy_schedule: List[ScheduleName],
+            occupancy: float,
+            gain_per_person: float,
+            appliance_gains: float,
+            hour: int,
     ) -> float:
         """
         Calculate gains from occupancy and appliances
@@ -386,15 +386,15 @@ class BuildingSimulator:
 
         """
         return (
-            occupancy * gain_per_person
-            + appliance_gains
-            * occupancy_schedule[hour].Appliances
-            * self.building_object.energy_ref_area
-            + self.building_object.lighting_demand
+                occupancy * gain_per_person
+                + appliance_gains
+                * occupancy_schedule[hour].Appliances
+                * self.building_object.energy_ref_area
+                + self.building_object.lighting_demand
         )
 
     def calc_appliance_gains_demand(
-        self, occupancy_schedule: List[ScheduleName], appliance_gains: float, hour: int
+            self, occupancy_schedule: List[ScheduleName], appliance_gains: float, hour: int
     ) -> float:
         """
         Calculate appliance_gains as part of the internal_gains
@@ -408,13 +408,13 @@ class BuildingSimulator:
 
         """
         return (
-            appliance_gains
-            * occupancy_schedule[hour].Appliances
-            * self.building_object.energy_ref_area
+                appliance_gains
+                * occupancy_schedule[hour].Appliances
+                * self.building_object.energy_ref_area
         )
 
     def get_appliance_gains_elt_demand(
-        self, occupancy_schedule: List[ScheduleName], appliance_gains: float, hour: int
+            self, occupancy_schedule: List[ScheduleName], appliance_gains: float, hour: int
     ) -> float:
         """
         Appliance_gains equal the electric energy that appliances use, except for negative appliance_gains of refrigerated counters in trade buildings for food!
@@ -431,9 +431,9 @@ class BuildingSimulator:
             -1 * appliance_gains / 2 if appliance_gains < 0 else appliance_gains
         )
         return (
-            appliance_gains_elt
-            * occupancy_schedule[hour].Appliances
-            * self.building_object.energy_ref_area
+                appliance_gains_elt
+                * occupancy_schedule[hour].Appliances
+                * self.building_object.energy_ref_area
         )
 
     def calc_sum_solar_gains_all_windows(self) -> float:
@@ -446,7 +446,7 @@ class BuildingSimulator:
         return sum(element.solar_gains for element in self.all_windows)
 
     def calc_energy_demand_for_time_step(
-        self, internal_gains: float, t_out: float, t_m_prev: float
+            self, internal_gains: float, t_out: float, t_m_prev: float
     ) -> None:
         """
         Calculate energy demand for the time step
@@ -483,10 +483,10 @@ class BuildingSimulator:
         return self.building_object.heating_supply_system in heat_source
 
     def calc_hot_water_usage(
-        self,
-        occupancy_schedule: List[ScheduleName],
-        tek_dhw_per_occupancy_full_usage_hour: float,
-        hour: int,
+            self,
+            occupancy_schedule: List[ScheduleName],
+            tek_dhw_per_occupancy_full_usage_hour: float,
+            hour: int,
     ) -> Tuple[float, float, float, float]:
         """
         Calculate hot water usage of the building for the time step with (self.building_object.heating_energy / self.building_object.heating_demand)
@@ -502,23 +502,23 @@ class BuildingSimulator:
         """
         if self.building_object.dhw_system not in ["NoDHW", " -"]:
             hot_water_demand = (
-                occupancy_schedule[hour].People
-                * tek_dhw_per_occupancy_full_usage_hour
-                * 1000
-                * self.building_object.energy_ref_area
+                    occupancy_schedule[hour].People
+                    * tek_dhw_per_occupancy_full_usage_hour
+                    * 1000
+                    * self.building_object.energy_ref_area
             )
 
             if self.building_object.heating_demand > 0:
                 hot_water_energy = hot_water_demand * (
-                    self.building_object.heating_energy
-                    / self.building_object.heating_demand
+                        self.building_object.heating_energy
+                        / self.building_object.heating_demand
                 )
             else:
                 hot_water_energy = hot_water_demand
 
             if self.building_object.dhw_system == "DecentralElectricDHW" or (
-                self.check_if_central_heating_or_central_dhw()
-                and self.check_if_heat_pump_air_or_ground_source()
+                    self.check_if_central_heating_or_central_dhw()
+                    and self.check_if_heat_pump_air_or_ground_source()
             ):
                 hot_water_sys_electricity = hot_water_energy
                 hot_water_sys_fossils = 0
@@ -640,7 +640,7 @@ class BuildingSimulator:
 
         """
         return (
-            self.building_object.heating_supply_system == "SolidFuelLiquidFuelFurnace"
+                self.building_object.heating_supply_system == "SolidFuelLiquidFuelFurnace"
         )
 
     def heat_pump(self) -> bool:
@@ -849,11 +849,11 @@ class BuildingSimulator:
         )
 
     def check_heating_sys_electricity_sum(
-        self,
-        calculation_of_sum: CalculationOfSum,
-        f_hs_hi: float,
-        f_ghg: int,
-        f_pe: float,
+            self,
+            calculation_of_sum: CalculationOfSum,
+            f_hs_hi: float,
+            f_ghg: int,
+            f_pe: float,
     ) -> Tuple[int, float, float, float]:
         """
 
@@ -872,13 +872,13 @@ class BuildingSimulator:
 
         if calculation_of_sum.Heating_Sys_Electricity_sum > 0:
             heating_sys_electricity_hi_sum = (
-                calculation_of_sum.Heating_Sys_Electricity_sum / f_hs_hi
+                    calculation_of_sum.Heating_Sys_Electricity_sum / f_hs_hi
             )
             heating_sys_carbon_sum = (heating_sys_electricity_hi_sum * f_ghg) / 1000
             heating_sys_pe_sum = heating_sys_electricity_hi_sum * f_pe
         else:
             heating_sys_fossils_hi_sum = (
-                calculation_of_sum.Heating_Sys_Fossils_sum / f_hs_hi
+                    calculation_of_sum.Heating_Sys_Fossils_sum / f_hs_hi
             )
             heating_sys_carbon_sum = (heating_sys_fossils_hi_sum * f_ghg) / 1000
             heating_sys_pe_sum = heating_sys_fossils_hi_sum * f_pe
@@ -891,11 +891,11 @@ class BuildingSimulator:
         )
 
     def check_hotwater_sys_electricity_sum(
-        self,
-        calculation_of_sum: CalculationOfSum,
-        f_hs_hi: float,
-        f_ghg: int,
-        f_pe: float,
+            self,
+            calculation_of_sum: CalculationOfSum,
+            f_hs_hi: float,
+            f_ghg: int,
+            f_pe: float,
     ) -> Tuple[int, float, float, float]:
         """
 
@@ -914,13 +914,13 @@ class BuildingSimulator:
 
         if calculation_of_sum.HotWater_Sys_Electricity_sum > 0:
             hot_water_sys_electricity_hi_sum = (
-                calculation_of_sum.HotWater_Sys_Electricity_sum / f_hs_hi
+                    calculation_of_sum.HotWater_Sys_Electricity_sum / f_hs_hi
             )
             hot_water_sys_pe_sum = hot_water_sys_electricity_hi_sum * f_pe
             hot_water_sys_carbon_sum = (hot_water_sys_electricity_hi_sum * f_ghg) / 1000
         else:
             hot_water_sys_fossils_hi_sum = (
-                calculation_of_sum.HotWater_Sys_Fossils_sum / f_hs_hi
+                    calculation_of_sum.HotWater_Sys_Fossils_sum / f_hs_hi
             )
             hot_water_sys_pe_sum = hot_water_sys_fossils_hi_sum * f_pe
             hot_water_sys_carbon_sum = (hot_water_sys_fossils_hi_sum * f_ghg) / 1000
@@ -932,11 +932,11 @@ class BuildingSimulator:
         )
 
     def check_cooling_system_elctricity_sum(
-        self,
-        calculation_of_sum: CalculationOfSum,
-        f_hs_hi: float,
-        f_ghg: int,
-        f_pe: float,
+            self,
+            calculation_of_sum: CalculationOfSum,
+            f_hs_hi: float,
+            f_ghg: int,
+            f_pe: float,
     ) -> Tuple[int, float, float, float]:
         """
         Args:
@@ -954,13 +954,13 @@ class BuildingSimulator:
 
         if calculation_of_sum.Cooling_Sys_Electricity_sum > 0:
             cooling_sys_electricity_hi_sum = (
-                calculation_of_sum.Cooling_Sys_Electricity_sum / f_hs_hi
+                    calculation_of_sum.Cooling_Sys_Electricity_sum / f_hs_hi
             )
             cooling_sys_carbon_sum = (cooling_sys_electricity_hi_sum * f_ghg) / 1000
             cooling_sys_pe_sum = cooling_sys_electricity_hi_sum * f_pe
         else:
             cooling_sys_fossils_hi_sum = (
-                calculation_of_sum.Cooling_Sys_Fossils_sum / f_hs_hi
+                    calculation_of_sum.Cooling_Sys_Fossils_sum / f_hs_hi
             )
             cooling_sys_carbon_sum = (cooling_sys_fossils_hi_sum * f_ghg) / 1000
             cooling_sys_pe_sum = cooling_sys_fossils_hi_sum * f_pe
@@ -972,7 +972,7 @@ class BuildingSimulator:
         )
 
     def sys_electricity_folssils_sum(
-        self, heating_sys_electricity_hi_sum: int, heating_sys_fossils_hi_sum: float
+            self, heating_sys_electricity_hi_sum: int, heating_sys_fossils_hi_sum: float
     ) -> float:
         """
         Calculates sum of heating_sys_electricity_hi_sum and heating_sys_fossils_hi_sum
@@ -987,7 +987,7 @@ class BuildingSimulator:
         return heating_sys_electricity_hi_sum + heating_sys_fossils_hi_sum
 
     def hot_energy_hi_sum(
-        self, hotWater_sys_electricity_hi_sum: int, hot_water_sys_fossils_hi_sum: float
+            self, hotWater_sys_electricity_hi_sum: int, hot_water_sys_fossils_hi_sum: float
     ):
         """
         Calculates sum of hotWater_sys_electricity_hi_sum and hot_water_sys_fossils_hi_sum
@@ -1001,7 +1001,7 @@ class BuildingSimulator:
         return hotWater_sys_electricity_hi_sum + hot_water_sys_fossils_hi_sum
 
     def cooling_sys_hi_sum(
-        self, cooling_sys_electricity_hi_sum: int, cooling_sys_fossils_hi_sum: float
+            self, cooling_sys_electricity_hi_sum: int, cooling_sys_fossils_hi_sum: float
     ) -> float:
         """
         Calculates sum of cooling_sys_electricity_hi_sum and cooling_sys_fossils_hi_sum
@@ -1016,7 +1016,7 @@ class BuildingSimulator:
         return cooling_sys_electricity_hi_sum + cooling_sys_fossils_hi_sum
 
     def check_if_central_dhw_use_same_fuel_type_as_heating_system(
-        self, fuel_type
+            self, fuel_type
     ) -> str:
         """
         Checks if central dhw uses the same fuel type as the heating system
@@ -1059,8 +1059,8 @@ class BuildingSimulator:
 
         """
         return (
-            self.building_object.cooling_supply_system
-            == "AbsorptionRefrigerationSystem"
+                self.building_object.cooling_supply_system
+                == "AbsorptionRefrigerationSystem"
         )
 
     def district_cooling(self) -> bool:
