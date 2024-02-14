@@ -180,7 +180,7 @@ def read_vergleichswerte_zuweisung() -> pd.DataFrame:
     )
 
 
-def read_tek_nwg_vergleichswerte() -> pd.DataFrame:
+def read_tek_nwg_comparative_values() -> pd.DataFrame:
     """
     Reads the csv file TEK_NWG_Vergleichswerte
     Returns:
