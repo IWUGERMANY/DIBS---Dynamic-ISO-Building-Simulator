@@ -87,7 +87,9 @@ class BuildingSimulator:
         """
         This method builds a window object
         Returns:
-            Window object
+            window
+        Return type
+            Window
         """
         return Window(
             0,
@@ -102,7 +104,9 @@ class BuildingSimulator:
         """
         This method builds a window object
         Returns:
-            Window object
+            window
+        Return type
+            Window
         """
 
         return Window(
@@ -117,8 +121,10 @@ class BuildingSimulator:
     def build_west_window(self) -> Window:
         """
         This method builds a window object
-        Returns:
-            Window object
+       Returns:
+            window
+        Return type
+            Window
         """
         return Window(
             180,
@@ -133,7 +139,9 @@ class BuildingSimulator:
         """
         This method builds a window object
         Returns:
-            Window object
+            window
+        Return type
+            Window
         """
         return Window(
             270,
@@ -148,7 +156,9 @@ class BuildingSimulator:
         """
         This method builds a list of all windows (south, west, east and north)
         Returns:
-            list of windows
+            windows
+        Return type
+            List[Window]
         """
         return [
             self.build_south_window(),
@@ -162,6 +172,8 @@ class BuildingSimulator:
         Find building's usage time DIN 18599-10 or SIA2024
         Returns:
             usage_start, usage_end
+        Return type
+            Tuple[int, int]
         """
         usage_start, usage_end = self.datasource.get_usage_time(
             self.building_object.hk_geb,
@@ -175,6 +187,8 @@ class BuildingSimulator:
         Find occupancy schedule from SIA2024, depending on hk_geb, uk_geb from csv file
         Returns:
             list_of_schedule_name, schedule_name or throws an error
+        Return type
+            Union[Tuple[List[ScheduleName], str, float], ValueError]
         """
         return self.datasource.get_schedule(
             self.building_object.hk_geb, self.building_object.uk_geb
@@ -186,6 +200,8 @@ class BuildingSimulator:
         announcement  of 15.04.2021 on the Building Energy Act (GEG) of 2020, depending on hk_geb, uk_geb
         Returns:
             tek_dhw, tek_name or throws an error
+        Return type
+            Union[Tuple[float, str], ValueError]
         """
         return self.datasource.get_tek(
             self.building_object.hk_geb, self.building_object.uk_geb
@@ -201,6 +217,8 @@ class BuildingSimulator:
 
         Returns:
             weather_data_objects
+        Return type
+            List[WeatherData]
         """
         return self.datasource.choose_and_get_the_right_weather_data_from_path(
             self.weather_period, self.epw_object.file_name
@@ -214,6 +232,8 @@ class BuildingSimulator:
 
         Returns:
             outdoor_temperature
+        Return type
+            float
         """
         return self.weather_data[hour].drybulb_C
 
@@ -225,6 +245,8 @@ class BuildingSimulator:
 
         Returns:
             year
+        Return type
+            int
         """
         return self.weather_data[hour].year
 
@@ -236,6 +258,8 @@ class BuildingSimulator:
 
         Returns:
             altitude, azimuth
+        Return type
+            Tuple[float, float]
         """
         location = Location()
         return location.calc_sun_position(
@@ -258,6 +282,8 @@ class BuildingSimulator:
 
         Returns:
             h_ve_adj
+        Return type
+            float
         """
         return self.building_object.calc_h_ve_adj(hour, t_out, usage_start, usage_end)
 
@@ -269,6 +295,9 @@ class BuildingSimulator:
 
         Returns:
             t_air
+        Return type
+            float
+
         """
         t_air = (
             self.building_object.t_set_heating
@@ -288,7 +317,7 @@ class BuildingSimulator:
             t_air:
             hour: hour to simulate
 
-        Returns:
+        Return type:
             None
 
         """
@@ -313,7 +342,7 @@ class BuildingSimulator:
             sun_azimuth: Azimuth angle of the sun in degrees
             hour: hour to simulate
 
-        Returns:
+        Return type:
             None
 
         """
@@ -337,6 +366,8 @@ class BuildingSimulator:
 
         Returns:
             occupancy
+        Return type
+            float
 
         """
         return occupancy_schedule[hour].People * self.building_object.max_occupancy
@@ -346,6 +377,8 @@ class BuildingSimulator:
         Sum of transmitted illuminance of all windows
         Returns:
             transmitted illuminance_sum
+        Return type
+            float
 
         """
         return sum(element.transmitted_illuminance for element in self.all_windows)
@@ -356,7 +389,8 @@ class BuildingSimulator:
         Args:
             occupancy_percent: occupancy for the time step
 
-        Returns:
+        Return type:
+            None
 
         """
         self.building_object.solve_building_lighting(
@@ -383,6 +417,8 @@ class BuildingSimulator:
 
         Returns:
             internal_gains
+        Return type
+            float
 
         """
         return (
@@ -405,6 +441,8 @@ class BuildingSimulator:
 
         Returns:
             appliance_gains_demand
+        Return type
+            float
 
         """
         return (
@@ -425,6 +463,9 @@ class BuildingSimulator:
             hour: hour to simulate
 
         Returns:
+            appliance_gains_elt_demand
+        Return type
+            float
 
         """
         appliance_gains_elt = (
@@ -441,6 +482,8 @@ class BuildingSimulator:
         Sum of solar gains of all windows
         Returns:
             solar_gains_sum
+        Return type
+            float
 
         """
         return sum(element.solar_gains for element in self.all_windows)
@@ -455,7 +498,8 @@ class BuildingSimulator:
             t_out: Outdoor temperature of this timestep
             t_m_prev:  Previous air temperature [C]
 
-        Returns:
+        Return type:
+            None
 
         """
         self.building_object.solve_building_energy(
@@ -464,9 +508,11 @@ class BuildingSimulator:
 
     def check_if_central_heating_or_central_dhw(self) -> bool:
         """
-        Checks some conditions
+        Checks if dhw system of the building in the list named central
         Returns:
             True or False
+        Return typ
+            boolean
 
         """
         central = ["CentralHeating", "CentralDHW"]
@@ -474,9 +520,11 @@ class BuildingSimulator:
 
     def check_if_heat_pump_air_or_ground_source(self) -> bool:
         """
-        Checks some conditions
+        Checks if dhw system of the building in the list named heat_source
         Returns:
             True or False
+        Return typ
+            boolean
 
         """
         heat_source = ["HeatPumpAirSource", "HeatPumpGroundSource", "ElectricHeating"]
@@ -489,7 +537,8 @@ class BuildingSimulator:
             hour: int,
     ) -> Tuple[float, float, float, float]:
         """
-        Calculate hot water usage of the building for the time step with (self.building_object.heating_energy / self.building_object.heating_demand)
+        Calculate hot water usage of the building for the time step with (self.building_object.heating_energy /
+        self.building_object.heating_demand)
         represents the Efficiency of the heat generation in the building
         Args:
             occupancy_schedule:
@@ -498,6 +547,8 @@ class BuildingSimulator:
 
         Returns:
             hot_water_demand, hot_water_energy, hot_water_sys_electricity, hot_water_sys_fossils
+        Return type
+            Tuple[float, float, float, float]
 
         """
         if self.building_object.dhw_system not in ["NoDHW", " -"]:
@@ -540,9 +591,11 @@ class BuildingSimulator:
 
     def biogas_boiler_types(self) -> bool:
         """
-        Checks some conditions
+        Checks if heating supply system of the building in the list named biogas_boiler_types
         Returns:
             True or False
+        Return typ
+            boolean
         """
 
         biogas_boiler_types = [
@@ -553,9 +606,11 @@ class BuildingSimulator:
 
     def biogas_oil_boilers_types(self) -> bool:
         """
-        Checks some conditions
+        Checks if heating supply system of the building in the list named biogas_oil_boilers_types
         Returns:
             True or False
+        Return typ
+            boolean
 
         """
         biogas_oil_boilers_types = [
@@ -567,9 +622,11 @@ class BuildingSimulator:
 
     def oil_boiler_types(self) -> bool:
         """
-        Checks some conditions
+        Checks if heating supply system of the building in the list named oil_boiler_types
         Returns:
             True or False
+        Return typ
+            boolean
 
         """
         oil_boiler_types = [
@@ -586,9 +643,11 @@ class BuildingSimulator:
 
     def lgas_boiler_temp(self) -> bool:
         """
-        Checks some conditions
+        Checks if heating supply system of the building in the list named lgas_boiler_temp
         Returns:
             True or False
+        Return typ
+            boolean
 
         """
         lgas_boiler_temp = [
@@ -603,9 +662,11 @@ class BuildingSimulator:
 
     def gas_boiler_standard(self) -> bool:
         """
-        Checks some conditions
+        Checks if heating supply system of the building in the list named gas_boiler_standard
         Returns:
             True or False
+        Return typ
+            boolean
 
         """
         gas_boiler_standard = [
@@ -625,18 +686,22 @@ class BuildingSimulator:
 
     def coal_solid_fuel_boiler(self) -> bool:
         """
-        Checks some conditions
+        Checks if heating supply system of the building is CoalSolidFuelBoiler
         Returns:
             True or False
+        Return typ
+            boolean
 
         """
         return self.building_object.heating_supply_system == "CoalSolidFuelBoiler"
 
     def solid_fuel_liquid_fuel_furnace(self) -> bool:
         """
-        Checks some conditions
+        Checks if heating supply system of the building is SolidFuelLiquidFuelFurnace
         Returns:
             True or False
+        Return typ
+            boolean
 
         """
         return (
@@ -645,9 +710,11 @@ class BuildingSimulator:
 
     def heat_pump(self) -> bool:
         """
-        Checks some conditions
+        Checks if heating supply system of the building in the list named heat_pumping
         Returns:
             True or False
+        Return typ
+            boolean
 
         """
         heat_pumping = ["HeatPumpAirSource", "HeatPumpGroundSource"]
@@ -655,9 +722,11 @@ class BuildingSimulator:
 
     def wood(self) -> bool:
         """
-        Checks some conditions
+        Checks if heating supply system of the building in the list named wood
         Returns:
             True or False
+        Return typ
+            boolean
 
         """
         wood = [
@@ -669,54 +738,66 @@ class BuildingSimulator:
 
     def gas_chip(self) -> bool:
         """
-        Checks some conditions
+        Checks if heating supply system of the building is GasCHP
         Returns:
             True or False
+        Return typ
+            boolean
 
         """
         return self.building_object.heating_supply_system == "GasCHP"
 
     def district_heating(self) -> bool:
         """
-        Checks some conditions
+        Checks if heating supply system of the building is DistrictHeating
         Returns:
             True or False
+        Return typ
+            boolean
 
         """
         return self.building_object.heating_supply_system == "DistrictHeating"
 
     def electric_heating(self) -> bool:
         """
-        Checks some conditions
+        Checks if heating supply system of the building is ElectricHeating
         Returns:
             True or False
+        Return typ
+            boolean
 
         """
         return self.building_object.heating_supply_system == "ElectricHeating"
 
     def direct_heater(self) -> bool:
         """
-        Checks some conditions
+        Checks if heating supply system of the building is DirectHeater
         Returns:
             True or False
+        Return typ
+            boolean
 
         """
         return self.building_object.heating_supply_system == "DirectHeater"
 
     def no_heating(self) -> bool:
         """
-        Checks some conditions
+        Checks if heating supply system of the building is NoHeating
         Returns:
             True or False
+        Return typ
+            boolean
 
         """
         return self.building_object.heating_supply_system == "NoHeating"
 
     def first_natural_gas(self) -> bool:
         """
-        Checks some conditions
+        Checks if heating supply system of the building in the list named lgaz
         Returns:
             True or False
+        Return typ
+            boolean
 
         """
         lgaz = [
@@ -731,18 +812,22 @@ class BuildingSimulator:
 
     def heat_pump_or_electric_heating(self) -> bool:
         """
-        Checks some conditions
+        See above method heat_pump() and electric_heating() for more information
         Returns:
             True or False
+        Return type
+            bool
 
         """
         return self.heat_pump() | self.electric_heating()
 
     def hard_coal(self) -> bool:
         """
-        Checks some conditions
+        See above method coal_solid_fuel_boiler() and solid_fuel_liquid_fuel_furnace() for more information
         Returns:
             True or False
+        Return type
+            bool
 
         """
         return self.coal_solid_fuel_boiler() or self.solid_fuel_liquid_fuel_furnace()
@@ -752,6 +837,8 @@ class BuildingSimulator:
         Choose the fuel type based on the heating_supply_system of the building
         Returns:
             fuel_type
+        Return type
+            str
         """
         try:
             if self.biogas_boiler_types():
@@ -865,6 +952,8 @@ class BuildingSimulator:
 
         Returns:
             heating_sys_electricity_hi_sum, heating_sys_carbon_sum, heating_sys_pe_sum, heating_sys_fossils_hi_sum
+        Return type
+            Tuple[int, float, float, float]
 
         """
         heating_sys_electricity_hi_sum = 0
@@ -907,6 +996,8 @@ class BuildingSimulator:
 
         Returns:
             hot_water_sys_electricity_hi_sum, hot_water_sys_pe_sum, hot_water_sys_carbon_sum, hot_water_sys_fossils_hi_sum
+        Return type
+            Tuple[int, float, float, float]
 
         """
         hot_water_sys_electricity_hi_sum = 0
@@ -947,6 +1038,8 @@ class BuildingSimulator:
 
         Returns:
             cooling_sys_electricity_hi_sum, cooling_sys_carbon_sum, cooling_sys_pe_sum, cooling_sys_fossils_hi_sum
+        Return type
+            Tuple[int, float, float, float]
 
         """
         cooling_sys_electricity_hi_sum = 0
@@ -982,13 +1075,15 @@ class BuildingSimulator:
 
         Returns:
             heating_sys_electricity_hi_sum + heating_sys_fossils_hi_sum
+        Return type
+            float
 
         """
         return heating_sys_electricity_hi_sum + heating_sys_fossils_hi_sum
 
     def hot_energy_hi_sum(
             self, hotWater_sys_electricity_hi_sum: int, hot_water_sys_fossils_hi_sum: float
-    ):
+    ) -> float:
         """
         Calculates sum of hotWater_sys_electricity_hi_sum and hot_water_sys_fossils_hi_sum
         Args:
@@ -997,6 +1092,8 @@ class BuildingSimulator:
 
         Returns:
             hotWater_sys_electricity_hi_sum + hot_water_sys_fossils_hi_sum
+        Return type
+            float
         """
         return hotWater_sys_electricity_hi_sum + hot_water_sys_fossils_hi_sum
 
@@ -1011,6 +1108,8 @@ class BuildingSimulator:
 
         Returns:
             cooling_sys_electricity_hi_sum + cooling_sys_fossils_hi_sum
+        Return type
+            float
 
         """
         return cooling_sys_electricity_hi_sum + cooling_sys_fossils_hi_sum
@@ -1026,6 +1125,8 @@ class BuildingSimulator:
 
         Returns:
             fuel_type
+        Return type
+            str
 
         """
 
@@ -1038,9 +1139,11 @@ class BuildingSimulator:
 
     def air_cool(self) -> bool:
         """
-        checks some conditions
+        Checks if cooling supply system of the building in the list named air_cool
         Returns:
-            bool
+            True or False
+        Return typ
+            boolean
 
         """
         air_cool = [
@@ -1053,9 +1156,11 @@ class BuildingSimulator:
 
     def absorption_refrigeration_system(self) -> bool:
         """
-        checks some conditions
+         Checks if cooling supply system of the building is AbsorptionRefrigerationSystem
         Returns:
-            bool
+            True or False
+        Return typ
+            boolean
 
         """
         return (
@@ -1065,27 +1170,33 @@ class BuildingSimulator:
 
     def district_cooling(self) -> bool:
         """
-        checks some conditions
+        Checks if cooling supply system of the building is DistrictCooling
         Returns:
-            bool
+            True or False
+        Return typ
+            boolean
 
         """
         return self.building_object.cooling_supply_system == "DistrictCooling"
 
     def gas_engine_piston_scroll(self) -> bool:
         """
-        checks some conditions
+        Checks if cooling supply system of the building is GasEnginePistonScroll
         Returns:
-            bool
+            True or False
+        Return typ
+            boolean
 
         """
         return self.building_object.cooling_supply_system == "GasEnginePistonScroll"
 
     def no_cooling(self) -> bool:
         """
-        checks some conditions
+        Checks if cooling supply system of the building is NoCooling
         Returns:
-            bool
+            True or False
+        Return typ
+            boolean
 
         """
         return self.building_object.cooling_supply_system == "NoCooling"
@@ -1095,6 +1206,8 @@ class BuildingSimulator:
 
         Returns:
             fuel_type or throws an error
+        Return type
+            Union[str, GHGEmissionError]
         """
         try:
             if self.air_cool():
