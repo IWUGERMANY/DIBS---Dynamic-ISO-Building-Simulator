@@ -16,7 +16,6 @@ __author__ = "Julian Bischof, Simon Knoll, Michael Hörner "
 __copyright__ = "Copyright 2023, Institut Wohnen und Umwelt"
 __license__ = "MIT"
 
-
 import supply_system
 import emission_system
 
@@ -102,7 +101,7 @@ class Building(object):
     h_tr_2: combined heat conductance, see function for definition [W/K]
     h_tr_3: combined heat conductance, see function for definition [W/K]
     """
-    
+
     def __init__(self,
                  scr_gebaeude_id,
                  plz,
@@ -144,7 +143,7 @@ class Building(object):
                  night_flushing_flow,
                  max_cooling_energy_per_floor_area,
                  max_heating_energy_per_floor_area,
-                 heating_supply_system,  
+                 heating_supply_system,
                  cooling_supply_system,
                  heating_emission_system,
                  cooling_emission_system):
@@ -155,20 +154,20 @@ class Building(object):
         self.window_area_east = window_area_east
         self.window_area_south = window_area_south
         self.window_area_west = window_area_west
-        self.window_area = window_area_north + window_area_east + window_area_south + window_area_west  
+        self.window_area = window_area_north + window_area_east + window_area_south + window_area_west
         # net room area                        
-        self.net_room_area = net_room_area   
+        self.net_room_area = net_room_area
         # energy reference area
         self.energy_ref_area = energy_ref_area
-               
+
         ## Fenestration and Lighting Properties
         self.glass_solar_transmittance = glass_solar_transmittance
         self.glass_light_transmittance = glass_light_transmittance
         self.glass_solar_shading_transmittance = glass_solar_shading_transmittance
         # lighting load
-        self.lighting_load = lighting_load   
+        self.lighting_load = lighting_load
         # Lighting set point                       
-        self.lighting_control = lighting_control                    
+        self.lighting_control = lighting_control
         # How the light entering the window is transmitted to the working plane
         self.lighting_utilisation_factor = lighting_utilisation_factor
         # How dirty the window is. Section 2.2.3.1 Environmental Science Handbook
@@ -179,7 +178,7 @@ class Building(object):
         self.hk_geb = hk_geb
         self.uk_geb = uk_geb
         self.max_occupancy = max_occupancy
-        
+
         # Night flushing
         self.night_flushing_flow = night_flushing_flow
 
@@ -187,15 +186,15 @@ class Building(object):
         # [m2] Effective mass area (See p. 81, Table 12)
         if thermal_capacitance <= 165000:
             self.mass_area = energy_ref_area * 2.5
-            
-        elif  165000 < thermal_capacitance <= 260000:
+
+        elif 165000 < thermal_capacitance <= 260000:
             self.mass_area = energy_ref_area * 3
-            
+
         elif thermal_capacitance > 260000:
             self.mass_area = energy_ref_area * 3.5
-            
+
         # [m3] Calculate building volume
-        self.building_vol = base_area * building_height  
+        self.building_vol = base_area * building_height
         # Calculate internal area (See 7.2.2.2, p. 35/36)  
         self.total_internal_area = energy_ref_area * 4.5
         self.A_t = self.total_internal_area
@@ -208,11 +207,11 @@ class Building(object):
         # Conductance of opaque surfaces to exterior [W/K]
         # p. 44, Eq. 18 --> H_x = A_i * U_i
         self.h_tr_op = (u_walls * wall_area_og) + (u_roof * roof_area) + \
-                        (base_area * u_base * temp_adj_base) + (wall_area_ug * u_walls * temp_adj_walls_ug)
+                       (base_area * u_base * temp_adj_base) + (wall_area_ug * u_walls * temp_adj_walls_ug)
         # Conductance to exterior through glazed surfaces [W/K], based on
         # U-wert of 1W/m2K
         self.h_tr_w = u_windows * self.window_area
-        
+
         ## Determine the ventilation conductance
         self.ach_inf = ach_inf
         self.ach_win = ach_win
@@ -229,7 +228,7 @@ class Building(object):
         # Conductance from the conditioned air to interior building surface
         # p. 35, Eq. 9
         self.h_tr_is = self.total_internal_area * 3.45
-        self.h_tr_em = max(0, (1 / ((1/self.h_tr_op) - (1/self.h_tr_ms))))
+        self.h_tr_em = max(0, (1 / ((1 / self.h_tr_op) - (1 / self.h_tr_ms))))
 
         ## Thermal set points and starting temperature 
         self.t_set_heating = t_set_heating
@@ -238,23 +237,22 @@ class Building(object):
 
         ## Thermal Properties
         # Boolean for if heating is required
-        self.has_heating_demand = False  
+        self.has_heating_demand = False
         # Boolean for if cooling is required
-        self.has_cooling_demand = False  
+        self.has_cooling_demand = False
         # max cooling load (W/m2)
         self.max_cooling_energy = max_cooling_energy_per_floor_area * \
-            energy_ref_area  
+                                  energy_ref_area
         # max heating load (W/m2)
         self.max_heating_energy = max_heating_energy_per_floor_area * \
-            energy_ref_area  
+                                  energy_ref_area
 
         ## Building System Properties
         self.heating_supply_system = heating_supply_system
         self.cooling_supply_system = cooling_supply_system
         self.heating_emission_system = heating_emission_system
         self.cooling_emission_system = cooling_emission_system
-        
-        
+
     @property
     def h_tr_1(self):
         """
@@ -277,7 +275,7 @@ class Building(object):
         Definition to simplify calc_phi_m_tot
         # (C.8) in [C.3 ISO 13790]
         """
-        return  1.0 / (1.0 / self.h_tr_2 + 1.0 / self.h_tr_ms)
+        return 1.0 / (1.0 / self.h_tr_2 + 1.0 / self.h_tr_ms)
 
     @property
     def t_opperative(self):
@@ -287,11 +285,8 @@ class Building(object):
         # (C.12) in [C.3 ISO 13790]
         """
         return 0.3 * self.t_air + 0.7 * self.t_s
-    
-        
-    
-    
-    def calc_h_ve_adj(self, hour, t_out, usage_start, usage_end):     
+
+    def calc_h_ve_adj(self, hour, t_out, usage_start, usage_end):
         """
         Calculates h_ve_adj depending on the building's usage time
         
@@ -311,70 +306,71 @@ class Building(object):
         """
         # Call this function and check if night flushing needs to be taken into account
         self.check_night_flushing(hour, t_out)
-        
-        daytime = hour%24
-        
+
+        daytime = hour % 24
+
         # Check if ach_vent and ach_win is equal to zero (this is necessary due to Eq. C.6, DIN EN ISO 13790)
         if self.ach_vent == 0 and self.ach_win == 0:
-            
+
             self.h_ve_adj = 1200 * 1 * self.building_vol * (self.ach_inf / 3600)
-        
-        else:    
+
+        else:
             if usage_start < usage_end:
                 if (usage_start <= daytime < usage_end) == True:
-                    if self.night_flushing_on == True:                                           
+                    if self.night_flushing_on == True:
                         self.h_ve_adj = 1200 * 1 * self.building_vol * (self.night_flushing_flow / 3600)
-                    
+
                         # Set t_set_heating = 0 for the time step, otherwise the heating system heats up during night flushing is on
                         self.t_set_heating = 0
-                    
+
                     else:
-                        self.h_ve_adj = 1200 * ((self.b_ek * self.building_vol * (self.ach_vent / 3600)) + (1 * self.building_vol * (self.ach_win / 3600)))
-                    
-                elif (usage_start <= daytime < usage_end) == False:         
-                    if self.night_flushing_on == True:                                    
+                        self.h_ve_adj = 1200 * ((self.b_ek * self.building_vol * (self.ach_vent / 3600)) + (
+                                1 * self.building_vol * (self.ach_win / 3600)))
+
+                elif (usage_start <= daytime < usage_end) == False:
+                    if self.night_flushing_on == True:
                         self.h_ve_adj = 1200 * 1 * self.building_vol * (self.night_flushing_flow / 3600)
-                    
+
                         # Set t_set_heating = 0 for the time step, otherwise the heating system heats up during night flushing is on
                         self.t_set_heating = 0
-                    
-                    else: 
+
+                    else:
                         # Only infiltration 
                         self.h_ve_adj = 1200 * 1 * self.building_vol * (self.ach_inf / 3600)
-                    
-                else: 
-                     raise ValueError('Something went wrong with ventilation heat loss coefficient h_ve_adj')   
-                     
+
+                else:
+                    raise ValueError('Something went wrong with ventilation heat loss coefficient h_ve_adj')
+
             else:
                 if (usage_end <= daytime < usage_start) == False:
                     if self.night_flushing_on == True:
-                                
+
                         self.h_ve_adj = 1200 * 1 * self.building_vol * (self.night_flushing_flow / 3600)
-                    
+
                         # Set t_set_heating = 0 for the time step, otherwise the heating system heats up during night flushing is on
                         self.t_set_heating = 0
-                    
+
                     else:
-                        self.h_ve_adj = 1200 * ((self.b_ek * self.building_vol * (self.ach_vent / 3600)) + (1 * self.building_vol * (self.ach_win / 3600)))
-                    
-                elif (usage_end <= daytime < usage_start) == True:         
-                    if self.night_flushing_on == True:                    
-                                
+                        self.h_ve_adj = 1200 * ((self.b_ek * self.building_vol * (self.ach_vent / 3600)) + (
+                                1 * self.building_vol * (self.ach_win / 3600)))
+
+                elif (usage_end <= daytime < usage_start) == True:
+                    if self.night_flushing_on == True:
+
                         self.h_ve_adj = 1200 * 1 * self.building_vol * (self.night_flushing_flow / 3600)
-                    
+
                         # Set t_set_heating = 0 for the time step, otherwise the heating system heats up during night flushing is on
                         self.t_set_heating = 0
-                    
-                    else: 
+
+                    else:
                         # Only infiltration 
                         self.h_ve_adj = 1200 * 1 * self.building_vol * (self.ach_inf / 3600)
-                                      
-                else: 
-                     raise ValueError('Something went wrong with ventilation heat loss coefficient h_ve_adj')   
-            
+
+                else:
+                    raise ValueError('Something went wrong with ventilation heat loss coefficient h_ve_adj')
+
         return self.h_ve_adj
-    
-    
+
     def check_night_flushing(self, hour, t_out):
         """
         Checks if night flushing is on/off
@@ -387,30 +383,28 @@ class Building(object):
         :return: self.night_flushing_on
         :rtype: bool
         """
-        
-        
-        daytime = hour%24                                   # Hour of the day
-        cooling_season = (2169 < hour < 6561)               # Assume cooling season from 01/04 9am - 01/10 9am
-        is_night_time = (daytime < 6 or daytime > 23)       # Define night time between 23:00 and 6:00
-        
+
+        daytime = hour % 24  # Hour of the day
+        cooling_season = (2169 < hour < 6561)  # Assume cooling season from 01/04 9am - 01/10 9am
+        is_night_time = (daytime < 6 or daytime > 23)  # Define night time between 23:00 and 6:00
+
         # Use night flushing only if all conditions are satisfied: 
         # Night flushing needs to be available in the specific building, during cooling season,
         # during night time, indoor air temperature is higher than 21 °C and indoor air temp 
         # is higher than outdoor temp + 2 °C
         if self.night_flushing_flow > 0 \
-            and (cooling_season == True) \
-            and (is_night_time == True) \
-            and (self.t_air > 21) \
-            and (self.t_air > (t_out + 2)):
-        
-                self.night_flushing_on = True
-        
+                and (cooling_season == True) \
+                and (is_night_time == True) \
+                and (round(self.t_air, 1) > 21) \
+                and (round(self.t_air, 1) > (t_out + 2)):
+
+            self.night_flushing_on = True
+
         else:
-                self.night_flushing_on = False
-        
+            self.night_flushing_on = False
+
         return self.night_flushing_on
-    
-    
+
     def solve_building_lighting(self, illuminance, occupancy):
         """
         Calculates the lighting demand for a set timestep
@@ -438,8 +432,7 @@ class Building(object):
             self.lighting_demand = self.lighting_load * self.net_room_area * occupancy
         else:
             self.lighting_demand = 0
-              
-            
+
     def solve_building_energy(self, internal_gains, solar_gains, t_out, t_m_prev):
         """
         Calculates the heating and cooling consumption of a building for a set timestep
@@ -475,12 +468,11 @@ class Building(object):
         if not self.has_heating_demand and not self.has_cooling_demand:
 
             # no heating or cooling demand
-            
+
             # calculate temperatures of building R-C-model and exit
             # --> rc_model_function_1(...)
             self.energy_demand = 0
 
-            
             self.heating_demand = 0  # Energy required by the zone
             self.cooling_demand = 0  # Energy surplus of the zone
             # Energy (in electricity) required by the supply system to provide
@@ -497,8 +489,8 @@ class Building(object):
             self.cooling_sys_fossils = 0
             # Electricity produced by the supply system (e.g. CHP)
             self.electricity_out = 0
-            #Set COP to nan if no heating or cooling is required
-            self.cop=float('nan')
+            # Set COP to nan if no heating or cooling is required
+            self.cop = float('nan')
 
         else:
 
@@ -518,12 +510,12 @@ class Building(object):
             supply_director = supply_system.SupplyDirector()  # Initialise Heating System Manager
 
             if self.has_heating_demand:
-                supply_director.set_builder(self.heating_supply_system(load=self.energy_demand, 
-                                                                t_out=t_out, 
-                                                                heating_supply_temperature=self.heating_supply_temperature,
-                                                                cooling_supply_temperature=self.cooling_supply_temperature, 
-                                                                has_heating_demand=self.has_heating_demand, 
-                                                                has_cooling_demand=self.has_cooling_demand))
+                supply_director.set_builder(self.heating_supply_system(load=self.energy_demand,
+                                                                       t_out=t_out,
+                                                                       heating_supply_temperature=self.heating_supply_temperature,
+                                                                       cooling_supply_temperature=self.cooling_supply_temperature,
+                                                                       has_heating_demand=self.has_heating_demand,
+                                                                       has_cooling_demand=self.has_cooling_demand))
                 supplyOut = supply_director.calc_system()
                 # All Variables explained underneath line 467
                 self.heating_demand = self.energy_demand
@@ -535,12 +527,12 @@ class Building(object):
                 self.electricity_out = supplyOut.electricity_out
 
             elif self.has_cooling_demand:
-                supply_director.set_builder(self.cooling_supply_system(load=self.energy_demand * (-1), 
-                                                                t_out=t_out, 
-                                                                heating_supply_temperature=self.heating_supply_temperature,
-                                                                cooling_supply_temperature=self.cooling_supply_temperature, 
-                                                                has_heating_demand=self.has_heating_demand, 
-                                                                has_cooling_demand=self.has_cooling_demand))
+                supply_director.set_builder(self.cooling_supply_system(load=self.energy_demand * (-1),
+                                                                       t_out=t_out,
+                                                                       heating_supply_temperature=self.heating_supply_temperature,
+                                                                       cooling_supply_temperature=self.cooling_supply_temperature,
+                                                                       has_heating_demand=self.has_heating_demand,
+                                                                       has_cooling_demand=self.has_cooling_demand))
                 supplyOut = supply_director.calc_system()
                 self.heating_demand = 0
                 self.heating_sys_electricity = 0
@@ -553,7 +545,7 @@ class Building(object):
             self.cop = supplyOut.cop
 
         self.sys_total_energy = self.heating_sys_electricity + self.heating_sys_fossils + \
-            self.cooling_sys_electricity + self.cooling_sys_fossils
+                                self.cooling_sys_electricity + self.cooling_sys_fossils
         self.heating_energy = self.heating_sys_electricity + self.heating_sys_fossils
         self.cooling_energy = self.cooling_sys_electricity + self.cooling_sys_fossils
 
@@ -577,10 +569,10 @@ class Building(object):
 
         # If the air temperature is less or greater than the set temperature,
         # there is a heating/cooling load
-        if self.t_air < self.t_set_heating:
+        if round(self.t_air, 1) < self.t_set_heating:
             self.has_heating_demand = True
             self.has_cooling_demand = False
-        elif self.t_air > self.t_set_cooling:
+        elif round(self.t_air, 1) > self.t_set_cooling:
             self.has_cooling_demand = True
             self.has_heating_demand = False
         else:
@@ -693,7 +685,7 @@ class Building(object):
         This assumes a perfect HVAC control system
         """
         self.energy_demand_unrestricted = energy_floorAx10 * \
-            (t_air_set - t_air_0) / (t_air_10 - t_air_0)
+                                          (t_air_set - t_air_0) / (t_air_10 - t_air_0)
 
     def calc_heat_flow(self, t_out, internal_gains, solar_gains, energy_demand):
         """
@@ -714,11 +706,11 @@ class Building(object):
         self.phi_ia = 0.5 * internal_gains
         # Heat flow to the surface node
         self.phi_st = (1 - (self.mass_area / self.A_t) - (self.h_tr_w /
-                            (9.1 * self.A_t))) * (0.5 * internal_gains + solar_gains)
+                                                          (9.1 * self.A_t))) * (0.5 * internal_gains + solar_gains)
         # Heatflow to the thermal mass node
         self.phi_m = (self.mass_area / self.A_t) * \
-            (0.5 * internal_gains + solar_gains)
-        
+                     (0.5 * internal_gains + solar_gains)
+
         # We call the EmissionDirector to modify these flows depending on the
         # system and the energy demand
         emDirector = emission_system.EmissionDirector()
@@ -741,7 +733,7 @@ class Building(object):
         # Set supply temperature to building object
         self.heating_supply_temperature = flows.heating_supply_temperature
         self.cooling_supply_temperature = flows.cooling_supply_temperature
-        
+
     def calc_t_m_next(self, t_m_prev):
         """
         Primary Equation, calculates the temperature of the next time step
@@ -762,8 +754,8 @@ class Building(object):
         t_supply = t_out  # ASSUMPTION: Supply air comes straight from the outside air
 
         self.phi_m_tot = self.phi_m + self.h_tr_em * t_out + \
-            self.h_tr_3 * (self.phi_st + self.h_tr_w * t_out + self.h_tr_1 *
-                           ((self.phi_ia / self.h_ve_adj) + t_supply)) / self.h_tr_2
+                         self.h_tr_3 * (self.phi_st + self.h_tr_w * t_out + self.h_tr_1 *
+                                        ((self.phi_ia / self.h_ve_adj) + t_supply)) / self.h_tr_2
 
     def calc_t_m(self, t_m_prev):
         """
@@ -783,8 +775,8 @@ class Building(object):
         t_supply = t_out  # ASSUMPTION: Supply air comes straight from the outside air
 
         self.t_s = (self.h_tr_ms * self.t_m + self.phi_st + self.h_tr_w * t_out + self.h_tr_1 * \
-            (t_supply + self.phi_ia / self.h_ve_adj)) / \
-            (self.h_tr_ms + self.h_tr_w + self.h_tr_1)
+                    (t_supply + self.phi_ia / self.h_ve_adj)) / \
+                   (self.h_tr_ms + self.h_tr_w + self.h_tr_1)
 
     def calc_t_air(self, t_out):
         """
@@ -798,7 +790,3 @@ class Building(object):
         # Calculate the temperature of the inside air
         self.t_air = (self.h_tr_is * self.t_s + self.h_ve_adj *
                       t_supply + self.phi_ia) / (self.h_tr_is + self.h_ve_adj)
-        
-       
-        
-      

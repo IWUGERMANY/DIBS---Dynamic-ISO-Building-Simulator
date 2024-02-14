@@ -262,9 +262,9 @@ for iteration, i_gebaeudeparameter in enumerate(namedlist_of_buildings):
 
         # Define t_air for calc_solar_gains(). Starting condition (hour==0) necessary for first time step  
         if hour == 0:
-            t_air = BuildingInstance.t_set_heating
+            t_air = round(BuildingInstance.t_set_heating, 2)
         else:
-            t_air = BuildingInstance.t_air
+            t_air = round(BuildingInstance.t_air, 2)
 
         # Calculate solar gains and illuminance through each window    
         SouthWindow.calc_solar_gains(sun_altitude=Altitude, sun_azimuth=Azimuth,
