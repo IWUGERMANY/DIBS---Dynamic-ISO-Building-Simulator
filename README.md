@@ -14,8 +14,7 @@ Any ongoing and future development of the DIBS will happen in the above-listed f
 
 
 ---
-<span style="color:red">some *blue* text</span>.
-The following information and documentation, such as the 'Getting Started' section refer to the DIBS implementation still available within THIS repository. However, as the development moved to the above-listed repositories it is advised to check there for the current version of the DIBS.
+# The following information and documentation, such as the 'Getting Started' section refer to the DIBS implementation still available within THIS repository. However, as the development moved to the above-listed repositories it is advised to check there for the current version of the DIBS.
 ---
 ## Getting Started
 You can install DIBS via downloading the zip file or either clone this repository. 
