@@ -60,3 +60,15 @@ beschränkten Auftrag. Die spätere Freigabe steht im nächsten Abschnitt.
   Secret-Präfixe ohne Treffer. Code-/Testhashes entsprechen den sieben erfolgreich
   ausgeführten Regressionstests. Arbeitsordner nach Code-Push sauber.
 - Dieser Publikationsnachtrag ändert weder Code noch Tests oder README.
+
+## Nutzerfreigabe zum Merge
+
+- Nutzer beauftragt anschließend den Merge des Reparaturbranches in den
+  Hauptbranch. Das GitHub-Repository verwendet `master` als Standardbranch;
+  es wird kein zusätzlicher `main` angelegt oder ein Branch umbenannt.
+- PR #13 geprüft: offen, Draft, konfliktfrei und mergefähig; keine gemeldeten
+  CI-Checks. Quell-/Testhashes stimmen weiterhin mit sieben bestandenen Tests überein.
+- README zwischen Basis und Reparaturbranch unverändert. Merge mit Mergecommit
+  und fachlicher Beschreibung vorgesehen, ohne Löschen des Reparaturbranches.
+- Nutzerfreigabe zum Merge ist keine Behauptung einer unabhängigen fachlichen
+  Codeprüfung. Ergebnis/Commit des Merges erst nach Ausführung berichten.
