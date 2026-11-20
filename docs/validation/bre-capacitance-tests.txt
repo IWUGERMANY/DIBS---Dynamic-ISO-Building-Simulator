@@ -1,0 +1,16 @@
+test_all_documented_codes_roundtrip_as_physical_integers (test_bre_capacitance.BRECapacitanceTests.test_all_documented_codes_roundtrip_as_physical_integers) ... [GITHUB_WORKSPACE]\DIBS---Dynamic-ISO-Building-Simulator\data_preprocessing\breitenerhebung\dataPreprocessingBE.py:1092: FutureWarning: Downcasting behavior in `replace` is deprecated and will be removed in a future version. To retain the old behavior, explicitly call `result.infer_objects(copy=False)`. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  building_data.replace(cleanup_thermal_capacitance_assignment, inplace = True)
+ok
+test_explicit_numeric_output_with_future_pandas_replace_behavior (test_bre_capacitance.BRECapacitanceTests.test_explicit_numeric_output_with_future_pandas_replace_behavior) ... ok
+test_missing_first_mapping_call_is_caught_before_export (test_bre_capacitance.BRECapacitanceTests.test_missing_first_mapping_call_is_caught_before_export) ... ok
+test_numeric_codes_from_excel_or_r_are_translated (test_bre_capacitance.BRECapacitanceTests.test_numeric_codes_from_excel_or_r_are_translated) ... [GITHUB_WORKSPACE]\DIBS---Dynamic-ISO-Building-Simulator\data_preprocessing\breitenerhebung\dataPreprocessingBE.py:1092: FutureWarning: Downcasting behavior in `replace` is deprecated and will be removed in a future version. To retain the old behavior, explicitly call `result.infer_objects(copy=False)`. To opt-in to the future behavior, set `pd.set_option('future.no_silent_downcasting', True)`
+  building_data.replace(cleanup_thermal_capacitance_assignment, inplace = True)
+ok
+test_processed_capacities_are_not_accepted_as_raw_construction_codes (test_bre_capacitance.BRECapacitanceTests.test_processed_capacities_are_not_accepted_as_raw_construction_codes) ... ok
+test_restored_preprocessor_is_python_and_warning_import_is_public (test_bre_capacitance.BRECapacitanceTests.test_restored_preprocessor_is_python_and_warning_import_is_public) ... ok
+test_unknown_or_missing_codes_block_export (test_bre_capacitance.BRECapacitanceTests.test_unknown_or_missing_codes_block_export) ... ok
+
+----------------------------------------------------------------------
+Ran 7 tests in 0.098s
+
+OK

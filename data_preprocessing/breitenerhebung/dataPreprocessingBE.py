@@ -19,7 +19,7 @@ __license__ = "MIT"
 import numpy as np
 import pandas as pd
 import warnings
-from pandas.core.common import SettingWithCopyWarning
+from pandas.errors import SettingWithCopyWarning
 
 # To install this package with conda run one of the following:
 # conda install -c conda-forge pyreadr 
@@ -1059,6 +1059,8 @@ cleanup_thermal_capacitance_encode = {"thermal_capacitance": {
                                                               '3.3': 'mittel',
                                                               '3.4': 'mittel'}}
 
+# Apply the detailed code-to-class mapping before class-to-capacity conversion.
+building_data.replace(cleanup_thermal_capacitance_encode, inplace = True)
 
 # =============================================================================
 # # detailed version, for consideration of primary (qB1) and secondary (qB2 - qB3) construction type. Not utilised, as DIBS so far only considers 'leicht', 'mittel' and 'schwer' if better data on thermal capacities was available, this could be enabled again!
@@ -1088,6 +1090,15 @@ cleanup_thermal_capacitance_assignment = {"thermal_capacitance": {
                                                               'mittel': 165000,
                                                               'leicht': 110000}}
 building_data.replace(cleanup_thermal_capacitance_assignment, inplace = True)
+
+# Reject unmapped codes (including missing values) before exporting a numeric
+# field that the simulator interprets directly as J/(m2 K).
+valid_thermal_capacitances = (110000, 165000, 260000)
+invalid_thermal_capacitance = ~building_data['thermal_capacitance'].isin(valid_thermal_capacitances)
+if invalid_thermal_capacitance.any():
+    invalid_values = sorted(building_data.loc[invalid_thermal_capacitance, 'thermal_capacitance'].astype(str).unique())
+    raise ValueError('Unmapped thermal_capacitance values; expected BRE construction codes: ' + ', '.join(invalid_values))
+building_data['thermal_capacitance'] = building_data['thermal_capacitance'].astype('int64')
 
 # Sollwert Heizung (t_set_heating)
 ##############################################################################
@@ -1401,4 +1412,4 @@ building_data.drop(['typ_18599', 'Fen_ant', 'geb_f_flaeche_n_iwu', 'geb_f_flaech
 
 # Save data to \iso_simulator\annualSimulation\SimulationData_Breitenerhebung.csv
 # Formerly: Save data to \iso_simulator\examples\SimulationData_Breitenerhebung.csv
-building_data.to_csv(r'..\..\iso_simulator\annualSimulation\SimulationData_Breitenerhebung.csv', index = False, sep = ';') 
+building_data.to_csv(r'..\..\iso_simulator\annualSimulation\SimulationData_Breitenerhebung.csv', index = False, sep = ';')

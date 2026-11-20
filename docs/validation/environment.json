@@ -1,0 +1,11 @@
+{
+  "recorded_utc": "2026-11-20T11:35:32.677073+00:00",
+  "python": "3.11.18",
+  "pandas": "2.2.1",
+  "numpy": "1.26.4",
+  "preprocessor_sha256": "db0d11bbf64844ad419cb6de6da371d59f655432530a3d8a14c738a23ac4460e",
+  "tests_sha256": "8cccf3946f59beb7546cdbadc97b8410ce855e0ac7285afc9e5038184710b839",
+  "tests_passed": 7,
+  "seconds": 0.098,
+  "full_preprocessing_executed": false
+}
