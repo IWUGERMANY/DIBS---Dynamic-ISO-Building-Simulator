@@ -46,3 +46,17 @@ beschränkten Auftrag. Die spätere Freigabe steht im nächsten Abschnitt.
   Auftrag. Die ursprüngliche README wird auch im Branchvergleich ausgeschlossen.
 - Finaler Commit/Push und PR-Link erst nach erfolgreicher Ausführung berichten.
   Commitzuordnung über Verlauf dieser Sessiondatei und AI-Usage-Session-Footer.
+
+## Tatsächlich veröffentlicht
+
+- Codecommit `97a3486930d12e5a5a5a0676e0b258f6d972526d` erstellt und auf
+  `origin/fix/bre-capacitance-translation` gepusht.
+- Draft-PR https://github.com/IWUGERMANY/DIBS---Dynamic-ISO-Building-Simulator/pull/13
+  gegen master erstellt. Fehler, Beispiel, Änderung, Prüfung, Grenzen und
+  Rücknahme stehen in der PR-Beschreibung. Kein Merge ausgeführt.
+- README gegenüber origin/master unverändert; zusätzlich Remote-PR-Dateiliste
+  geprüft: README und separate Reparaturübersicht sind nicht Bestandteil des PR.
+- Sechs vorgemerkte Dateien, Whitespace-Prüfung bestanden, ausgewählte bekannte
+  Secret-Präfixe ohne Treffer. Code-/Testhashes entsprechen den sieben erfolgreich
+  ausgeführten Regressionstests. Arbeitsordner nach Code-Push sauber.
+- Dieser Publikationsnachtrag ändert weder Code noch Tests oder README.
